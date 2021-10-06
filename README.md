@@ -15,6 +15,7 @@ I ended up modifying lots of components on this machine:
 - Handles 2x on top and 2x at bottom sides (This beast is 30Kg...)
 - LDO 1.8° on Z axis (4) & LDO 0.9° on X/Y axis (2)
 - LGX extruder
+- Custom Galileo Z blocks and skirts from oc_geek
 - Klicky probe (instead of the inductive Z sensor) for bed leveling and final Z0 setting
 - AB-BN-30 tool body with 5015 part cooling fan CFD optimized
 - MGN12H single rail on X axis
@@ -51,7 +52,11 @@ Under the bed is a Nevermore duo v5 recirculating active carbon filter. This fil
 
 #### Adaptive bed mesh
 
-This part is a work in progress and not finalized: the goal is to mesh only if it's needed (no mesh if there is a single part in the center of the bed). If a mesh is needed, I also want it to be focalized only where the parts are located.
+Only do a bed mesh if it's needed (ie. no mesh if there is only a small single part in the center of the bed, and/or only mesh around the parts with a small margin).
+To be able to use it, you need to add in SuperSlicer custom g_code :
+```
+PRINT_START [...common args...] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
+```
 
 #### Pre-print phase
 
@@ -60,4 +65,4 @@ The macro ```PRINT_START``` is dedicated to prepare the machine to print:
 2. Then, there is a chamber heating phase using the nevermore fans at full power. This phase is customizable: it follow the chamber temperature setting from the slicer and there is also a timeout if the temperature is not reached in time. This phase ensure the chamber of the machine is at a good temperature for critical material like ABS that is very prone to warping and layer adhesion problems.
 3. When the bed and chamber are at temperature, the machine goes for a quad gantry leveling, a purge of the hotend/nozzle, cleaning of the nozzle tip and auto Z calibration.
 4. Then the macro apply custom material parameters like PA, nevermore filtering, retraction settings, etc...
-5. At the end a full bed mesh is recorded (this will change soon with the addaptive bed mesh) before starting the print
+5. At the end, an adaptive bed mesh is recorded before starting the print
