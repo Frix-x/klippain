@@ -1,0 +1,2 @@
+adxl_results/**/*.tar.gz filter=lfs diff=lfs merge=lfs -text
+adxl_results/**/*.csv filter=lfs diff=lfs merge=lfs -text
