@@ -3,9 +3,10 @@
 ###### GRAPH PLOTTING SCRIPT ######
 ###################################
 # Written by Frix_x#0161 #
-# @version: 1.0
+# @version: 1.1
 
 # CHANGELOG:
+#   v1.1: multiple fixes and tweaks (mainly to avoid having empty files read by the python scripts after the mv command)
 #   v1.0: first version of the script
 
 # Installation:
@@ -25,7 +26,7 @@
 RESULTS_FOLDER=~/klipper_config/adxl_results # Path to the folder where storing the results files
 SCRIPTS_FOLDER=~/klipper_config/scripts # Path to the folder where the graph_vibrations.py is located
 KLIPPER_FOLDER=~/klipper # Path of the klipper main folder
-STORE_RESULTS=2 # Number of results to keep (older files are automatically cleaned). 0 to keep them indefinitely
+STORE_RESULTS=3 # Number of results to keep (older files are automatically cleaned). 0 to keep them indefinitely
 #################################################################################################################
 
 
@@ -34,42 +35,45 @@ STORE_RESULTS=2 # Number of results to keep (older files are automatically clean
 #####################################################################
 
 function plot_shaper_graph {
-  local generator   
+  local generator filename newfilename date axis
   generator="${KLIPPER_FOLDER}/scripts/calibrate_shaper.py"
   
-  find /tmp -type f -name "resonances_*.csv" | while read filename; do
+  while read filename; do
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\///")"
     date="$(basename "${newfilename}" | cut -d '.' -f1 | awk -F'_' '{print $3"_"$4}')"
     axis="$(basename "${newfilename}" | cut -d '_' -f2)"
     mv "${filename}" "${isf}"/inputshaper/"${newfilename}"
     
+    sync && sleep 2
     "${generator}" "${isf}"/inputshaper/"${newfilename}" -o "${isf}"/inputshaper/resonances_"${axis}"_"${date}".png
-  done 
+  done <<< "$(find /tmp -type f -name "resonances_*.csv" 2>&1 | grep -v "Permission")"
 }
 
 function plot_belts_graph {
-  local date_ext generator
+  local date_ext generator filename belt
   date_ext="$(date +%Y%m%d_%H%M%S)"
   generator="${KLIPPER_FOLDER}/scripts/graph_accelerometer.py"
   
-  find /tmp -type f -name "raw_data_axis*.csv" | while read filename; do
+  while read filename; do
     belt="$(basename "${filename}" | cut -d '_' -f4 | cut -d '.' -f1 | sed -e 's/\(.*\)/\U\1/')"
     mv "${filename}" "${isf}"/belts/belt_"${date_ext}"_"${belt}".csv
-  done 
+  done <<< "$(find /tmp -type f -name "raw_data_axis*.csv" 2>&1 | grep -v "Permission")"
   
+  sync && sleep 2
   "${generator}" -c "${isf}"/belts/belt_"${date_ext}"_*.csv -o "${isf}"/belts/belts_"${date_ext}".png
 }
 
 function plot_vibr_graph {
-  local date_ext generator
+  local date_ext generator filename newfilename
   date_ext="$(date +%Y%m%d_%H%M%S)"
   generator="${SCRIPTS_FOLDER}/graph_vibrations.py"
   
-  find /tmp -type f -name "adxl345-*.csv" | while read filename; do
+  while read filename; do
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\/adxl345/vibr_${date_ext}/")"
     mv "${filename}" "${isf}"/vibrations/"${newfilename}"
-  done 
+  done <<< "$(find /tmp -type f -name "adxl345-*.csv" 2>&1 | grep -v "Permission")"
   
+  sync && sleep 2
   "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png
   
   tar cfz "${isf}"/vibrations/vibrations_"${date_ext}".tar.gz "${isf}"/vibrations/vibr_"${date_ext}"*.csv
@@ -87,7 +91,7 @@ function clean_files {
       csv="$(basename "${filename}" | cut -d '.' -f1)"
       old+=("${isf}"/inputshaper/"${csv}".csv)
     fi
-  done <<< "$(find "${isf}"/inputshaper/ -type f -name *.png -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep2}")"
+  done <<< "$(find "${isf}"/inputshaper/ -type f -name '*.png' -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep2}")"
   
   while read filename; do
     if [ ! -z "${filename}" ]; then
@@ -96,7 +100,7 @@ function clean_files {
       old+=("${isf}"/belts/belt_"${date}"_A.csv)
       old+=("${isf}"/belts/belt_"${date}"_B.csv)
     fi
-  done <<< "$(find "${isf}"/belts/ -type f -name *.png -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep1}")"
+  done <<< "$(find "${isf}"/belts/ -type f -name '*.png' -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep1}")"
 
   while read filename; do
     if [ ! -z "${filename}" ]; then
@@ -104,7 +108,7 @@ function clean_files {
       csv="$(basename "${filename}" | cut -d '.' -f1)"
       old+=("${isf}"/vibrations/"${csv}".tar.gz)
     fi
-  done <<< "$(find "${isf}"/vibrations/ -type f -name *.png -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep1}")"
+  done <<< "$(find "${isf}"/vibrations/ -type f -name '*.png' -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep1}")"
 
   if [ "${#old[@]}" -ne 0 -a "${STORE_RESULTS}" -ne 0 ]; then
     for rmv in "${old[@]}"; do
