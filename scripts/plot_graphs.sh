@@ -7,10 +7,11 @@
 
 # CHANGELOG:
 #   v1.1: multiple fixes and tweaks (mainly to avoid having empty files read by the python scripts after the mv command)
-#   v1.0: first version of the script
+#   v1.0: first version of the script based on a Zellneralex script
 
 # Installation:
 #   1. Copy this file somewhere in your config folder and edit the parameters below if needed
+#   2bis. Make it executable using SSH: type 'chmod +x ./plot_graph.sh' when in the folder.
 #   2. Be sure to have the gcode_shell_command.py Klipper extension installed (easiest way to install it is to use KIAUH in the Advanced section)
 #   3. Create a gcode_shell_command to be able to start it from a macro (see my shell_commands.cfg file)
 
