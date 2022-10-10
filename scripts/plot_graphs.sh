@@ -75,7 +75,7 @@ function plot_vibr_graph {
   done <<< "$(find /tmp -type f -name "adxl345-*.csv" 2>&1 | grep -v "Permission")"
   
   sync && sleep 2
-  "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png
+  "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png -a "$1"
   
   tar cfz "${isf}"/vibrations/vibrations_"${date_ext}".tar.gz "${isf}"/vibrations/vibr_"${date_ext}"*.csv
   rm "${isf}"/vibrations/vibr_"${date_ext}"*.csv
@@ -134,7 +134,7 @@ fi
 
 isf="${RESULTS_FOLDER//\~/${HOME}}"
 
-case ${@} in
+case ${1} in
   SHAPER|shaper)
     plot_shaper_graph
   ;;
@@ -142,14 +142,14 @@ case ${@} in
     plot_belts_graph
   ;;
   VIBRATIONS|vibrations)
-    plot_vibr_graph
+    plot_vibr_graph ${2}
   ;;
   *)
   echo -e "\nUsage:"
-  echo -e "\t${0} SHAPER|BELTS|VIBRATIONS"
+  echo -e "\t${0} SHAPER, BELTS or VIBRATIONS"
   echo -e "\t\tSHAPER\tGenerate input shaper diagram"
-  echo -e "\t\tBELT\tGenerate belt tension diagram\n"
-  echo -e "\t\tVIBRATIONS\tGenerate vibration response diagram\n"
+  echo -e "\t\tBELT\tGenerate belt tension diagram"
+  echo -e "\t\tVIBRATIONS axis-name\tGenerate vibration response diagram\n"
   exit 1
 esac
 
