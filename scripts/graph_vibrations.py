@@ -4,9 +4,10 @@
 ###### SPEED AND VIBRATIONS PLOTTING SCRIPT ######
 ##################################################
 # Written by Frix_x#0161 #
-# @version: 1.0
+# @version: 1.1
 
 # CHANGELOG:
+#   v1.1: better graph formatting
 #   v1.0: first version of the script
 
 

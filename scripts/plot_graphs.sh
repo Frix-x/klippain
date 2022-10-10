@@ -3,9 +3,10 @@
 ###### GRAPH PLOTTING SCRIPT ######
 ###################################
 # Written by Frix_x#0161 #
-# @version: 1.1
+# @version: 1.2
 
 # CHANGELOG:
+#   v1.2: added the movement name to be transfered to the Python script in vibration calibration (to print it on the result graphs)
 #   v1.1: multiple fixes and tweaks (mainly to avoid having empty files read by the python scripts after the mv command)
 #   v1.0: first version of the script based on a Zellneralex script
 
