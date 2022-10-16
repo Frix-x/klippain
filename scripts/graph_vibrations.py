@@ -4,9 +4,10 @@
 ###### SPEED AND VIBRATIONS PLOTTING SCRIPT ######
 ##################################################
 # Written by Frix_x#0161 #
-# @version: 1.0
+# @version: 1.1
 
 # CHANGELOG:
+#   v1.1: better graph formatting
 #   v1.0: first version of the script
 
 
@@ -17,13 +18,11 @@
 #####################################################################
 
 import optparse, matplotlib, re, sys, importlib, os, operator
-from textwrap import wrap
 from collections import OrderedDict
 import numpy as np
 import matplotlib.pyplot, matplotlib.dates, matplotlib.font_manager
 import matplotlib.ticker
 
-matplotlib.rcParams.update({'figure.autolayout': True})
 matplotlib.use('Agg')
 
 
@@ -117,21 +116,21 @@ def calc_powertot(psd_list, freqs):
 ######################################################################
 
 def plot_total_power(ax, speeds, power_total):
-    ax.set_title('Machine total vibrations')
+    ax.set_title('Vibrations decomposition')
     ax.set_xlabel('Speed (mm/s)')
-    ax.set_ylabel('Total vibrations')
+    ax.set_ylabel('Energy')
 
-    ax.plot(speeds, power_total[0], label="\n".join(wrap('X+Y+Z', 60)), alpha=0.6)
-    ax.plot(speeds, power_total[1], label="\n".join(wrap('X', 60)), alpha=0.6)
-    ax.plot(speeds, power_total[2], label="\n".join(wrap('Y', 60)), alpha=0.6)
-    ax.plot(speeds, power_total[3], label="\n".join(wrap('Z', 60)), alpha=0.6)
+    ax.plot(speeds, power_total[0], label="X+Y+Z", alpha=0.6)
+    ax.plot(speeds, power_total[1], label="X", alpha=0.6)
+    ax.plot(speeds, power_total[2], label="Y", alpha=0.6)
+    ax.plot(speeds, power_total[3], label="Z", alpha=0.6)
 
     ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
     ax.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
     ax.grid(which='major', color='grey')
     ax.grid(which='minor', color='lightgrey')
     fontP = matplotlib.font_manager.FontProperties()
-    fontP.set_size('x-small')
+    fontP.set_size('medium')
     ax.legend(loc='best', prop=fontP)
 
     return
@@ -144,7 +143,7 @@ def plot_spectrogram(ax, speeds, freqs, power_spectral_densities, max_freq):
         for j in range(len(freqs)):
             spectrum[j, i] = power_spectral_densities[i][0][j]
 
-    ax.set_title("\n".join(wrap("Vibrations spectrogram (X+Y+Z)")))
+    ax.set_title("Summed vibrations spectrogram")
     ax.pcolormesh(speeds, freqs, spectrum, norm=matplotlib.colors.LogNorm(),
             cmap='inferno', shading='gouraud')
     ax.set_ylim([0., max_freq])
@@ -207,6 +206,8 @@ def main():
     opts = optparse.OptionParser(usage)
     opts.add_option("-o", "--output", type="string", dest="output",
                     default=None, help="filename of output graph")
+    opts.add_option("-a", "--axis", type="string", dest="axisname",
+                    default=None, help="axis name to be shown on the side of the graph")
     opts.add_option("-f", "--max_freq", type="float", default=1000.,
                     help="maximum frequency to graph")
     opts.add_option("-r", "--remove", type="int", default=0,
@@ -235,15 +236,18 @@ def main():
     freqs, power_spectral_densities = calc_psd(datas, group_by, options.max_freq)
     power_total = calc_powertot(power_spectral_densities, freqs)
 
-    fig, axs = matplotlib.pyplot.subplots(2, sharex=True)
+    fig, axs = matplotlib.pyplot.subplots(2, 1, sharex=True)
+    fig.suptitle("Machine vibrations - " + options.axisname + " moves", fontsize=16)
 
     # Remove speeds duplicates and graph the processed datas
     speeds = list(OrderedDict((x, True) for x in speeds).keys())
     plot_total_power(axs[0], speeds, power_total)
     plot_spectrogram(axs[1], speeds, freqs, power_spectral_densities, options.max_freq)
 
-    fig.set_size_inches(16, 16)
+    fig.set_size_inches(10, 10)
     fig.tight_layout()
+    fig.subplots_adjust(top=0.92)
+
     fig.savefig(options.output)
 
 if __name__ == '__main__':

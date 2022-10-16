@@ -3,17 +3,23 @@
 ###### GRAPH PLOTTING SCRIPT ######
 ###################################
 # Written by Frix_x#0161 #
-# @version: 1.1
+# @version: 1.3
 
 # CHANGELOG:
+#   v1.3: some documentation improvement regarding the line endings that needs to be LF for this file
+#   v1.2: added the movement name to be transfered to the Python script in vibration calibration (to print it on the result graphs)
 #   v1.1: multiple fixes and tweaks (mainly to avoid having empty files read by the python scripts after the mv command)
 #   v1.0: first version of the script based on a Zellneralex script
 
 # Installation:
 #   1. Copy this file somewhere in your config folder and edit the parameters below if needed
-#   2bis. Make it executable using SSH: type 'chmod +x ./plot_graphs.sh' when in the folder.
-#   2. Be sure to have the gcode_shell_command.py Klipper extension installed (easiest way to install it is to use KIAUH in the Advanced section)
-#   3. Create a gcode_shell_command to be able to start it from a macro (see my shell_commands.cfg file)
+#      Note: If using Windows to do the copy/paste, be careful with the line endings for this file: LF (or \n) is mandatory !!! No \r should be
+#            present in the file as it could lead to some errors like "\r : unknown command" when running the script. If you're not confident
+#            regarding your text editor behavior, the best way is to directly download the file on the pi by using for example wget:
+#            type 'wget -P /home/pi/klipper_config/scripts https://raw.githubusercontent.com/Frix-x/klipper-voron-V2/main/scripts/plot_graphs.sh'
+#   2. Make it executable using SSH: type 'chmod +x /home/pi/klipper_config/scripts/plot_graphs.sh' (adjust the path if needed).
+#   3. Be sure to have the gcode_shell_command.py Klipper extension installed (easiest way to install it is to use KIAUH in the Advanced section)
+#   4. Create a gcode_shell_command to be able to start it from a macro (see my shell_commands.cfg file)
 
 # Usage:
 #   This script was designed to be used with gcode_shell_commands. Use it to call it.
@@ -75,7 +81,7 @@ function plot_vibr_graph {
   done <<< "$(find /tmp -type f -name "adxl345-*.csv" 2>&1 | grep -v "Permission")"
   
   sync && sleep 2
-  "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png
+  "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png -a "$1"
   
   tar cfz "${isf}"/vibrations/vibrations_"${date_ext}".tar.gz "${isf}"/vibrations/vibr_"${date_ext}"*.csv
   rm "${isf}"/vibrations/vibr_"${date_ext}"*.csv
@@ -134,7 +140,7 @@ fi
 
 isf="${RESULTS_FOLDER//\~/${HOME}}"
 
-case ${@} in
+case ${1} in
   SHAPER|shaper)
     plot_shaper_graph
   ;;
@@ -142,14 +148,14 @@ case ${@} in
     plot_belts_graph
   ;;
   VIBRATIONS|vibrations)
-    plot_vibr_graph
+    plot_vibr_graph ${2}
   ;;
   *)
   echo -e "\nUsage:"
-  echo -e "\t${0} SHAPER|BELTS|VIBRATIONS"
+  echo -e "\t${0} SHAPER, BELTS or VIBRATIONS"
   echo -e "\t\tSHAPER\tGenerate input shaper diagram"
-  echo -e "\t\tBELT\tGenerate belt tension diagram\n"
-  echo -e "\t\tVIBRATIONS\tGenerate vibration response diagram\n"
+  echo -e "\t\tBELT\tGenerate belt tension diagram"
+  echo -e "\t\tVIBRATIONS axis-name\tGenerate vibration response diagram\n"
   exit 1
 esac
 
