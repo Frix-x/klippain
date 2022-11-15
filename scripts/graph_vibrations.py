@@ -11,7 +11,7 @@
 #   v1.0: first version of the script
 
 
-# Be sure to make this script executable using SSH: type 'chmod +x ./graph_vibrations.sh' when in the folder !
+# Be sure to make this script executable using SSH: type 'chmod +x ./graph_vibrations.py' when in the folder !
 
 #####################################################################
 ################ !!! DO NOT EDIT BELOW THIS LINE !!! ################
