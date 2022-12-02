@@ -24,14 +24,14 @@ If you installed and use the full config folder of this github repository, this 
 If you want to install it to your own custom config, here is the way to go:
   1. Copy the [adaptive_bed_mesh.cfg](./../../macros/addons/adaptive_bed_mesh.cfg) macro file directly into your own config and include it.
   2. The macro needs the bounding box of the first layer to be able to compute a mesh on this surface. There is now two way to get it. Choose the one you prefer for your setup:
-    
-      - **The first way is the most easy** as you have nothing to do beside activating the `[exclude_object]` mechanisms of Moonraker and Klipper. To proceed, you can follow the excellent [Exclude Objects guide from the Mainsail team](https://docs.mainsail.xyz/features/exclude_objects). Then you can go to step 3.
+
+      - **Method 1. It's the most easy way** as you have nothing to do beside activating the `[exclude_object]` mechanisms of Moonraker and Klipper. To proceed, you can follow the excellent [Exclude Objects guide from the Mainsail team](https://docs.mainsail.xyz/features/exclude_objects). Then you can go to step 3.
       
         This method of extracting data was derived from [Kyleisah KAMP repository](https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging). Many thanks to him for the idea!
       
         Please note that only G-Code files that have been prepared accordingly will be able to use the adaptive mesh feature. For old and unprocessed files, a normal bed mesh will be automatically applied instead.
       
-      - **If you want to do it the manual way**, you will need to change some settings in your slicer:
+      - **Method 2. If you want to do it the manual way**, you will need to change some settings in your slicer:
 
         - **SuperSlicer** is easy. Just change your custom g_code PRINT_START macro to add the SIZE argument like this (everything should be on one line !):
 
@@ -50,6 +50,8 @@ If you want to install it to your own custom config, here is the way to go:
           ```
           PRINT_START [all your own things...] SIZE=%MINX%_%MINY%_%MAXX%_%MAXY%
           ```
+
+> Please note that using the `[exclude_object]` tags (method 1) is a little bit less precise than using the original "SIZE" parameter (method 2) as the `[exclude_object]` tags are using the full parts sizes (not only the first layer). So if you do a part with large overhangs, it will do a large mesh using the tags but will only mesh the base of the part with the SIZE parameter. Also, if you add a skirt around the parts, there is no tags associated to this and the mesh can be a little bit smaller and lead to bad adhesion of the skirt in case of a very bad "taco" bed (like on an Ender3 or CR10 style printers). So my advice is: use the [exclude_object] tags method for a new installation as it's much more easier to install. But if you are updating from an older version of the macro, continue to use the SIZE parameter as the hard part is already done and will still work.
 
   3. In klipper, if it's not already the case, add and configure a `[bed_mesh]` for your machine. This will be the base on which my macro compute the new adaptive bed mesh. Keep in mind that you can (and should) push the precision a little bit further: do not hesistate to go with a mesh of 9x9 (or even more) as with my adaptive bed mesh, not all the points will be probed for smaller parts.
 
