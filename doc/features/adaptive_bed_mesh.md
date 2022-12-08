@@ -22,7 +22,7 @@ Here is how the magic happen:
 If you installed and use the full config folder of this github repository, this is already enabled by default and should work out of the box.
 
 If you want to install it to your own custom config, here is the way to go:
-  1. Copy the [adaptive_bed_mesh.cfg](./../../macros/addons/adaptive_bed_mesh.cfg) macro file directly into your own config and include it.
+  1. Copy the [adaptive_bed_mesh.cfg](./../../macros/calibration/adaptive_bed_mesh.cfg) macro file directly into your own config and include it.
   2. The macro needs the bounding box of the first layer to be able to compute a mesh on this surface. There is now two way to get it. Choose the one you prefer for your setup:
 
       - **Method 1. It's the most easy way** as you have nothing to do beside activating the `[exclude_object]` mechanisms of Moonraker and Klipper. To proceed, you can follow the excellent [Exclude Objects guide from the Mainsail team](https://docs.mainsail.xyz/features/exclude_objects). Then you can go to step 3.

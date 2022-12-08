@@ -17,7 +17,7 @@ The printed model can then be inspected by looking at the top and bottom lines i
 If you installed and use the full config folder of this github repository, this is already enabled by default and should work out of the box.
 
 If you want to install it to your own custom config, here is the way to go:
-  1. Copy the [calibrate_pa.cfg](./../../macros/addons/calibration/calibrate_pa.cfg) macro file directly into your own config.
+  1. Copy the [calibrate_pa.cfg](./../../macros/calibration/calibrate_pa.cfg) macro file directly into your own config.
   2. Be sure to uncomment (if not already the case), the two lines related to pressure advance under the `[extruder]` section of your config. Using 0.040 is a safe default value for direct drive extruders but it doesn't matter that much as it will be changed later and we just want to activate it:
     
      ```

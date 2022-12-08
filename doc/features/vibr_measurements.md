@@ -21,7 +21,7 @@ Results can be found in the [ADXL results folder](./../../adxl_results/) that is
 
 ## Installation
 
-  1. Copy the [vibr_calibrate_02.cfg](./../../macros/addons/calibration/vibr_calibrate_02.cfg) macro file directly into your own config.
+  1. Copy the [vibr_calibrate_02.cfg](./../../macros/calibration/vibr_calibrate_02.cfg) macro file directly into your own config.
   2. Be sure to have the `gcode_shell_command.py` Klipper extension installed. Easiest way to install it is to use the advanced section of KIAUH.
   3. Add my [scripts](./../../scripts/) folder at the root of your own config (ie. in your `~/printer_data/config/` directory).
      
