@@ -16,7 +16,7 @@ This macro is parametric and most of the values can be adjusted with their respe
 If you installed and use the full config folder of this github repository, this is already enabled by default and should work out of the box.
 
 If you want to install it to your own custom config, here is the way to go:
-  1. Copy the [calibrate_flow.cfg](./../../macros/addons/calibration/calibrate_flow.cfg) macro file directly into your own config.
+  1. Copy the [calibrate_flow.cfg](./../../macros/calibration/calibrate_flow.cfg) macro file directly into your own config.
   2. **IMPORTANT STEP**: Add and activate (if not already the case) a `[gcode_arcs]` section in your config as it's used for the round corners. Don't hesitate to change the resolution to something like 0.1 or 0.2 to get a better surface finish in the corner radius.
 
 
