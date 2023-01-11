@@ -3,9 +3,10 @@
 ###### GRAPH PLOTTING SCRIPT ######
 ###################################
 # Written by Frix_x#0161 #
-# @version: 1.4
+# @version: 1.5
 
 # CHANGELOG:
+#   v1.5: fixed klipper unnexpected fail at the end of the execution, even if graphs were correctly generated (unicode decode error fixed)
 #   v1.4: added the ~/klipper dir parameter to the call of graph_vibrations.py for a better user handling (in case user is not "pi")
 #   v1.3: some documentation improvement regarding the line endings that needs to be LF for this file
 #   v1.2: added the movement name to be transfered to the Python script in vibration calibration (to print it on the result graphs)
@@ -41,6 +42,8 @@ STORE_RESULTS=3 # Number of results to keep (older files are automatically clean
 #####################################################################
 ################ !!! DO NOT EDIT BELOW THIS LINE !!! ################
 #####################################################################
+
+export LC_ALL=C
 
 function plot_shaper_graph {
   local generator filename newfilename date axis
