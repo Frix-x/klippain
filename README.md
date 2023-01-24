@@ -15,7 +15,7 @@ I also tried, when possible, to put all the print settings directly in the Klipp
 
 This config is also known for the **adaptive bed mesh** functionnality that I wrote some time ago, the **custom calibrations macros** for pressure advance, flow, etc..., the **automated input shaper workflow**, and the **vibrations measurements** macros and scripts.
 
-To get more info, you can find a [list with the details and usage instruction for all the features](./doc/features.md) in the doc folder. There is also for each, some custom install instructions if you want to install them as standalone in your own config and don't want to use this full generic config folder.
+To get more info, you can find a [list with the details and usage instruction for all the features](./docs/features.md) in the docs folder. There is also for each, some custom install instructions if you want to install them as standalone in your own config and don't want to use this full generic config folder.
 
 
 ## Installation
@@ -31,7 +31,7 @@ The install of this config folder should not be too complicated if you are alrea
   
   3. Open and configure the `printer.cfg` file: you just need to uncomment the lines that suit your printer hardware configuration. Basically start by selecting the board_pins coresponding to your MCU, then select the components used and software config needed (such as extruder type, XY motors, Z motors, QGL vs Z_TILT, etc...).
   4. Then, open the selected `board_pins` file in the `config/mcus` folder and add your MCU(s) serial port(s). Please follow the [official klipper documentation](https://www.klipper3d.org/FAQ.html#wheres-my-serial-port) to find it.
-  5. Check your wiring and verify that the selected `board_pins` file is correct. See [pinout.md](./doc/pinout.md) for more info
+  5. Check your wiring and verify that the selected `board_pins` file is correct. See [pinout.md](./docs/pinout.md) for more info
   6. Now, open all the selected files in your `printer.cfg` and check that the pins are ok for your machine (regarding the board prefix name, the direction `!`, the pull-ups `^` or pull-downs `~`). Note: this step is necessary because of a current Klipper limitation that doesn't allow me to put these symbols directly in the board_pins files... I'm still looking for alternatives.
   7. Also, in the same way, open all the selected files in your `printer.cfg` and check the dimensions, the limits, the currents, and all the other values in every config sections. **Pay a special attention to the axis limits** in the `[stepper_...]` sections from the files located in [config/hardware/XY](./config/hardware/XY/) or [config/hardware/Z](./config/hardware/Z/). Also check the thermistor types in `[extruder]` and `[heated_bed]`, size of the plate in `[bed_mesh]`, etc... Note: this step is necessary because of a current Klipper limitation that doesn't allow the use of variables in the config files... I'm still looking for alternatives.
   8. Modify and adapt the `variables.cfg` file to suit the configuration of your machine. This file helps to configure and customize how all the macros should behave (coordinates of everythings, enabling/disabling software features, etc...).
