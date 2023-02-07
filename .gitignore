@@ -1,0 +1,5 @@
+# This gitignore is configured to not track user defined files at the root of the config
+# And thus allowing a full update of the repo while keeping user files untouched
+
+/*.cfg
+/moonraker.conf

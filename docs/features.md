@@ -1,11 +1,11 @@
-# Detailed features description
+# Features
 
 This config is designed to be generic. You can use it on a lot of machines by selecting and enabling the hardware options you need. This also activate automatically the associated macros and process under the hood.
 
 On the other hand, if you don't want to use this full config folder, most of the specific macros and software features can also be installed as standalone in your own config folder.
 
 
-## Software features
+## Software
 
 I tried, when possible, to put all the print settings directly in the Klipper config. My utlimate goal is be to be able to use the same Gcode file (sliced generically) with multiple materials or even share it across multiple printers. That's why I use and set firmware retraction, set pressure advance in the macros, etc...
 
@@ -19,7 +19,7 @@ Here you can find a list of all the custom features availables in the macros or 
   - More feature descriptions and info will be added later...
 
 
-## Hardware features
+## Hardware
 
 This config support out of the box a lot of different machine hardware configurations.
 More info will be added in this section later...
