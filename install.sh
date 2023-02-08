@@ -9,15 +9,16 @@
 #   v1.0: first version of the script to allow a peaceful install and update ;)
 
 
-set -eu
-
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
 USER_CONFIG_PATH="$(realpath -e ${HOME}/printer_data/config)"
 # Where to clone Frix-x repository config files (read-only and keep untouched)
 FRIX_CONFIG_PATH="${HOME}/frix-x_config"
-# Path used to store backups when updating (automatically dated)
-BACKUP_PATH="${HOME}/.klipper_config_backup_$(date +'%Y%m%d%H%M%S')"
+# Path used to store backups when updating (backups are automatically dated when saved inside)
+BACKUP_PATH="${HOME}/frix-x_config_backups"
 
+
+set -eu
+export LC_ALL=C
 
 # Step 1: Verify that the script is not run as root and Klipper is installed
 function preflight_checks {
@@ -42,49 +43,60 @@ function check_download {
 
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
         echo "Downloading Frix-x configuration folder..."
-        git -C $frixtemppath clone https://github.com/Frix-x/klipper-voron-V2.git $frixreponame
-        chmod +x ${FRIX_CONFIG_PATH}/install.sh
-        echo "Download complete!"
+        if git -C $frixtemppath clone https://github.com/Frix-x/klipper-voron-V2.git $frixreponame; then
+            chmod +x ${FRIX_CONFIG_PATH}/install.sh
+            echo "Download complete!"
+        else
+            echo "Download of Frix-x configuration git repository failed!"
+            exit -1
+        fi
     else
-        echo "Frix-x configuration folder found!"
+        echo "Frix-x git repository folder found locally!"
     fi
 }
 
 # Step 3: Backup the old Klipper configuration
 function backup_config {
-    echo "Backup your old configuration files... You will find them in: ${BACKUP_PATH}"
-    mv -f ${USER_CONFIG_PATH} ${BACKUP_PATH}
+    mkdir -p ${BACKUP_DIR}
+
+    if [ -f "${USER_CONFIG_PATH}/.VERSION" ]; then
+        echo "Frix-x configuration already in use: only a backup of the custom user cfg files is needed"
+        find ${USER_CONFIG_PATH} -type f -regex '.*\.\(cfg\|conf\|VERSION\)' | xargs mv -t ${BACKUP_DIR}/ 2>/dev/null
+    else
+        echo "New installation detected: a full backup of the user config folder is needed"
+        cp -fa ${USER_CONFIG_PATH} ${BACKUP_DIR}
+    fi
+
+    echo "Backup done in: ${BACKUP_DIR}"
 }
 
 # Step 4: Put the new configuration files in place to be ready to start
 function install_config {
-    echo "Installing the new Frix-x Klipper configuration..."
+    echo "Installation of the last Frix-x Klipper configuration files"
     mkdir -p ${USER_CONFIG_PATH}
 
-    # Symlink Frix-x config folders (read-only repository) to the user's config directory
+    # Symlink Frix-x config folders (read-only git repository) to the user's config directory
     for dir in config macros scripts moonraker; do
-        ln -fs ${FRIX_CONFIG_PATH}/$dir ${USER_CONFIG_PATH}/$dir
+        ln -fsn ${FRIX_CONFIG_PATH}/$dir ${USER_CONFIG_PATH}/$dir
     done
 
-    # Copy the ADXL results from the last backup to restore them to the user's config directory
-    if [ ! -d "${BACKUP_PATH}/adxl_results" ]; then
-        cp -fa ${BACKUP_PATH}/adxl_results ${USER_CONFIG_PATH}/
+    # Copy custom user's config files from the last backup to restore them to their config directory (or install templates if it's a first install)
+    if [ -f "${BACKUP_DIR}/.VERSION" ]; then
+        echo "Update done: restoring user config files now!"
+        find ${BACKUP_DIR} -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
+    else
+        echo "New installation detected: default config templates will be set in place!"
+        cp -fa ${FRIX_CONFIG_PATH}/user_templates/* ${USER_CONFIG_PATH}/
     fi
-
-    # Copy custom user's config files from the last backup to restore them to their config directory
-    for file in mcus.cfg overrides.cfg printer.cfg moonraker.conf variables.cfg save_variables.cfg; do
-        if [ -f "${BACKUP_PATH}/$file" ]; then
-            cp -fa ${BACKUP_PATH}/$file ${USER_CONFIG_PATH}/$file
-        else
-            cp -fa ${FRIX_CONFIG_PATH}/user_templates/$file ${USER_CONFIG_PATH}/$file
-        fi
-    done
 
     # CHMOD the scripts to be sure they are all executables (Git should keep the modes on files but it's to be sure)
     chmod +x ${FRIX_CONFIG_PATH}/install.sh
     for file in graph_vibrations.py plot_graphs.sh; do
         chmod +x ${FRIX_CONFIG_PATH}/scripts/$file
     done
+
+    # Create the config version tracking file in the user config directory
+    git -C ${FRIX_CONFIG_PATH} rev-parse HEAD > ${USER_CONFIG_PATH}/.VERSION
 }
 
 # Step 5: restarting Klipper
@@ -93,9 +105,14 @@ function restart_klipper {
     sudo systemctl restart klipper
 }
 
+
+BACKUP_DIR="${BACKUP_PATH}/config_$(date +'%Y%m%d%H%M%S')"
+
 # Run steps
 preflight_checks
 check_download
 backup_config
 install_config
 restart_klipper
+
+echo "Everything is ok, Frix-x config installed and up to date!"
