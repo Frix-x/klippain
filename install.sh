@@ -105,7 +105,7 @@ function check_download {
             fi
             ;;
         n)
-            exit -1
+            ;;
     esac
 }
 
