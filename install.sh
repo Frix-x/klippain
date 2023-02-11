@@ -94,26 +94,28 @@ function check_download {
         echo "Frix-x git repository folder found locally!"
     fi
 
-    echo
-    echo -e "Do you use an ERCF and do you want to use ERCF Software V3...${INPUT}"
-    echo
-    case $yn in
-        y)
-            if [ ! -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
-                echo "Downloading ERCF Software V3 configuration folder..."
-                if git -C $ercfrepopath clone https://github.com/moggieuk/ERCF-Software-V3.git $ercfreponame;
-                    echo "Download complete!"
+    if [ "${INSTALL_ERCF}" -eq 1 ]; then
+        echo
+        echo -e "Do you use an ERCF and do you want to use ERCF Software V3...${INPUT}"
+        echo
+        case $yn in
+            y)
+                if [ ! -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
+                    echo "Downloading ERCF Software V3 configuration folder..."
+                    if git -C $ercfrepopath clone https://github.com/moggieuk/ERCF-Software-V3.git $ercfreponame;
+                        echo "Download complete!"
+                    else
+                        echo "Download of ERCF Software V3 configuration git repository failed!"
+                        exit -1
+                    fi
                 else
-                    echo "Download of ERCF Software V3 configuration git repository failed!"
-                    exit -1
+                    echo "ERCF Software V3 git repository folder found locally!"
                 fi
-            else
-                echo "ERCF Software V3 git repository folder found locally!"
-            fi
-            ;;
-        n)
-            exit -1
-    esac
+                ;;
+            n)
+                ;;
+        esac
+    fi
 }
 
 # Step 3: Backup the old Klipper configuration
