@@ -40,6 +40,13 @@ prompt_yn() {
     done
 }
 
+INSTALL_OPTIONS=0
+while getopts "e" arg; do
+    case $arg in
+        e) INSTALL_ERCF=1;;
+    esac
+done
+
 # Step 1: Verify that the script is not run as root and Klipper is installed
 function preflight_checks {
     if [ "$EUID" -eq 0 ]; then
@@ -87,26 +94,28 @@ function check_download {
         echo "Frix-x git repository folder found locally!"
     fi
 
-    echo
-    echo -e "Do you use an ERCF and do you want to use ERCF Software V3...${INPUT}"
-    echo
-    case $yn in
-        y)
-            if [ ! -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
-                echo "Downloading ERCF Software V3 configuration folder..."
-                if git -C $ercfrepopath clone https://github.com/moggieuk/ERCF-Software-V3.git $ercfreponame;
-                    echo "Download complete!"
+    if [ "${INSTALL_ERCF}" -eq 1 ]; then
+        echo
+        echo -e "Do you use an ERCF and do you want to use ERCF Software V3...${INPUT}"
+        echo
+        case $yn in
+            y)
+                if [ ! -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
+                    echo "Downloading ERCF Software V3 configuration folder..."
+                    if git -C $ercfrepopath clone https://github.com/moggieuk/ERCF-Software-V3.git $ercfreponame;
+                        echo "Download complete!"
+                    else
+                        echo "Download of ERCF Software V3 configuration git repository failed!"
+                        exit -1
+                    fi
                 else
-                    echo "Download of ERCF Software V3 configuration git repository failed!"
-                    exit -1
+                    echo "ERCF Software V3 git repository folder found locally!"
                 fi
-            else
-                echo "ERCF Software V3 git repository folder found locally!"
-            fi
-            ;;
-        n)
-            exit -1
-    esac
+                ;;
+            n)
+                ;;
+        esac
+    fi
 }
 
 # Step 3: Backup the old Klipper configuration
@@ -155,14 +164,16 @@ function install_config {
 
 # Step 5: Put the ercf plugin files in place to be ready to use if ERCF Software V3
 function link_ercf_plugin() {
-    if [ -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
-        echo -e "Linking ercf extension to Klipper..."
-        if [ -d "${KLIPPER_HOME}/klippy/extras" ]; then
-            for file in `cd ${ERCF_SOFTWARE_V3 _PATH}/extras ; ls *.py`; do
-                ln -sf "${ERCF_SOFTWARE_V3 _PATH}/extras/${file}" "${KLIPPER_HOME}/klippy/extras/${file}"
-            done
-        else
-            echo -e "ERCF modules not installed because Klipper 'extras' directory not found!"
+    if [ "${INSTALL_ERCF}" -eq 1 ]; then
+        if [ -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
+            echo -e "Linking ercf extension to Klipper..."
+            if [ -d "${KLIPPER_HOME}/klippy/extras" ]; then
+                for file in `cd ${ERCF_SOFTWARE_V3 _PATH}/extras ; ls *.py`; do
+                    ln -sf "${ERCF_SOFTWARE_V3 _PATH}/extras/${file}" "${KLIPPER_HOME}/klippy/extras/${file}"
+                done
+            else
+                echo -e "ERCF modules not installed because Klipper 'extras' directory not found!"
+            fi
         fi
     fi
 }
