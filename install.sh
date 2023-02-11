@@ -16,7 +16,7 @@ USER_CONFIG_PATH="$(realpath -e ${HOME}/printer_data/config)"
 # Where to clone Frix-x repository config files (read-only and keep untouched)
 FRIX_CONFIG_PATH="${HOME}/frix-x_config"
 # Where to clone ERCF-Software-V3 repository config files (read-only and keep untouched)
-ERCF_SOFTWARE_V3 _PATH="${HOME}/ERCF-Software-V3"
+ERCF_SOFTWARE_V3_PATH="${HOME}/ERCF-Software-V3"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
 BACKUP_PATH="${HOME}/frix-x_config_backups"
 
@@ -24,7 +24,7 @@ BACKUP_PATH="${HOME}/frix-x_config_backups"
 set -eu
 export LC_ALL=C
 
-prompt_yn() {
+function prompt_yn() {
     while true; do
         read -p "$@ (y/n)?" yn
         case "${yn}" in
@@ -34,14 +34,14 @@ prompt_yn() {
             N|n|No|no)
         echo "n" 
                 break;;
-            *)
-        ;;
+            *) 
+                echo "Please answer yes or no.";;
         esac
     done
 }
 
-INSTALL_OPTIONS=0
-while getopts "e" arg; do
+INSTALL_ERCF=0
+while getopts e arg; do
     case $arg in
         e) INSTALL_ERCF=1;;
     esac
@@ -65,8 +65,8 @@ function preflight_checks {
         exit -1
     fi
     if [ ! -d "${KLIPPER_CONFIG_PATH}" ]; then
-        if [ ! -d "${PRINTER_DATA_CONFIG_PATH}" ]; then
-            echo -e "${ERROR}Klipper config directory (${KLIPPER_CONFIG_PATH} or ${USER_CONFIG_PATH}) not found."
+        if [ ! -d "${USER_CONFIG_PATH}" ]; then
+            echo -e "Klipper config directory (${KLIPPER_CONFIG_PATH} or ${USER_CONFIG_PATH}) not found."
             exit -1
         fi
         KLIPPER_CONFIG_PATH="${USER_CONFIG_PATH}"
@@ -78,8 +78,8 @@ function check_download {
     local frixtemppath frixreponame ercfrepopath ercfreponame
     frixtemppath="$(dirname ${FRIX_CONFIG_PATH})"
     frixreponame="$(basename ${FRIX_CONFIG_PATH})"
-    ercfrepopath="$(dirname ${ERCF_SOFTWARE_V3 _PATH})"
-    ercfreponame="$(basename ${ERCF_SOFTWARE_V3 _PATH})"
+    ercfrepopath="$(dirname ${ERCF_SOFTWARE_V3_PATH})"
+    ercfreponame="$(basename ${ERCF_SOFTWARE_V3_PATH})"
 
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
         echo "Downloading Frix-x configuration folder..."
@@ -96,13 +96,12 @@ function check_download {
 
     if [ "${INSTALL_ERCF}" -eq 1 ]; then
         echo
-        echo -e "Do you use an ERCF and do you want to use ERCF Software V3...${INPUT}"
-        echo
+        yn=$(prompt_yn "Do you have an ERCF and do you want to use ERCF Software V3?")
         case $yn in
             y)
-                if [ ! -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
+                if [ ! -d "${ERCF_SOFTWARE_V3_PATH}" ]; then
                     echo "Downloading ERCF Software V3 configuration folder..."
-                    if git -C $ercfrepopath clone https://github.com/moggieuk/ERCF-Software-V3.git $ercfreponame;
+                    if git -C $ercfrepopath clone https://github.com/moggieuk/ERCF-Software-V3.git $ercfreponame; then
                         echo "Download complete!"
                     else
                         echo "Download of ERCF Software V3 configuration git repository failed!"
@@ -111,9 +110,9 @@ function check_download {
                 else
                     echo "ERCF Software V3 git repository folder found locally!"
                 fi
-                ;;
+            ;;
             n)
-                ;;
+            ;;
         esac
     fi
 }
@@ -165,11 +164,11 @@ function install_config {
 # Step 5: Put the ercf plugin files in place to be ready to use if ERCF Software V3
 function link_ercf_plugin() {
     if [ "${INSTALL_ERCF}" -eq 1 ]; then
-        if [ -d "${ERCF_SOFTWARE_V3 _PATH}" ]; then
+        if [ -d "${ERCF_SOFTWARE_V3_PATH}" ]; then
             echo -e "Linking ercf extension to Klipper..."
-            if [ -d "${KLIPPER_HOME}/klippy/extras" ]; then
-                for file in `cd ${ERCF_SOFTWARE_V3 _PATH}/extras ; ls *.py`; do
-                    ln -sf "${ERCF_SOFTWARE_V3 _PATH}/extras/${file}" "${KLIPPER_HOME}/klippy/extras/${file}"
+            if [ -d "${KLIPPER_PATH}/klippy/extras" ]; then
+                for file in `cd ${ERCF_SOFTWARE_V3_PATH}/extras ; ls *.py`; do
+                    ln -sf "${ERCF_SOFTWARE_V3_PATH}/extras/${file}" "${KLIPPER_PATH}/klippy/extras/${file}"
                 done
             else
                 echo -e "ERCF modules not installed because Klipper 'extras' directory not found!"
