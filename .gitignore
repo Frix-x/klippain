@@ -4,7 +4,5 @@
 /*.cfg
 /moonraker.conf
 /KlipperScreen.conf
-/telegram.conf
-/sonar.conf
-/crowsnest.conf
+/*.conf
 /.VERSION
