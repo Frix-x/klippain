@@ -44,6 +44,7 @@ All the predefined board_pins files can be found in [config/mcus](../config/mcus
 
 #### Other I/Os
   - `RUNOUT_SENSOR`: filament motion sensor pin
+  - `TOOLHEAD_SENSOR`: filament motion sensor pin optional for ERCF
   - `SERVO_PIN`: servo pin for a mechanical and movable probe dock (such as the ones that are commonly found on the Voron V0 mods)
 
 
