@@ -85,8 +85,10 @@ function install_config {
         echo "Update done: restoring user config files now!"
         find ${BACKUP_DIR} -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
     else
-        echo "New installation detected: default config templates will be set in place!"
+        echo "New installation detected: config templates will be set in place!"
         cp -fa ${FRIX_CONFIG_PATH}/user_templates/* ${USER_CONFIG_PATH}/
+        # TODO: add small menu for asking user MCUs configuration and populating an "mcu.cfg" file
+        # by automatically copy/pasting from the mcu_defaults folder files
     fi
 
     # CHMOD the scripts to be sure they are all executables (Git should keep the modes on files but it's to be sure)
