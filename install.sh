@@ -3,9 +3,10 @@
 ###### AUTOMATED INSTALL AND UPDATE SCRIPT ######
 #################################################
 # Written by yomgui1 & Frix_x
-# @version: 1.0
+# @version: 1.1
 
 # CHANGELOG:
+#   v1.1: added an MCU template automatic installation system
 #   v1.0: first version of the script to allow a peaceful install and update ;)
 
 
@@ -35,6 +36,7 @@ function preflight_checks {
     fi
 }
 
+
 # Step 2: Check if the git config folder exist (or download it)
 function check_download {
     local frixtemppath frixreponame
@@ -55,6 +57,7 @@ function check_download {
     fi
 }
 
+
 # Step 3: Backup the old Klipper configuration
 function backup_config {
     mkdir -p ${BACKUP_DIR}
@@ -69,6 +72,7 @@ function backup_config {
 
     echo "Backup done in: ${BACKUP_DIR}"
 }
+
 
 # Step 4: Put the new configuration files in place to be ready to start
 function install_config {
@@ -87,8 +91,7 @@ function install_config {
     else
         echo "New installation detected: config templates will be set in place!"
         cp -fa ${FRIX_CONFIG_PATH}/user_templates/* ${USER_CONFIG_PATH}/
-        # TODO: add small menu for asking user MCUs configuration and populating an "mcu.cfg" file
-        # by automatically copy/pasting from the mcu_defaults folder files
+        install_mcu_templates
     fi
 
     # CHMOD the scripts to be sure they are all executables (Git should keep the modes on files but it's to be sure)
@@ -100,6 +103,104 @@ function install_config {
     # Create the config version tracking file in the user config directory
     git -C ${FRIX_CONFIG_PATH} rev-parse HEAD > ${USER_CONFIG_PATH}/.VERSION
 }
+
+
+# Helper function to ask and install the MCU templates if needed
+function install_mcu_templates {
+    local install_template file_list main_template install_toolhead_template toolhead_template install_ercf_template
+
+    read -rp "Would you like to select and install MCU wiring templates files? (Y/n) " install_template
+    if [[ -z "$install_template" ]]; then
+        install_template="y"
+    fi
+    install_template="${install_template,,}"
+
+    # Check and exit if the user do not wants to install an MCU template file
+    if [[ "$install_template" =~ ^(no|n)$ ]]; then
+        echo "Skipping installation of MCU templates. You will need to manually populate your own mcu.cfg file!"
+        return
+    fi
+
+    # If "yes" was selected, let's continue the install by listing the main MCU template
+    file_list=()
+    while IFS= read -r -d '' file; do
+        file_list+=("$file")
+    done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main" -maxdepth 1 -type f -print0)
+    echo "Please select your main MCU in the following list:"
+    for i in "${!file_list[@]}"; do
+        echo "  $((i+1))) $(basename "${file_list[i]}")"
+    done
+
+    read -p "Enter the number of the template to be installed (or 0 to skip): " main_template
+    if [[ "$main_template" -gt 0 ]]; then
+        # If the user selected a file, copy its content into the mcu.cfg file
+        filename=$(basename "${file_list[$((main_template-1))]}")
+        cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
+        echo "Template '$filename' inserted into your mcu.cfg user file"
+    else
+        echo "No template selected. Skip and continuing..."
+    fi
+
+    # Next see if the user use a toolhead board
+    read -rp "Do you have a toolhead MCU board and wants to install a template? (y/N) " install_toolhead_template
+    if [[ -z "$install_toolhead_template" ]]; then
+        install_toolhead_template="n"
+    fi
+    install_toolhead_template="${install_toolhead_template,,}"
+
+    # Check if the user wants to install a toolhead MCU template
+    if [[ "$install_toolhead_template" =~ ^(yes|y)$ ]]; then
+        file_list=()
+        while IFS= read -r -d '' file; do
+            file_list+=("$file")
+        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead" -maxdepth 1 -type f -print0)
+        echo "Please select your toolhead MCU in the following list:"
+        for i in "${!file_list[@]}"; do
+            echo "  $((i+1))) $(basename "${file_list[i]}")"
+        done
+
+        read -p "Enter the number of the template to be installed (or 0 to skip): " toolhead_template
+        if [[ "$toolhead_template" -gt 0 ]]; then
+            # If the user selected a file, copy its content into the mcu.cfg file
+            filename=$(basename "${file_list[$((toolhead_template-1))]}")
+            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
+            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/overrides/default.cfg" >> ${USER_CONFIG_PATH}/overrides.cfg
+            echo "Template '$filename' inserted into your mcu.cfg and default overrides added to your overrides.cfg user files"
+        else
+            echo "No toolhead template selected. Skip and continuing..."
+        fi
+    fi
+
+    # Finally see if the user use an ERCF board
+    read -rp "Do you have an ERCF MCU board and wants to install a template? (y/N) " install_ercf_template
+    if [[ -z "$install_ercf_template" ]]; then
+        install_ercf_template="n"
+    fi
+    install_ercf_template="${install_ercf_template,,}"
+
+    # Check if the user wants to install an ERCF MCU template
+    if [[ "$install_ercf_template" =~ ^(yes|y)$ ]]; then
+        file_list=()
+        while IFS= read -r -d '' file; do
+            file_list+=("$file")
+        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf" -maxdepth 1 -type f -print0)
+        echo "Please select your ERCF MCU in the following list:"
+        for i in "${!file_list[@]}"; do
+            echo "  $((i+1))) $(basename "${file_list[i]}")"
+        done
+
+        read -p "Enter the number of the template to be installed (or 0 to skip): " ercf_template
+        if [[ "$ercf_template" -gt 0 ]]; then
+            # If the user selected a file, copy its content into the mcu.cfg file
+            filename=$(basename "${file_list[$((ercf_template-1))]}")
+            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
+            echo "Template '$filename' inserted into your mcu.cfg user file"
+        else
+            echo "No ERCF template selected. Skip and continuing..."
+        fi
+    fi
+}
+
 
 # Step 5: restarting Klipper
 function restart_klipper {
