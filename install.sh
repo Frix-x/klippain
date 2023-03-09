@@ -24,14 +24,14 @@ export LC_ALL=C
 # Step 1: Verify that the script is not run as root and Klipper is installed
 function preflight_checks {
     if [ "$EUID" -eq 0 ]; then
-        echo "This script must not be run as root"
+        echo "[PRE-CHECK] This script must not be run as root!"
         exit -1
     fi
 
     if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F 'klipper.service')" ]; then
-        echo "Klipper service found! Continuing..."
+        printf "[PRE-CHECK] Klipper service found! Continuing...\n\n"
     else
-        echo "Klipper service not found, please install Klipper first!"
+        echo "[ERROR] Klipper service not found, please install Klipper first!"
         exit -1
     fi
 }
@@ -44,16 +44,16 @@ function check_download {
     frixreponame="$(basename ${FRIX_CONFIG_PATH})"
 
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
-        echo "Downloading Frix-x configuration folder..."
+        echo "[DOWNLOAD] Downloading Frix-x configuration folder..."
         if git -C $frixtemppath clone https://github.com/Frix-x/klipper-voron-V2.git $frixreponame; then
             chmod +x ${FRIX_CONFIG_PATH}/install.sh
-            echo "Download complete!"
+            printf "[DOWNLOAD] Download complete!\n\n"
         else
-            echo "Download of Frix-x configuration git repository failed!"
+            echo "[ERROR] Download of Frix-x configuration git repository failed!"
             exit -1
         fi
     else
-        echo "Frix-x git repository folder found locally!"
+        printf "[DOWNLOAD] Frix-x git repository folder already found locally. Continuing...\n\n"
     fi
 }
 
@@ -63,20 +63,20 @@ function backup_config {
     mkdir -p ${BACKUP_DIR}
 
     if [ -f "${USER_CONFIG_PATH}/.VERSION" ]; then
-        echo "Frix-x configuration already in use: only a backup of the custom user cfg files is needed"
+        echo "[BACKUP] Frix-x configuration already in use: only a backup of the custom user cfg files is needed"
         find ${USER_CONFIG_PATH} -type f -regex '.*\.\(cfg\|conf\|VERSION\)' | xargs mv -t ${BACKUP_DIR}/ 2>/dev/null
     else
-        echo "New installation detected: a full backup of the user config folder is needed"
+        echo "[BACKUP] New installation detected: a full backup of the user config folder is needed"
         cp -fa ${USER_CONFIG_PATH} ${BACKUP_DIR}
     fi
 
-    echo "Backup done in: ${BACKUP_DIR}"
+    printf "[BACKUP] Backup done in: ${BACKUP_DIR}\n\n"
 }
 
 
 # Step 4: Put the new configuration files in place to be ready to start
 function install_config {
-    echo "Installation of the last Frix-x Klipper configuration files"
+    echo "[INSTALL] Installation of the last Frix-x Klipper configuration files"
     mkdir -p ${USER_CONFIG_PATH}
 
     # Symlink Frix-x config folders (read-only git repository) to the user's config directory
@@ -86,10 +86,10 @@ function install_config {
 
     # Copy custom user's config files from the last backup to restore them to their config directory (or install templates if it's a first install)
     if [ -f "${BACKUP_DIR}/.VERSION" ]; then
-        echo "Update done: restoring user config files now!"
+        printf "[INSTALL] Update done: restoring user config files now!\n\n"
         find ${BACKUP_DIR} -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
     else
-        echo "New installation detected: config templates will be set in place!"
+        printf "[INSTALL] New installation detected: config templates will be set in place!\n\n"
         cp -fa ${FRIX_CONFIG_PATH}/user_templates/* ${USER_CONFIG_PATH}/
         install_mcu_templates
     fi
@@ -109,7 +109,7 @@ function install_config {
 function install_mcu_templates {
     local install_template file_list main_template install_toolhead_template toolhead_template install_ercf_template
 
-    read -rp "Would you like to select and install MCU wiring templates files? (Y/n) " install_template
+    read -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
     if [[ -z "$install_template" ]]; then
         install_template="y"
     fi
@@ -117,7 +117,7 @@ function install_mcu_templates {
 
     # Check and exit if the user do not wants to install an MCU template file
     if [[ "$install_template" =~ ^(no|n)$ ]]; then
-        echo "Skipping installation of MCU templates. You will need to manually populate your own mcu.cfg file!"
+        printf "[CONFIG] Skipping installation of MCU templates. You will need to manually populate your own mcu.cfg file!\n\n"
         return
     fi
 
@@ -126,23 +126,23 @@ function install_mcu_templates {
     while IFS= read -r -d '' file; do
         file_list+=("$file")
     done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main" -maxdepth 1 -type f -print0)
-    echo "Please select your main MCU in the following list:"
+    echo "[CONFIG] Please select your main MCU in the following list:"
     for i in "${!file_list[@]}"; do
         echo "  $((i+1))) $(basename "${file_list[i]}")"
     done
 
-    read -p "Enter the number of the template to be installed (or 0 to skip): " main_template
+    read -p "[CONFIG] Template to install (or 0 to skip): " main_template
     if [[ "$main_template" -gt 0 ]]; then
         # If the user selected a file, copy its content into the mcu.cfg file
         filename=$(basename "${file_list[$((main_template-1))]}")
         cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-        echo "Template '$filename' inserted into your mcu.cfg user file"
+        printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
     else
-        echo "No template selected. Skip and continuing..."
+        printf "[CONFIG] No template selected. Skip and continuing...\n\n"
     fi
 
     # Next see if the user use a toolhead board
-    read -rp "Do you have a toolhead MCU board and wants to install a template? (y/N) " install_toolhead_template
+    read -rp "[CONFIG] Do you have a toolhead MCU and wants to install a template? (y/N) " install_toolhead_template
     if [[ -z "$install_toolhead_template" ]]; then
         install_toolhead_template="n"
     fi
@@ -154,25 +154,25 @@ function install_mcu_templates {
         while IFS= read -r -d '' file; do
             file_list+=("$file")
         done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead" -maxdepth 1 -type f -print0)
-        echo "Please select your toolhead MCU in the following list:"
+        echo "[CONFIG] Please select your toolhead MCU in the following list:"
         for i in "${!file_list[@]}"; do
             echo "  $((i+1))) $(basename "${file_list[i]}")"
         done
 
-        read -p "Enter the number of the template to be installed (or 0 to skip): " toolhead_template
+        read -p "[CONFIG] Template to install (or 0 to skip): " toolhead_template
         if [[ "$toolhead_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
             filename=$(basename "${file_list[$((toolhead_template-1))]}")
             cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
             cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/overrides/default.cfg" >> ${USER_CONFIG_PATH}/overrides.cfg
-            echo "Template '$filename' inserted into your mcu.cfg and default overrides added to your overrides.cfg user files"
+            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg and default overrides added to your overrides.cfg user files\n\n"
         else
-            echo "No toolhead template selected. Skip and continuing..."
+            printf "[CONFIG] No toolhead template selected. Skip and continuing...\n\n"
         fi
     fi
 
     # Finally see if the user use an ERCF board
-    read -rp "Do you have an ERCF MCU board and wants to install a template? (y/N) " install_ercf_template
+    read -rp "[CONFIG] Do you have an ERCF MCU and wants to install a template? (y/N) " install_ercf_template
     if [[ -z "$install_ercf_template" ]]; then
         install_ercf_template="n"
     fi
@@ -184,19 +184,19 @@ function install_mcu_templates {
         while IFS= read -r -d '' file; do
             file_list+=("$file")
         done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf" -maxdepth 1 -type f -print0)
-        echo "Please select your ERCF MCU in the following list:"
+        echo "[CONFIG] Please select your ERCF MCU in the following list:"
         for i in "${!file_list[@]}"; do
             echo "  $((i+1))) $(basename "${file_list[i]}")"
         done
 
-        read -p "Enter the number of the template to be installed (or 0 to skip): " ercf_template
+        read -p "[CONFIG] Template to install (or 0 to skip): " ercf_template
         if [[ "$ercf_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
             filename=$(basename "${file_list[$((ercf_template-1))]}")
             cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-            echo "Template '$filename' inserted into your mcu.cfg user file"
+            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
         else
-            echo "No ERCF template selected. Skip and continuing..."
+            printf "[CONFIG] No ERCF template selected. Skip and continuing...\n\n"
         fi
     fi
 }
@@ -204,12 +204,16 @@ function install_mcu_templates {
 
 # Step 5: restarting Klipper
 function restart_klipper {
-    echo "Restarting Klipper..."
+    echo "[POST-INSTALL] Restarting Klipper..."
     sudo systemctl restart klipper
 }
 
 
 BACKUP_DIR="${BACKUP_PATH}/config_$(date +'%Y%m%d%H%M%S')"
+
+printf "\n=======================================\n"
+echo "Frix-x configuration install and update"
+printf "=======================================\n\n"
 
 # Run steps
 preflight_checks
@@ -218,4 +222,4 @@ backup_config
 install_config
 restart_klipper
 
-echo "Everything is ok, Frix-x config installed and up to date!"
+echo "[POST-INSTALL] Everything is ok, Frix-x config installed and up to date!"
