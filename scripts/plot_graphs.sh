@@ -6,6 +6,7 @@
 # @version: 1.5
 
 # CHANGELOG:
+#   v1.6: fixed race condition that results from input shaper macros delayed writes to .csv raw data in /tmp.  Added dependency for "lsof" utility.
 #   v1.5: fixed klipper unnexpected fail at the end of the execution, even if graphs were correctly generated (unicode decode error fixed)
 #   v1.4: added the ~/klipper dir parameter to the call of graph_vibrations.py for a better user handling (in case user is not "pi")
 #   v1.3: some documentation improvement regarding the line endings that needs to be LF for this file
@@ -21,6 +22,7 @@
 #            type 'wget -P ~/printer_data/config/scripts https://raw.githubusercontent.com/Frix-x/klippain/main/scripts/plot_graphs.sh'
 #   2. Make it executable using SSH: type 'chmod +x ~/printer_data/config/scripts/plot_graphs.sh' (adjust the path if needed).
 #   3. Be sure to have the gcode_shell_command.py Klipper extension installed (easiest way to install it is to use KIAUH in the Advanced section)
+#   4. If it is not already installed on your system, be sure to install the utility "lsof" as well (e.g. "apt install lsof", etc)
 #   4. Create a gcode_shell_command to be able to start it from a macro (see my shell_commands.cfg file)
 
 # Usage:
@@ -53,6 +55,13 @@ function plot_shaper_graph {
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\///")"
     date="$(basename "${newfilename}" | cut -d '.' -f1 | awk -F'_' '{print $3"_"$4}')"
     axis="$(basename "${newfilename}" | cut -d '_' -f2)"
+
+    # Check if file is open
+    while [ $(lsof | grep "${filename}" | wc -l) -ne 0 ]; do
+      # Wait until file is closed
+      sleep 1
+    done
+
     mv "${filename}" "${isf}"/inputshaper/"${newfilename}"
     
     sync && sleep 2
@@ -67,6 +76,13 @@ function plot_belts_graph {
   
   while read filename; do
     belt="$(basename "${filename}" | cut -d '_' -f4 | cut -d '.' -f1 | sed -e 's/\(.*\)/\U\1/')"
+
+    # Check if file is open
+    while [ $(lsof | grep "${filename}" | wc -l) -ne 0 ]; do
+      # Wait until file is closed
+      sleep 1
+    done
+
     mv "${filename}" "${isf}"/belts/belt_"${date_ext}"_"${belt}".csv
   done <<< "$(find /tmp -type f -name "raw_data_axis*.csv" 2>&1 | grep -v "Permission")"
   
@@ -81,6 +97,13 @@ function plot_vibr_graph {
   
   while read filename; do
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\/adxl345/vibr_${date_ext}/")"
+
+    # Check if file is open
+    while [ $(lsof | grep "${filename}" | wc -l) -ne 0 ]; do
+      # Wait until file is closed
+      sleep 1
+    done
+
     mv "${filename}" "${isf}"/vibrations/"${newfilename}"
   done <<< "$(find /tmp -type f -name "adxl345-*.csv" 2>&1 | grep -v "Permission")"
   
