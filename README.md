@@ -20,7 +20,7 @@ Installing this configuration should not be too complicated if you are already f
 
 Then, to run the installation script, connect to your printer using SSH and type the following command:
 ```
-wget -qO /tmp/install.sh https://raw.githubusercontent.com/Frix-x/klipper-voron-V2/main/install.sh && bash /tmp/install.sh
+wget -O - https://raw.githubusercontent.com/Frix-x/klipper-voron-V2/main/install.sh | bash
 ```
   
 This script will backup your old configuration, download this GitHub repository into your RaspberryPi home directory and setup the entire environment in `~/printer_data/config`. You'll also be asked if you want to select and install some MCU board_pins templates. This is recommended as it will allow a very fast filling of your `mcu.cfg` user file, but you can always do it manually afterwards if you prefer.
