@@ -109,7 +109,7 @@ function install_config {
 function install_mcu_templates {
     local install_template file_list main_template install_toolhead_template toolhead_template install_ercf_template
 
-    read -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
+    read < /dev/tty -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
     if [[ -z "$install_template" ]]; then
         install_template="y"
     fi
@@ -131,7 +131,7 @@ function install_mcu_templates {
         echo "  $((i+1))) $(basename "${file_list[i]}")"
     done
 
-    read -p "[CONFIG] Template to install (or 0 to skip): " main_template
+    read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " main_template
     if [[ "$main_template" -gt 0 ]]; then
         # If the user selected a file, copy its content into the mcu.cfg file
         filename=$(basename "${file_list[$((main_template-1))]}")
@@ -142,7 +142,7 @@ function install_mcu_templates {
     fi
 
     # Next see if the user use a toolhead board
-    read -rp "[CONFIG] Do you have a toolhead MCU and wants to install a template? (y/N) " install_toolhead_template
+    read < /dev/tty -rp "[CONFIG] Do you have a toolhead MCU and wants to install a template? (y/N) " install_toolhead_template
     if [[ -z "$install_toolhead_template" ]]; then
         install_toolhead_template="n"
     fi
@@ -159,7 +159,7 @@ function install_mcu_templates {
             echo "  $((i+1))) $(basename "${file_list[i]}")"
         done
 
-        read -p "[CONFIG] Template to install (or 0 to skip): " toolhead_template
+        read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " toolhead_template
         if [[ "$toolhead_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
             filename=$(basename "${file_list[$((toolhead_template-1))]}")
@@ -172,7 +172,7 @@ function install_mcu_templates {
     fi
 
     # Finally see if the user use an ERCF board
-    read -rp "[CONFIG] Do you have an ERCF MCU and wants to install a template? (y/N) " install_ercf_template
+    read < /dev/tty -rp "[CONFIG] Do you have an ERCF MCU and wants to install a template? (y/N) " install_ercf_template
     if [[ -z "$install_ercf_template" ]]; then
         install_ercf_template="n"
     fi
@@ -189,7 +189,7 @@ function install_mcu_templates {
             echo "  $((i+1))) $(basename "${file_list[i]}")"
         done
 
-        read -p "[CONFIG] Template to install (or 0 to skip): " ercf_template
+        read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " ercf_template
         if [[ "$ercf_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
             filename=$(basename "${file_list[$((ercf_template-1))]}")
