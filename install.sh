@@ -90,7 +90,7 @@ function install_config {
         find ${BACKUP_DIR} -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
     else
         printf "[INSTALL] New installation detected: config templates will be set in place!\n\n"
-        cp -fa ${FRIX_CONFIG_PATH}/user_templates/* ${USER_CONFIG_PATH}/
+        find ${FRIX_CONFIG_PATH}/user_templates/ -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
         install_mcu_templates
     fi
 
