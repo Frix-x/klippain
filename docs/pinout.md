@@ -5,7 +5,7 @@ In Klipper, once a `[board_pins]` is defined, the aliases are used in all sectio
 
 ## Configuring your mcu.cfg file
 
-This generic configuration is designed using a two-level [board_pins] model:
+Klippain is designed using a two-level [board_pins] model:
   1. First level: Some rules and pin naming conventions (let's call them "Frix-x names") were defined and used in all config files. Then a set of [user board_pins templates](./../user_templates/mcu_defaults/) were created for the most common MCUs of the market. This is basically what you need to put in your `mcu.cfg` file.
   2. Second level: Since it's always a pain to retrieve the pin names from the boards manufacturer's documentation like `PA12` or `gpio23` (let's call them "controller names"), I added a second layer of [board_pins] to link some "easy to retrieve names" (ie. what's printed on the MCU boards around the ports and easy to read with "MCU_" as a prefix) to these "controller names". This second layer of board_pins is located [in this folder](./../config/mcu_definitions/) and is not intended to be modified.
 
@@ -16,7 +16,8 @@ Frix-x names -> Manufacturer (PCB print) names > controller names
 
 So in order to populate your own `mcu.cfg` file, just copy one of the [user template](./../user_templates/mcu_defaults/) into it. Then feel free to change the wiring to your liking. For example, if you have wired your part fan to port `FAN3` instead of `FAN0`, just change the definition to `PART_FAN=MCU_FAN3` and that's it!
 
-  > **NOTA** : Klipper does not allow `[board_pins]` sections to contain pin modifiers such as `!`, `^` and `~`. Moreover, when configuring multiple MCUs at the same time, all the aliases used in the hardware sections must be prefixed with the MCU name. This is a current limitation of Klipper and is why you need to use the overrides.cfg file to add them.
+  > **Info**
+  > Klipper does not allow `[board_pins]` sections to contain pin modifiers such as `!`, `^` and `~`. Moreover, when configuring multiple MCUs at the same time, all the aliases used in the hardware sections must be prefixed with the MCU name. This is a current limitation of Klipper and is why you need to use the overrides.cfg file to add them.
 
 
 ## Using a new MCU

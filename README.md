@@ -1,13 +1,17 @@
-# Generic Klipper configuration
+# Klippain
 
-This generic Klipper configuration is designed for CoreXY printers. I use it on my Voron V2.4 (V2.1237), my Voron Trident, my custom TriZero, and my heavily modified Prusa i3 MK3s. Other printer owners (on Voron, VZbot, Ender5, ...) have also reported no issues using it.
+> Klippain - the pain-free recipe for (french)bread and butter Klipper configuration!
 
-This is a WIP: the files are frequently updated with new features that I create, but also with merged PRs from users. **Always** look, think, understand, and adjust to your own. But that should work in most cases. You can reach me in the Voron Discord: I'm **Frix_x#0161**.
+Klippain is a generic and modular Klipper configuration for CoreXY 3D printers. I use it on my Voron V2.4 (V2.1237), my Voron Trident, my custom TriZero, and my heavily modified Prusa i3 MK3s. Other CoreXY printer owners (Voron, VZbot, Ender5, ...) have also reported no issues using it.
+
+The files are frequently updated with new features that I create, but also with merged PRs from users. **Always** look, think, understand, and adjust to your own. But that should work in most cases. You can reach me in the Voron Discord: I'm **Frix_x#0161**.
+
+Yes, "pain" \pɛ̃\ is the french word for bread: there is no pain in pain, only joy. Thanks to the french channel "honhonhonbaguette-FR" on the Voron Discord for this joke and name suggestion!
 
 
 ## Features
 
-This configuration is designed to be generic: you can use it on a wide variety of machines by simply selecting and enabling the hardware and software options that you need.
+Klippain is designed to be generic: you can use it on a wide variety of machines by simply selecting and enabling the hardware and software options that you need.
 
 The **adaptive bed mesh** functionality I wrote some time ago, the **custom calibration macros** for pressure advance & flow, the **automated input shaper workflows**, and the **vibrations measurement** macros and scripts are among the custom features available out of the box.
 
@@ -16,11 +20,11 @@ Here is a [list with the details and usage instruction for all the features](./d
 
 ## Installation
 
-Installing this configuration should not be too complicated if you are already familiar with the Klipper ecosystem. Make sure you already have Klipper, Moonraker, and a WebUI is installed on your printer. You can use [KIAUH](https://github.com/th33xitus/kiauh) if you don't.
+Installing Klippain should not be too complicated if you are already familiar with the Klipper ecosystem. Make sure you already have Klipper, Moonraker, and a WebUI is installed on your printer. You can use [KIAUH](https://github.com/th33xitus/kiauh) if you don't.
 
 Then, to run the installation script, connect to your printer using SSH and type the following command:
 ```
-wget -O - https://raw.githubusercontent.com/Frix-x/klipper-voron-V2/main/install.sh | bash
+wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/install.sh | bash
 ```
   
 This script will backup your old configuration, download this GitHub repository into your RaspberryPi home directory and setup the entire environment in `~/printer_data/config`. You'll also be asked if you want to select and install some MCU board_pins templates. This is recommended as it will allow a very fast filling of your `mcu.cfg` user file, but you can always do it manually afterwards if you prefer.

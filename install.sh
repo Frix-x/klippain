@@ -13,9 +13,9 @@
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
 USER_CONFIG_PATH="$(realpath -e ${HOME}/printer_data/config)"
 # Where to clone Frix-x repository config files (read-only and keep untouched)
-FRIX_CONFIG_PATH="${HOME}/frix-x_config"
+FRIX_CONFIG_PATH="${HOME}/klippain_config"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
-BACKUP_PATH="${HOME}/frix-x_config_backups"
+BACKUP_PATH="${HOME}/klippain_config_backups"
 
 
 set -eu
@@ -44,16 +44,16 @@ function check_download {
     frixreponame="$(basename ${FRIX_CONFIG_PATH})"
 
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
-        echo "[DOWNLOAD] Downloading Frix-x configuration folder..."
-        if git -C $frixtemppath clone https://github.com/Frix-x/klipper-voron-V2.git $frixreponame; then
+        echo "[DOWNLOAD] Downloading Klippain repository..."
+        if git -C $frixtemppath clone https://github.com/Frix-x/klippain.git $frixreponame; then
             chmod +x ${FRIX_CONFIG_PATH}/install.sh
             printf "[DOWNLOAD] Download complete!\n\n"
         else
-            echo "[ERROR] Download of Frix-x configuration git repository failed!"
+            echo "[ERROR] Download of Klippain git repository failed!"
             exit -1
         fi
     else
-        printf "[DOWNLOAD] Frix-x git repository folder already found locally. Continuing...\n\n"
+        printf "[DOWNLOAD] Klippain repository already found locally. Continuing...\n\n"
     fi
 }
 
@@ -63,7 +63,7 @@ function backup_config {
     mkdir -p ${BACKUP_DIR}
 
     if [ -f "${USER_CONFIG_PATH}/.VERSION" ]; then
-        echo "[BACKUP] Frix-x configuration already in use: only a backup of the custom user cfg files is needed"
+        echo "[BACKUP] Klippain already in use: only a backup of the custom user cfg files is needed"
         find ${USER_CONFIG_PATH} -type f -regex '.*\.\(cfg\|conf\|VERSION\)' | xargs mv -t ${BACKUP_DIR}/ 2>/dev/null
     else
         echo "[BACKUP] New installation detected: a full backup of the user config folder is needed"
@@ -76,7 +76,7 @@ function backup_config {
 
 # Step 4: Put the new configuration files in place to be ready to start
 function install_config {
-    echo "[INSTALL] Installation of the last Frix-x Klipper configuration files"
+    echo "[INSTALL] Installation of the last Klippain config files"
     mkdir -p ${USER_CONFIG_PATH}
 
     # Symlink Frix-x config folders (read-only git repository) to the user's config directory
@@ -142,7 +142,7 @@ function install_mcu_templates {
     fi
 
     # Next see if the user use a toolhead board
-    read < /dev/tty -rp "[CONFIG] Do you have a toolhead MCU and wants to install a template? (y/N) " install_toolhead_template
+    read < /dev/tty -rp "[CONFIG] Do you have a toolhead MCU and want to install a template? (y/N) " install_toolhead_template
     if [[ -z "$install_toolhead_template" ]]; then
         install_toolhead_template="n"
     fi
@@ -172,7 +172,7 @@ function install_mcu_templates {
     fi
 
     # Finally see if the user use an ERCF board
-    read < /dev/tty -rp "[CONFIG] Do you have an ERCF MCU and wants to install a template? (y/N) " install_ercf_template
+    read < /dev/tty -rp "[CONFIG] Do you have an ERCF MCU and want to install a template? (y/N) " install_ercf_template
     if [[ -z "$install_ercf_template" ]]; then
         install_ercf_template="n"
     fi
@@ -211,9 +211,9 @@ function restart_klipper {
 
 BACKUP_DIR="${BACKUP_PATH}/config_$(date +'%Y%m%d%H%M%S')"
 
-printf "\n=======================================\n"
-echo "Frix-x configuration install and update"
-printf "=======================================\n\n"
+printf "\n======================================\n"
+echo "- Klippain install and update script -"
+printf "======================================\n\n"
 
 # Run steps
 preflight_checks
@@ -222,4 +222,4 @@ backup_config
 install_config
 restart_klipper
 
-echo "[POST-INSTALL] Everything is ok, Frix-x config installed and up to date!"
+echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
