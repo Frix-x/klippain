@@ -1,56 +1,69 @@
-# Generic Klipper configuration
+# Klippain
 
-This is a global generic Klipper config dedicated to be used on CoreXY printers (and perhaps others with some minor modifications). It's currently used on all my own machines: a Voron V2.4 (V2.1237), a Voron Trident, a custom TriZero, and a heavily modified Prusa i3 MK3s. Other Voron owners have also reported using this config as-is without any problems.
+> Klippain - the pain-free recipe for (french)bread and butter Klipper configuration!
 
-Please keep in mind this is a WIP and the files are beeing updated frequently with new custom features, PRs merged from users or just if I want to. **Do not** take it as a fully compliant config for every machines: look, think, understand and adapt it to your own.
+Klippain is a generic and modular Klipper configuration for CoreXY 3D printers. I use it on my Voron V2.4 (V2.1237), my Voron Trident, my custom TriZero, and my heavily modified Prusa i3 MK3s. Other CoreXY printer owners (Voron, VZbot, Ender5, ...) have also reported no issues using it.
 
-You can reach out in the Voron Discord: i'm **Frix_x#0161**.
+The files are frequently updated with new features that I create, but also with merged PRs from users. **Always** look, think, understand, and adjust to your own. But that should work in most cases. You can reach me in the Voron Discord: I'm **Frix_x#0161**.
+
+Yes, "pain" \pɛ̃\ is the french word for bread: there is no pain in pain, only joy. Thanks to the french channel "honhonhonbaguette-FR" on the Voron Discord for this joke and name suggestion!
 
 
 ## Features
 
-This config is designed to be generic. You can use it on a lot of machines by selecting and enabling the hardware options you need. This also activate automatically the associated macros and process under the hood.
+Klippain is designed to be generic: you can use it on a wide variety of machines by simply selecting and enabling the hardware and software options that you need.
 
-I also tried, when possible, to put all the print settings directly in the Klipper config. My utlimate goal would be to be able to use the same Gcode file (sliced generically) with multiple materials or even share it across multiple printers. That's why I'm use and set firmware retraction in the macros, set pressure advance in the macros, etc...
+The **adaptive bed mesh** functionality I wrote some time ago, the **custom calibration macros** for pressure advance & flow, the **automated input shaper workflows**, and the **vibrations measurement** macros and scripts are among the custom features available out of the box.
 
-This config is also known for the **adaptive bed mesh** functionnality that I wrote some time ago, the **custom calibrations macros** for pressure advance, flow, etc..., the **automated input shaper workflow**, and the **vibrations measurements** macros and scripts.
-
-To get more info, you can find a [list with the details and usage instruction for all the features](./doc/features.md) in the doc folder. There is also for each, some custom install instructions if you want to install them as standalone in your own config and don't want to use this full generic config folder.
+Here is a [list with the details and usage instruction for all the features](./docs/features.md). There are also some installation instructions in their documentation if you want to use them standalone in your own personal configuration.
 
 
 ## Installation
 
-The install of this config folder should not be too complicated if you are already familiar with the klipper configuration system. Here are the steps:
-  1. Use an SSH connection to connect to your printer
-  1. Check if you already have a `config` folder in the `~/printer_data` directory and remove it (or rename it to keep a backup).
-  2. Clone this config in the `~/printer_data/config` directory. You can use the following command:
+Installing Klippain should not be too complicated if you are already familiar with the Klipper ecosystem. Make sure you already have Klipper, Moonraker, and a WebUI is installed on your printer. You can use [KIAUH](https://github.com/th33xitus/kiauh) if you don't.
 
-     ```
-     git clone https://github.com/Frix-x/klipper-voron-V2.git ~/printer_data/config
-     ```
+Then, to run the installation script, connect to your printer using SSH and type the following command:
+```
+wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/install.sh | bash
+```
   
-  3. Open and configure the `printer.cfg` file: you just need to uncomment the lines that suit your printer hardware configuration. Basically start by selecting the board_pins coresponding to your MCU, then select the components used and software config needed (such as extruder type, XY motors, Z motors, QGL vs Z_TILT, etc...).
-  4. Then, open the selected `board_pins` file in the `config/mcus` folder and add your MCU(s) serial port(s). Please follow the [official klipper documentation](https://www.klipper3d.org/FAQ.html#wheres-my-serial-port) to find it.
-  5. Check your wiring and verify that the selected `board_pins` file is correct. See [pinout.md](./doc/pinout.md) for more info
-  6. Now, open all the selected files in your `printer.cfg` and check that the pins are ok for your machine (regarding the board prefix name, the direction `!`, the pull-ups `^` or pull-downs `~`). Note: this step is necessary because of a current Klipper limitation that doesn't allow me to put these symbols directly in the board_pins files... I'm still looking for alternatives.
-  7. Also, in the same way, open all the selected files in your `printer.cfg` and check the dimensions, the limits, the currents, and all the other values in every config sections. **Pay a special attention to the axis limits** in the `[stepper_...]` sections from the files located in [config/hardware/XY](./config/hardware/XY/) or [config/hardware/Z](./config/hardware/Z/). Also check the thermistor types in `[extruder]` and `[heated_bed]`, size of the plate in `[bed_mesh]`, etc... Note: this step is necessary because of a current Klipper limitation that doesn't allow the use of variables in the config files... I'm still looking for alternatives.
-  8. Modify and adapt the `variables.cfg` file to suit the configuration of your machine. This file helps to configure and customize how all the macros should behave (coordinates of everythings, enabling/disabling software features, etc...).
-  9. **Check very carefully all the features! This step is very important to avoid any problem on your machine.** You can start by following the [config checks from the official Klipper documentation](https://www.klipper3d.org/Config_checks.html). Then also verify that you are able to attach/detach the mechanical probe, do the QGL/Z_TILT, have the correct coordinates for all the used components (purge bucket, physical Z endstop, etc...). You should also verify your first layer calibration (and the `switch_offset` parameter from the automatic z calibration plugin if using it), etc...
-  10. Finally when everything looks to be working, you need to add the custom print start gcode in your slicer. Here is an example for SuperSlicer:
-     
-      ```
-      START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
-      ```
-     
-      Also add to your custom print end gcode in your slicer:
+This script will backup your old configuration, download this GitHub repository into your RaspberryPi home directory and setup the entire environment in `~/printer_data/config`. You'll also be asked if you want to select and install some MCU board_pins templates. This is recommended as it will allow a very fast filling of your `mcu.cfg` user file, but you can always do it manually afterwards if you prefer.
 
-      ```
-      END_PRINT
-      ```
+
+## Configuration
+
+To configure and customize everything for your printer, there are some additional steps required. Please follow them carefully!
+
+#### 1. MCUs settings
+If you didn't install any MCU templates during the installation (or want to customize the default wiring), you will need to modify your `mcu.cfg` file by following the [MCU pinout and wiring documentation](./docs/pinout.md).
+
+Also, do not forget to fill in the serial_port or can_uuid of your MCUs. If needed, you can refer to the [official klipper documentation](https://www.klipper3d.org/FAQ.html#wheres-my-serial-port) to find them.
+
+#### 2. Printer settings, overrides and variables
+Open the `printer.cfg` file and uncomment the lines that correspond to your printer hardware or software components in order to enable them (such as extruder type, XY motors, Z motors, QGL vs Z_TILT, etc...). This will customize the behavior of this generic Klipper configuration and will also enable the corresponding macros.
+
+Then it's time to customize the configuration by editing the `overrides.cfg` user file by following the [overrides documentation and examples](./docs/overrides.md). You can tweak the machine dimensions, limits, currents, and everything else in all this config sections. You can also use the overrides to invert motor directions, etc...
+
+When Klipper is able to boot, modify and adapt the `variables.cfg` file to suit the configuration of your machine. This file adds additional customization to how all the macros will behave (coordinates of everything, enable/disable some software features, etc...).
+
+#### 3. Initial startup of the machine
+Before printing for the first time, you will need to **check all the features very carefully to avoid any problems on your machine!** You can start by following the [config checks section from the official Klipper documentation](https://www.klipper3d.org/Config_checks.html).
+Then, also check that you are able to attach/detach the mechanical probe (if you use one), do a QGL/Z_TILT, have correct coordinates for all the used components (purge bucket, physical Z endstop, etc...). You should also check your first layer calibration (and the `switch_offset` parameter of the automatic z calibration plugin if you use it), etc...
+
+Finally when everything seems to work, you need to add the custom print start gcode to your slicer. Here is an example for SuperSlicer:     
+```
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
+```
+
+Also add the custom print end gcode to your slicer:
+
+```
+END_PRINT
+```
 
 
 ## Sponsor the work
 
-I try to stay open to any user needs if it suit and fit this config design. Please open an issue or a PR if you want a specific hardware device or new functionnalities to be supported.
+I try to be open to any user request if it fits into this configuration design. So feel free to open an issue or a PR if you want your specific hardware device or new feature to be supported.
 
-Also, feel free to buy me a coffee or help me buy new hardware to support them in this config :)
+Alternatively, you can also buy me a coffee or help me buy new hardware to support my work :)
