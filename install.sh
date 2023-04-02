@@ -3,15 +3,19 @@
 ###### AUTOMATED INSTALL AND UPDATE SCRIPT ######
 #################################################
 # Written by yomgui1 & Frix_x
-# @version: 1.1
+# @version: 1.2
 
 # CHANGELOG:
+#   v1.2: fixed some bugs and adding small new features:
+#          - now it's ok to use the install script with the user config folder absent
+#          - avoid copying all the existing MCU templates to the user config directory during install to keep it clean
+#          - updated the logic to keep the user custom files and folders structure during a backup (it was previously flattened)
 #   v1.1: added an MCU template automatic installation system
 #   v1.0: first version of the script to allow a peaceful install and update ;)
 
 
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
-USER_CONFIG_PATH="$(realpath -e ${HOME}/printer_data/config)"
+USER_CONFIG_PATH="${HOME}/printer_data/config"
 # Where to clone Frix-x repository config files (read-only and keep untouched)
 FRIX_CONFIG_PATH="${HOME}/klippain_config"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
@@ -62,15 +66,12 @@ function check_download {
 function backup_config {
     mkdir -p ${BACKUP_DIR}
 
-    if [ -f "${USER_CONFIG_PATH}/.VERSION" ]; then
-        echo "[BACKUP] Klippain already in use: only a backup of the custom user cfg files is needed"
-        find ${USER_CONFIG_PATH} -type f -regex '.*\.\(cfg\|conf\|VERSION\)' | xargs mv -t ${BACKUP_DIR}/ 2>/dev/null
-    else
-        echo "[BACKUP] New installation detected: a full backup of the user config folder is needed"
-        cp -fa ${USER_CONFIG_PATH} ${BACKUP_DIR}
-    fi
+    # Copy every files from the user config ("2>/dev/null || :" allow it to fail silentely in case the config dir doesn't exist)
+    cp -fa ${USER_CONFIG_PATH}/. ${BACKUP_DIR} 2>/dev/null || :
+    # Then delete the symlinks inside the backup folder as they are not needed here...
+    find ${BACKUP_DIR} -type l -exec rm -f {} \;
 
-    printf "[BACKUP] Backup done in: ${BACKUP_DIR}\n\n"
+    printf "[BACKUP] Backup of current user config files done in: ${BACKUP_DIR}\n\n"
 }
 
 
@@ -84,13 +85,12 @@ function install_config {
         ln -fsn ${FRIX_CONFIG_PATH}/$dir ${USER_CONFIG_PATH}/$dir
     done
 
-    # Copy custom user's config files from the last backup to restore them to their config directory (or install templates if it's a first install)
-    if [ -f "${BACKUP_DIR}/.VERSION" ]; then
-        printf "[INSTALL] Update done: restoring user config files now!\n\n"
-        find ${BACKUP_DIR} -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
-    else
+    # Detect if it's a first install by looking at the .VERSION file to ask for the config
+    # template install. If the config is already installed, nothing need to be done here
+    # as moonraker is already pulling the changes and custom user config files are already here
+    if [ ! -f "${BACKUP_DIR}/.VERSION" ]; then
         printf "[INSTALL] New installation detected: config templates will be set in place!\n\n"
-        find ${FRIX_CONFIG_PATH}/user_templates/ -type f -regex '.*\.\(cfg\|conf\)' | xargs cp -ft ${USER_CONFIG_PATH}/
+        find ${FRIX_CONFIG_PATH}/user_templates/ -type d -name 'mcu_defaults' -prune -o -type f -print | xargs cp -ft ${USER_CONFIG_PATH}/
         install_mcu_templates
     fi
 
@@ -100,7 +100,7 @@ function install_config {
         chmod +x ${FRIX_CONFIG_PATH}/scripts/$file
     done
 
-    # Create the config version tracking file in the user config directory
+    # Create or update the config version tracking file in the user config directory
     git -C ${FRIX_CONFIG_PATH} rev-parse HEAD > ${USER_CONFIG_PATH}/.VERSION
 }
 
@@ -209,7 +209,7 @@ function restart_klipper {
 }
 
 
-BACKUP_DIR="${BACKUP_PATH}/config_$(date +'%Y%m%d%H%M%S')"
+BACKUP_DIR="${BACKUP_PATH}/$(date +'%Y_%m_%d-%H%M%S')"
 
 printf "\n======================================\n"
 echo "- Klippain install and update script -"
@@ -223,3 +223,4 @@ install_config
 restart_klipper
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
+echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
