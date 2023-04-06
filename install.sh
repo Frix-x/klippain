@@ -25,21 +25,6 @@ BACKUP_PATH="${HOME}/klippain_config_backups"
 set -eu
 export LC_ALL=C
 
-# Step 1: Verify that the script is not run as root and Klipper is installed
-function preflight_checks {
-    if [ "$EUID" -eq 0 ]; then
-        echo "[PRE-CHECK] This script must not be run as root!"
-        exit -1
-    fi
-
-    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F 'klipper.service')" ]; then
-        printf "[PRE-CHECK] Klipper service found! Continuing...\n\n"
-    else
-        echo "[ERROR] Klipper service not found, please install Klipper first!"
-        exit -1
-    fi
-}
-
 function custom_printer_name {
 
     read < /dev/tty -rp "[CONFIG] Would you like to select custom folder locations? (Y/n) " custom_folder
@@ -56,6 +41,21 @@ function custom_printer_name {
     # Input folder name 
     read < /dev/tty -rp "[CONFIG]  Please input the custom Folder name:" USER_CONFIG_PATH_INPUT
         USER_CONFIG_PATH="${HOME}/${USER_CONFIG_PATH_INPUT}/config"
+}
+
+# Step 1: Verify that the script is not run as root and Klipper is installed
+function preflight_checks {
+    if [ "$EUID" -eq 0 ]; then
+        echo "[PRE-CHECK] This script must not be run as root!"
+        exit -1
+    fi
+
+    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F "${USER_CONFIG_PATH_INPUT}"'-klipper.service')" ]; then
+        printf "[PRE-CHECK] Klipper service found! Continuing...\n\n"
+    else
+        echo "[ERROR] Klipper service not found, please install Klipper first!"
+        exit -1
+    fi
 }
 
 # Step 2: Check if the git config folder exist (or download it)
