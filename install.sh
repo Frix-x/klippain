@@ -40,6 +40,23 @@ function preflight_checks {
     fi
 }
 
+function custom_printer_name {
+
+    read < /dev/tty -rp "[CONFIG] Would you like to select custom folder locations? (Y/n) " custom_folder
+    if [[ -z "$custom_folder" ]]; then
+        custom_folder="y"
+    fi
+
+    # Continue with the standard folder location
+    if [[ "$custom_folder" =~ ^(no|n)$ ]]; then
+        printf "[CONFIG] Using the standard folder configuration!\n\n"
+        return
+    fi
+
+    # Input folder name 
+    read < /dev/tty -rp "[CONFIG]  Please input the custom Folder name:" USER_CONFIG_PATH_INPUT
+        USER_CONFIG_PATH="${HOME}/${USER_CONFIG_PATH_INPUT}/config"
+}
 
 # Step 2: Check if the git config folder exist (or download it)
 function check_download {
@@ -220,7 +237,7 @@ preflight_checks
 check_download
 backup_config
 install_config
-restart_klipper
+restart_"${USER_CONFIG_PATH_INPUT}"-klipper
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
 echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
