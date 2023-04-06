@@ -26,8 +26,6 @@ set -eu
 export LC_ALL=C
 
 function folder_name {
-    echo "Please do something"
-
 
     read < /dev/tty -rp "[CONFIG] Would you like to select custom folder locations? (Y/n) " custom_folder
     if [[ -z "$custom_folder" ]]; then
