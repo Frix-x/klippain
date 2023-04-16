@@ -2,6 +2,8 @@
 
 > Klippain - the pain-free recipe for (french)bread and butter Klipper configuration!
 
+![Klippain](./docs/klippain.png)
+
 Klippain is a generic and modular Klipper configuration for CoreXY 3D printers. I use it on my Voron V2.4 (V2.1237), my Voron Trident, my custom TriZero, and my heavily modified Prusa i3 MK3s. Other CoreXY printer owners (Voron, VZbot, Ender5, ...) have also reported no issues using it.
 
 The files are frequently updated with new features that I create, but also with merged PRs from users. **Always** look, think, understand, and adjust to your own. But that should work in most cases. You can reach me in the Voron Discord: I'm **Frix_x#0161**.

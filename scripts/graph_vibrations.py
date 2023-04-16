@@ -4,9 +4,10 @@
 ###### SPEED AND VIBRATIONS PLOTTING SCRIPT ######
 ##################################################
 # Written by Frix_x#0161 #
-# @version: 1.1
+# @version: 1.2
 
 # CHANGELOG:
+#   v1.2: fixed a bug that could happen when username is not "pi" (thanks @spikeygg)
 #   v1.1: better graph formatting
 #   v1.0: first version of the script
 
@@ -173,7 +174,7 @@ def parse_log(logname, opts):
 
 def extract_speed(logname, opts):
     try:
-        speed = re.search('sp(.+?)n', logname).group(1)
+        speed = re.search('sp(.+?)n', os.path.basename(logname)).group(1)
     except AttributeError:
         opts.error("File %s does not contain speed in its name and therefore "
                "is not supported by graph_vibrations.py script." % (logname,))
