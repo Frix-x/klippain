@@ -13,7 +13,7 @@
 #   v1.1: added an MCU template automatic installation system
 #   v1.0: first version of the script to allow a peaceful install and update ;)
 
-
+KLIPPER_SERVICE=klipper
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
 USER_CONFIG_PATH="${HOME}/printer_data/config"
 # Where to clone Frix-x repository config files (read-only and keep untouched)
@@ -25,6 +25,26 @@ BACKUP_PATH="${HOME}/klippain_config_backups"
 set -eu
 export LC_ALL=C
 
+function folder_name {
+
+    read < /dev/tty -rp "[CONFIG] Would you like to select custom folder locations? (Y/n) " custom_folder
+    if [[ -z "$custom_folder" ]]; then
+        custom_folder="y"
+    fi
+
+    # Continue with the standard folder location
+    if [[ "$custom_folder" =~ ^(no|n)$ ]]; then
+        printf "[CONFIG] Using the standard folder configuration!\n\n"
+        return
+    fi
+
+    # Input folder name 
+    read < /dev/tty -rp "[CONFIG]  Please input the custom Folder name:" USER_CONFIG_PATH_INPUT
+        USER_CONFIG_PATH="${HOME}/${USER_CONFIG_PATH_INPUT}_data/config"
+        KLIPPER_SERVICE=klipper-"${USER_CONFIG_PATH_INPUT}"
+        BACKUP_DIR="${BACKUP_PATH}/${USER_CONFIG_PATH_INPUT}/$(date +'%Y_%m_%d-%H%M%S')"
+}
+
 # Step 1: Verify that the script is not run as root and Klipper is installed
 function preflight_checks {
     if [ "$EUID" -eq 0 ]; then
@@ -32,14 +52,13 @@ function preflight_checks {
         exit -1
     fi
 
-    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F 'klipper.service')" ]; then
+    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F "${KLIPPER_SERVICE}"'.service')" ]; then
         printf "[PRE-CHECK] Klipper service found! Continuing...\n\n"
     else
-        echo "[ERROR] Klipper service not found, please install Klipper first!"
+        echo "[ERROR] Klipper service (""${KLIPPER_SERVICE}"".service) not found, please install Klipper first!"
         exit -1
     fi
 }
-
 
 # Step 2: Check if the git config folder exist (or download it)
 function check_download {
@@ -205,7 +224,7 @@ function install_mcu_templates {
 # Step 5: restarting Klipper
 function restart_klipper {
     echo "[POST-INSTALL] Restarting Klipper..."
-    sudo systemctl restart klipper
+    sudo systemctl restart "${KLIPPER_SERVICE}"
 }
 
 
@@ -216,6 +235,7 @@ echo "- Klippain install and update script -"
 printf "======================================\n\n"
 
 # Run steps
+folder_name
 preflight_checks
 check_download
 backup_config
