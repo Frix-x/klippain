@@ -1,71 +1,42 @@
 # Klippain
 
-> Klippain - the pain-free recipe for (french)bread and butter Klipper configuration!
+> Klippain - The pain-free recipe for (french)bread and butter Klipper configuration!
+
+Klippain is a generic, modular, and highly customizable Klipper configuration for CoreXY 3D printers. Designed for use on various machines, it has been reported working correctly on Voron V2.4, Voron Trident, Voron V0, TriZero, VZbot, Ender5, etc... I even use it myself on an heavily modified Prusa i3 MK3s.
 
 ![Klippain](./docs/klippain.png)
 
-Klippain is a generic and modular Klipper configuration for CoreXY 3D printers. I use it on my Voron V2.4 (V2.1237), my Voron Trident, my custom TriZero, and my heavily modified Prusa i3 MK3s. Other CoreXY printer owners (Voron, VZbot, Ender5, ...) have also reported no issues using it.
+The configuration is regularly updated with new features and merged PRs from users. You can reach me on the Voron Discord as **Frix_x#0161**.
 
-The files are frequently updated with new features that I create, but also with merged PRs from users. **Always** look, think, understand, and adjust to your own. But that should work in most cases. You can reach me in the Voron Discord: I'm **Frix_x#0161**.
-
-Yes, "pain" \pɛ̃\ is the french word for bread: there is no pain in pain, only joy. Thanks to the french channel "honhonhonbaguette-FR" on the Voron Discord for this joke and name suggestion!
+Fun fact: "pain" \pɛ̃\ is the French word for bread, so there's no pain in this pain—only joy! Thanks to the French channel "honhonhonbaguette-FR" on the Voron Discord for the joke and name suggestion!
 
 
 ## Features
 
-Klippain is designed to be generic: you can use it on a wide variety of machines by simply selecting and enabling the hardware and software options that you need.
+Klippain is designed for versatility. By selecting and enabling the desired hardware and software options, it can be used on a wide range of machines.
 
-The **adaptive bed mesh** functionality I wrote some time ago, the **custom calibration macros** for pressure advance & flow, the **automated input shaper workflows**, and the **vibrations measurement** macros and scripts are among the custom features available out of the box.
-
-Here is a [list with the details and usage instruction for all the features](./docs/features.md). There are also some installation instructions in their documentation if you want to use them standalone in your own personal configuration.
+Custom features available out of the box include **adaptive bed mesh**, **custom printer calibration macros**, **automated input shaper workflows**, and **vibration measurement** macros and scripts, ... Refer to the [features documentation](./docs/features.md) for a detailed list and usage instructions.
 
 
 ## Installation
 
-Installing Klippain should not be too complicated if you are already familiar with the Klipper ecosystem. Make sure you already have Klipper, Moonraker, and a WebUI is installed on your printer. You can use [KIAUH](https://github.com/th33xitus/kiauh) if you don't.
+To install Klippain, first ensure you have already Klipper, Moonraker, and a WebUI installed on your printer. If not, use [KIAUH](https://github.com/th33xitus/kiauh).
 
-Then, to run the installation script, connect to your printer using SSH and type the following command:
-```
+Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
+
+```bash
 wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/install.sh | bash
 ```
-  
-This script will backup your old configuration, download this GitHub repository into your RaspberryPi home directory and setup the entire environment in `~/printer_data/config`. You'll also be asked if you want to select and install some MCU board_pins templates. This is recommended as it will allow a very fast filling of your `mcu.cfg` user file, but you can always do it manually afterwards if you prefer.
+
+Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./docs/configuration.md).
+
+  > **Warning**
+  >
+  > General rule to keep the auto-update feature working: **never modify Klippain files directly**, but instead add overrides as per the documentation! To proceed, you can modify all the pre-installed templates in your config root folder (`printer.cfg`, `mcu.cfg`, `variables.cfg` and `overrides.cfg`) as they will be preserved on update.
 
 
-## Configuration
+## Support the Project
 
-To configure and customize everything for your printer, there are some additional steps required. Please follow them carefully!
+I strive to accommodate user requests that align with this configuration's design. Feel free to open an issue or a PR for specific hardware device support or new features.
 
-#### 1. MCUs settings
-If you didn't install any MCU templates during the installation (or want to customize the default wiring), you will need to modify your `mcu.cfg` file by following the [MCU pinout and wiring documentation](./docs/pinout.md).
-
-Also, do not forget to fill in the serial_port or can_uuid of your MCUs. If needed, you can refer to the [official klipper documentation](https://www.klipper3d.org/FAQ.html#wheres-my-serial-port) to find them.
-
-#### 2. Printer settings, overrides and variables
-Open the `printer.cfg` file and uncomment the lines that correspond to your printer hardware or software components in order to enable them (such as extruder type, XY motors, Z motors, QGL vs Z_TILT, etc...). This will customize the behavior of this generic Klipper configuration and will also enable the corresponding macros.
-
-Then it's time to customize the configuration by editing the `overrides.cfg` user file by following the [overrides documentation and examples](./docs/overrides.md). You can tweak the machine dimensions, limits, currents, and everything else in all this config sections. You can also use the overrides to invert motor directions, etc...
-
-When Klipper is able to boot, modify and adapt the `variables.cfg` file to suit the configuration of your machine. This file adds additional customization to how all the macros will behave (coordinates of everything, enable/disable some software features, etc...).
-
-#### 3. Initial startup of the machine
-Before printing for the first time, you will need to **check all the features very carefully to avoid any problems on your machine!** You can start by following the [config checks section from the official Klipper documentation](https://www.klipper3d.org/Config_checks.html).
-Then, also check that you are able to attach/detach the mechanical probe (if you use one), do a QGL/Z_TILT, have correct coordinates for all the used components (purge bucket, physical Z endstop, etc...). You should also check your first layer calibration (and the `switch_offset` parameter of the automatic z calibration plugin if you use it), etc...
-
-Finally when everything seems to work, you need to add the custom print start gcode to your slicer. Here is an example for SuperSlicer:     
-```
-START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
-```
-
-Also add the custom print end gcode to your slicer:
-
-```
-END_PRINT
-```
-
-
-## Sponsor the work
-
-I try to be open to any user request if it fits into this configuration design. So feel free to open an issue or a PR if you want your specific hardware device or new feature to be supported.
-
-Alternatively, you can also buy me a coffee or help me buy new hardware to support my work :)
+Alternatively, consider buying me a coffee or contributing to new hardware purchases to support my work!
