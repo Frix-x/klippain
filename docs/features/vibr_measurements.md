@@ -14,7 +14,7 @@ It's a fully automated workflow that work by moving the toolhead while using the
      2. it then move the graph and associated archive of CSVs to the [ADXL results folder](./../../adxl_results/).
      3. it manage the folder to delete the older files and keep only a set (default is three) of the most recent results.
 
-Results can be found in the [ADXL results folder](./../../adxl_results/) that is placed directly at the root of the config folder to allow the access directly from your browser using the FLuidd/Maisail file manager. No SSH is needed!
+Results can be found in the [ADXL results folder](./../../adxl_results/) that is placed directly at the root of the config folder to allow the access directly from your browser using the FLuidd/Maisail file manager. No SSH is needed! You can get some hints on the results in my documentation about how to [read and interpret the IS graphs](../input_shaper.md).
 
 ![vibrations measurement example](./../images/vibrations_example.png)
 
@@ -64,4 +64,4 @@ Then, call the `VIBRATIONS_CALIBRATION` macro with the direction and speed range
 |TRAVEL_SPEED|200|speed in mm/s used for all the travels moves|
 |ACCEL_CHIP|"adxl345"|accelerometer chip name in the config|
 
-Wait for the script to finish the computation and look for the results in the results folder. You can find them directly in your config folder by using the WebUI of Mainsail/Fluidd.
+Wait for the script to finish the computation and look for the results in the results folder. You can find them directly in your config folder by using the WebUI of Mainsail/Fluidd. You can get some hints on the results in my documentation about how to [read and interpret the IS graphs](../input_shaper.md).
