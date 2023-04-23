@@ -2,9 +2,7 @@
 
 In Klipper, when two identical `[section]` are defined, it's the last one in the include order that will take over. Additionally, any missing values are filled in by the last entry. This mechanism is called an "override".
 
-It allow me to set default values for each configuration section that you can include from the `printer.cfg` file. Then, if you want to change those values, you can add some overrides without having to change all the files in this repo. This has the advantage of keeping my repo read-only and compatible with Moonraker's update manager.
-
-To keeps Klippain files read-only and compatible with Moonraker's update manager, you will need to use this mechansim extensively. Indeed, there is default values included in every Klippain files, but if you want to change them, you can add some overrides without having to dig and modify all the files in Klippain folders.
+To keeps Klippain files read-only and compatible with Moonraker's update manager, you will need to use this mechansim extensively. There is default values included in every Klippain files, but if you want to change them, you can add some overrides without having to dig and modify all the files in Klippain folders.
 
 Use overrides to tweak machine dimensions, invert motor directions, change axis limits, currents, sensors type, or anything you feel the need to change. You can even override a full macro to replace it completely by your own or add new features to Klippain on your side. This is a very powerful feature!
 
