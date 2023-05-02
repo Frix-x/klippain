@@ -6,7 +6,8 @@
 # @version: 1.6
 
 # CHANGELOG:
-#   v1.6: updated the handling of shaper graph files to be able to optionnaly account for added positions in the filenames and remove them
+#   v1.6: - updated the handling of shaper graph files to be able to optionnaly account for added positions in the filenames and remove them
+#         - fixed a bug in the belt graph on slow SD card or Pi clones (Klipper was still writing in the file while we were already reading it)
 #   v1.5: fixed klipper unnexpected fail at the end of the execution, even if graphs were correctly generated (unicode decode error fixed)
 #   v1.4: added the ~/klipper dir parameter to the call of graph_vibrations.py for a better user handling (in case user is not "pi")
 #   v1.3: some documentation improvement regarding the line endings that needs to be LF for this file
@@ -46,12 +47,31 @@ STORE_RESULTS=3 # Number of results to keep (older files are automatically clean
 
 export LC_ALL=C
 
+function is_fopen() {
+  filepath=$(realpath "$1")
+  for pid in $(ls /proc | grep -E '^[0-9]+$'); do
+    if [ -d "/proc/$pid/fd" ]; then
+      for fd in /proc/$pid/fd/*; do
+        if [ -L "$fd" ] && [ "$(readlink -f "$fd")" == "$filepath" ]; then
+          return 0
+        fi
+      done
+    fi
+  done
+  return 1
+}
+
 function plot_shaper_graph {
   local generator filename newfilename date axis
   generator="${KLIPPER_FOLDER}/scripts/calibrate_shaper.py"
 
   # For each file
   while read filename; do
+    # Wait for the file handler to be released by Klipper
+    while is_fopen "${filename}"; do
+      sleep 3
+    done
+
     # We remove the /tmp in front of the filename
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\///")"
 
@@ -80,6 +100,11 @@ function plot_belts_graph {
 
   # For each file
   while read filename; do
+    # Wait for the file handler to be released by Klipper
+    while is_fopen "${filename}"; do
+      sleep 3
+    done
+
     # We extract the belt tested from the filename
     belt="$(basename "${filename}" | cut -d '_' -f4 | cut -d '.' -f1 | sed -e 's/\(.*\)/\U\1/')"
 
@@ -97,14 +122,23 @@ function plot_vibr_graph {
   date_ext="$(date +%Y%m%d_%H%M%S)"
   generator="${SCRIPTS_FOLDER}/graph_vibrations.py"
 
+  # For each file
   while read filename; do
+    # Wait for the file handler to be released by Klipper
+    while is_fopen "${filename}"; do
+      sleep 3
+    done
+
+    # Cleanup of the filename and moving it in the result folder
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\/adxl345/vibr_${date_ext}/")"
     mv "${filename}" "${isf}"/vibrations/"${newfilename}"
   done <<< "$(find /tmp -type f -name "adxl345-*.csv" 2>&1 | grep -v "Permission")"
-
   sync && sleep 2
+
+  # We compute the vibration graphs using all the csv files
   "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png -a "$1" -k "${KLIPPER_FOLDER}"
 
+  # Finally we cleanup the folder by moving the csv files in an archive
   tar cfz "${isf}"/vibrations/vibrations_"${date_ext}".tar.gz "${isf}"/vibrations/vibr_"${date_ext}"*.csv
   rm "${isf}"/vibrations/vibr_"${date_ext}"*.csv
 }
@@ -161,9 +195,6 @@ if [ ! -d "${RESULTS_FOLDER}/vibrations" ]; then
 fi
 
 isf="${RESULTS_FOLDER//\~/${HOME}}"
-
-# Dirty fix to be sure Klipper has closed the file before doing anything
-sync && sleep 5
 
 case ${1} in
   SHAPER|shaper)
