@@ -3,9 +3,11 @@
 ###### GRAPH PLOTTING SCRIPT ######
 ###################################
 # Written by Frix_x#0161 #
-# @version: 1.5
+# @version: 1.6
 
 # CHANGELOG:
+#   v1.6: - updated the handling of shaper graph files to be able to optionnaly account for added positions in the filenames and remove them
+#         - fixed a bug in the belt graph on slow SD card or Pi clones (Klipper was still writing in the file while we were already reading it)
 #   v1.5: fixed klipper unnexpected fail at the end of the execution, even if graphs were correctly generated (unicode decode error fixed)
 #   v1.4: added the ~/klipper dir parameter to the call of graph_vibrations.py for a better user handling (in case user is not "pi")
 #   v1.3: some documentation improvement regarding the line endings that needs to be LF for this file
@@ -45,17 +47,48 @@ STORE_RESULTS=3 # Number of results to keep (older files are automatically clean
 
 export LC_ALL=C
 
+function is_fopen() {
+  filepath=$(realpath "$1")
+  for pid in $(ls /proc | grep -E '^[0-9]+$'); do
+    if [ -d "/proc/$pid/fd" ]; then
+      for fd in /proc/$pid/fd/*; do
+        if [ -L "$fd" ] && [ "$(readlink -f "$fd")" == "$filepath" ]; then
+          return 0
+        fi
+      done
+    fi
+  done
+  return 1
+}
+
 function plot_shaper_graph {
   local generator filename newfilename date axis
   generator="${KLIPPER_FOLDER}/scripts/calibrate_shaper.py"
-  
+
+  # For each file
   while read filename; do
+    # Wait for the file handler to be released by Klipper
+    while is_fopen "${filename}"; do
+      sleep 3
+    done
+
+    # We remove the /tmp in front of the filename
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\///")"
+
+    # We check if there is the position added by Klipper and remove it
+    if [[ ${newfilename} =~ ^resonances_[[:alpha:]]_([0-9]*\.)+[0-9]*_ ]]; then
+      newfilename="$(echo ${newfilename} | sed -E 's/(^resonances_[[:alpha:]])_(([0-9]*\.)+[0-9]*_)+/\1_/')"
+    fi
+
+    # We extract the date and axis name from the filename
     date="$(basename "${newfilename}" | cut -d '.' -f1 | awk -F'_' '{print $3"_"$4}')"
     axis="$(basename "${newfilename}" | cut -d '_' -f2)"
+
+    # Then we move the file to the result folder
     mv "${filename}" "${isf}"/inputshaper/"${newfilename}"
-    
     sync && sleep 2
+
+    # Finally we compute the shaper graphs
     "${generator}" "${isf}"/inputshaper/"${newfilename}" -o "${isf}"/inputshaper/resonances_"${axis}"_"${date}".png
   done <<< "$(find /tmp -type f -name "resonances_*.csv" 2>&1 | grep -v "Permission")"
 }
@@ -64,13 +97,23 @@ function plot_belts_graph {
   local date_ext generator filename belt
   date_ext="$(date +%Y%m%d_%H%M%S)"
   generator="${KLIPPER_FOLDER}/scripts/graph_accelerometer.py"
-  
+
+  # For each file
   while read filename; do
+    # Wait for the file handler to be released by Klipper
+    while is_fopen "${filename}"; do
+      sleep 3
+    done
+
+    # We extract the belt tested from the filename
     belt="$(basename "${filename}" | cut -d '_' -f4 | cut -d '.' -f1 | sed -e 's/\(.*\)/\U\1/')"
+
+    # And we move it to the result folder while injecting the date and belt inside the filename
     mv "${filename}" "${isf}"/belts/belt_"${date_ext}"_"${belt}".csv
   done <<< "$(find /tmp -type f -name "raw_data_axis*.csv" 2>&1 | grep -v "Permission")"
-  
   sync && sleep 2
+
+  # Finally we compute the belts graph
   "${generator}" -c "${isf}"/belts/belt_"${date_ext}"_*.csv -o "${isf}"/belts/belts_"${date_ext}".png
 }
 
@@ -78,15 +121,24 @@ function plot_vibr_graph {
   local date_ext generator filename newfilename
   date_ext="$(date +%Y%m%d_%H%M%S)"
   generator="${SCRIPTS_FOLDER}/graph_vibrations.py"
-  
+
+  # For each file
   while read filename; do
+    # Wait for the file handler to be released by Klipper
+    while is_fopen "${filename}"; do
+      sleep 3
+    done
+
+    # Cleanup of the filename and moving it in the result folder
     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\/adxl345/vibr_${date_ext}/")"
     mv "${filename}" "${isf}"/vibrations/"${newfilename}"
   done <<< "$(find /tmp -type f -name "adxl345-*.csv" 2>&1 | grep -v "Permission")"
-  
   sync && sleep 2
+
+  # We compute the vibration graphs using all the csv files
   "${generator}" "${isf}"/vibrations/vibr_"${date_ext}"*.csv -o "${isf}"/vibrations/vibrations_"${date_ext}".png -a "$1" -k "${KLIPPER_FOLDER}"
-  
+
+  # Finally we cleanup the folder by moving the csv files in an archive
   tar cfz "${isf}"/vibrations/vibrations_"${date_ext}".tar.gz "${isf}"/vibrations/vibr_"${date_ext}"*.csv
   rm "${isf}"/vibrations/vibr_"${date_ext}"*.csv
 }
@@ -103,7 +155,7 @@ function clean_files {
       old+=("${isf}"/inputshaper/"${csv}".csv)
     fi
   done <<< "$(find "${isf}"/inputshaper/ -type f -name '*.png' -printf '%T@ %p\n' | sort -k 1 -n -r | sed 's/^[^ ]* //' | tail -n +"${keep2}")"
-  
+
   while read filename; do
     if [ ! -z "${filename}" ]; then
       old+=("${filename}")

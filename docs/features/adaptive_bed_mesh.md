@@ -25,7 +25,7 @@ If you want to install it to your own custom config, here is the way to go:
   1. Copy the [adaptive_bed_mesh.cfg](./../../macros/calibration/adaptive_bed_mesh.cfg) macro file directly into your own config and include it.
   2. The macro needs the bounding box of the first layer to be able to compute a mesh on this surface. There is now two way to get it. Choose the one you prefer for your setup:
 
-      - **Method 1. It's the most easy way** as you have nothing to do beside activating the `[exclude_object]` mechanisms of Moonraker and Klipper. To proceed, you can follow the excellent [Exclude Objects guide from the Mainsail team](https://docs.mainsail.xyz/features/exclude_objects). Then you can go to step 3.
+      - **Method 1. It's the most easy way** as you have nothing to do beside activating the `[exclude_object]` mechanisms of Moonraker and Klipper. To proceed, you can follow the excellent [Exclude Objects guide from the Mainsail team](https://docs.mainsail.xyz/overview/features/exclude-objects). Then you can go to step 3.
       
         This method of extracting data was derived from [Kyleisah KAMP repository](https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging). Many thanks to him for the idea!
       
