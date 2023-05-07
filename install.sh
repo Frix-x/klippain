@@ -3,9 +3,11 @@
 ###### AUTOMATED INSTALL AND UPDATE SCRIPT ######
 #################################################
 # Written by yomgui1 & Frix_x
-# @version: 1.2
+# @version: 1.3
 
 # CHANGELOG:
+#   v1.3: added a warning on first install to be sure the user wants to install klippain and fixed a bug
+#         where some artefacts of the old user config where still present after the install (harmless bug but not clean)
 #   v1.2: fixed some bugs and adding small new features:
 #          - now it's ok to use the install script with the user config folder absent
 #          - avoid copying all the existing MCU templates to the user config directory during install to keep it clean
@@ -25,7 +27,8 @@ BACKUP_PATH="${HOME}/klippain_config_backups"
 set -eu
 export LC_ALL=C
 
-# Step 1: Verify that the script is not run as root and Klipper is installed
+# Step 1: Verify that the script is not run as root and Klipper is installed.
+#         Then if it's a first install, warn and ask the user if he is sure to proceed
 function preflight_checks {
     if [ "$EUID" -eq 0 ]; then
         echo "[PRE-CHECK] This script must not be run as root!"
@@ -37,6 +40,25 @@ function preflight_checks {
     else
         echo "[ERROR] Klipper service not found, please install Klipper first!"
         exit -1
+    fi
+
+    local install_klippain_answer
+    if [ ! -f "${USER_CONFIG_PATH}/.VERSION" ]; then
+        echo "[PRE-CHECK] New installation of Klippain detected!"
+        echo "[PRE-CHECK] This install script will WIPE AND REPLACE your current Klipper config with the full Klippain system (a backup will be kept)"
+        
+        read < /dev/tty -rp "[PRE-CHECK] Are you sure want to proceed and install Klippain? (y/N) " install_klippain_answer
+        if [[ -z "$install_klippain_answer" ]]; then
+            install_klippain_answer="n"
+        fi
+        install_klippain_answer="${install_klippain_answer,,}"
+
+        if [[ "$install_klippain_answer" =~ ^(yes|y)$ ]]; then
+            printf "[PRE-CHECK] Installation confirmed! Continuing...\n\n"
+        else
+            echo "[PRE-CHECK] Installation was canceled!"
+            exit -1
+        fi
     fi
 }
 
@@ -70,6 +92,12 @@ function backup_config {
     cp -fa ${USER_CONFIG_PATH}/. ${BACKUP_DIR} 2>/dev/null || :
     # Then delete the symlinks inside the backup folder as they are not needed here...
     find ${BACKUP_DIR} -type l -exec rm -f {} \;
+
+    # If Klippain is not already installed (we check for .VERSION in the backup to detect it),
+    # we need to remove, wipe and clean the current user config folder...
+    if [ ! -f "${BACKUP_DIR}/.VERSION" ]; then
+        rm -R ${USER_CONFIG_PATH}
+    fi
 
     printf "[BACKUP] Backup of current user config files done in: ${BACKUP_DIR}\n\n"
 }
