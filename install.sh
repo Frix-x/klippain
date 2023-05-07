@@ -164,8 +164,7 @@ function install_mcu_templates {
             # If the user selected a file, copy its content into the mcu.cfg file
             filename=$(basename "${file_list[$((toolhead_template-1))]}")
             cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/overrides/default.cfg" >> ${USER_CONFIG_PATH}/overrides.cfg
-            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg and default overrides added to your overrides.cfg user files\n\n"
+            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
         else
             printf "[CONFIG] No toolhead template selected. Skip and continuing...\n\n"
         fi
