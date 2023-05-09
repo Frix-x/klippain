@@ -9,7 +9,7 @@ This set of two macros (and associated bash script) is here to help you configur
      2. it then move the graphs and associated csv to the [ADXL results folder](./../../adxl_results/).
      3. it manage the folder to delete the older files and keep only a set (default is three) of the most recent results.
 
-Results can be found in the [ADXL results folder](./../../adxl_results/) that is placed directly at the root of the config folder to allow the access directly from your browser using the FLuidd/Maisail file manager. No more SSH is needed to calibrate your input shaper!
+Results can be found in the [ADXL results folder](./../../adxl_results/) that is placed directly at the root of the config folder to allow the access directly from your browser using the FLuidd/Maisail file manager. No more SSH is needed to calibrate your input shaper! You can get some hints on the results in my documentation about how to [read and interpret the IS graphs](../input_shaper.md).
 
 | Belts resonances example | X resonances example | Y resonances example |
 |:----------------------:|:----------------------:|:---------------------:|
@@ -49,4 +49,4 @@ Be sure your machine is homed and then call one of the following macros:
   - `BELTS_SHAPER_CALIBRATION` to get the belt resonnance graphs. This is usefull to verify the belts tension, but also to check if the belt paths are OK.
   - `AXES_SHAPER_CALIBRATION` to get the standard input shaper graphs and suppress the ringing/ghosting artefacts in your prints.
 
-Then, look for the results in the results folder. You can find them directly in your config folder by using the WebUI of Mainsail/Fluidd.
+Then, look for the results in the results folder. You can find them directly in your config folder by using the WebUI of Mainsail/Fluidd. You can get some hints on the results in my documentation about how to [read and interpret the IS graphs](../input_shaper.md).
