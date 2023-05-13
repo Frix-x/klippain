@@ -37,3 +37,14 @@ Also, add custom print end G-code to your slicer:
 ```
 END_PRINT
 ```
+
+If using an ERCF with Happy Hare config installed, you must specify INITIAL_TOOL in your slicer start G-code. Base on the previous example for SuperSlicer:
+```
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
+```
+And optionaly you can specify if you want or not unloading filament at the end of the print by using ERCF_UNLOAD_AT_END=1 or ERCF_UNLOAD_AT_END=0. For example for SuperSlicer:
+```
+END_PRINT ERCF_UNLOAD_AT_END=0
+```
+Rem: By default, Klippain unloads the filament at the end of the print; you can choose the default behavior by modifying the variables values in variables.cfg.
+
