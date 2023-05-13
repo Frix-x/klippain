@@ -24,7 +24,7 @@ Results can be found in the [ADXL results folder](./../../adxl_results/) that is
   1. Copy the [IS_vibrations_measurement.cfg](./../../macros/calibration/IS_vibrations_measurement.cfg) macro file directly into your own config.
   2. Be sure to have the `gcode_shell_command.py` Klipper extension installed. Easiest way to install it is to use the advanced section of KIAUH.
   3. Add my [scripts](./../../scripts/) folder at the root of your own config (ie. in your `~/printer_data/config/` directory).
-     
+
      Note: if using Windows to do the copy/paste of the files, be careful with the line endings for the `plot_graphs.sh` file and the `graph_vibrations.py` file: **Linux line endings (LF or \n) are mandatory!** If the file are using Windows line endings, you will get errors like `\r : unknown command` when running the script. If you're not confident regarding your text editor behavior, the best way is to directly download the files on the pi by using for example wget over SSH:
      
      ```
@@ -33,7 +33,7 @@ Results can be found in the [ADXL results folder](./../../adxl_results/) that is
      ```
 
   4. Make the scripts executable using SSH. When in the folder, use:
-     
+
      ```
      chmod +x ./plot_graphs.sh
      chmod +x ./graph_vibrations.py

@@ -26,11 +26,11 @@ If you want to install it to your own custom config, here is the way to go:
   2. The macro needs the bounding box of the first layer to be able to compute a mesh on this surface. There is now two way to get it. Choose the one you prefer for your setup:
 
       - **Method 1. It's the most easy way** as you have nothing to do beside activating the `[exclude_object]` mechanisms of Moonraker and Klipper. To proceed, you can follow the excellent [Exclude Objects guide from the Mainsail team](https://docs.mainsail.xyz/overview/features/exclude-objects). Then you can go to step 3.
-      
+
         This method of extracting data was derived from [Kyleisah KAMP repository](https://github.com/kyleisah/Klipper-Adaptive-Meshing-Purging). Many thanks to him for the idea!
       
         Please note that only G-Code files that have been prepared accordingly will be able to use the adaptive mesh feature. For old and unprocessed files, a normal bed mesh will be automatically applied instead.
-      
+
       - **Method 2. If you want to do it the manual way**, you will need to change some settings in your slicer:
 
         - **SuperSlicer** is easy. Just change your custom g_code PRINT_START macro to add the SIZE argument like this (everything should be on one line !):
@@ -40,13 +40,13 @@ If you want to install it to your own custom config, here is the way to go:
           ```
 
         - **Cura** is a bit more tricky as you need to install the post process plugin by frankbags called MeshPrintSize.py.
-     
+
           In Cura menu, click `Help` > `Show configuration folder`. Then, copy [this python script](https://gist.github.com/frankbags/c85d37d9faff7bce67b6d18ec4e716ff#file-meshprintsize-py) into the plugins folder. Some users reported problems with newer versions of Cura, so if it's not working, try placing the script manually here: `C:\Program Files\Ultimaker Cura 5.0.0\share\cura\plugins\PostProcessingPlugin\scripts`.
-     
+
           Then restart Cura and select in the menu: `Extensions` > `Post processing` > select `Mesh Print Size`.
-     
+
           At the end, change your custom g_code PRINT_START macro to add the SIZE argument like this (everything should be on one line !):
-     
+
           ```
           PRINT_START [all your own things...] SIZE=%MINX%_%MINY%_%MAXX%_%MAXY%
           ```
@@ -58,7 +58,7 @@ If you want to install it to your own custom config, here is the way to go:
   4. **VERY IMPORTANT CHECKS**:
      - Check that the `BED_MESH_CALIBRATE` command is working correctly now or fix your `[bed_mesh]` section.
      - Check that the `mesh_min`, `mesh_max`, `probe_count` and `mesh_pps` config entries in your `[bed_mesh]` section are specified using **TWO numbers** as my macro is waiting for  it and will fail if there is only one specified. Something like this is ok:
-     
+
        ```
        probe_count: 9,9
        ```
@@ -74,13 +74,13 @@ If you want to install it to your own custom config, here is the way to go:
 There is two way to use this set of macros and do an adaptive bed mesh. Choose between the two points the one that is best for you:
     
   1. First way is the normal and easy way adapted for most of the users: in your klipper config, modify your `PRINT_START` macro definition by calling the `ADAPTIVE_BED_MESH` macro when you want to start the probing:
-     
+
      ```
      ADAPTIVE_BED_MESH
      ```
 
   2. Second way is for power users that also use the [klipper_z_calibration](https://github.com/protoloft/klipper_z_calibration) plugin and want to do the bed mesh **after** the Z calibration procedure. You will first need to add a call to `COMPUTE_MESH_PARAMETERS` somewhere in the beginning of your `PRINT_START`.
-             
+
      Then you will need to call **in an another macro** the `CALIBRATE_Z` command with the computed mesh center point:
 
      ```
@@ -96,9 +96,9 @@ There is two way to use this set of macros and do an adaptive bed mesh. Choose b
 <details>
 <summary>Using the SIZE parameter from the slicer</summary>
 There is two way to use this set of macros and do an adaptive bed mesh. Choose between the two points the one that is best for you:
-    
+
   1. First way is the normal and easy way adapted for most of the users: in your klipper config, modify your `PRINT_START` macro definition by adding two lines of gcode. The first one is to get the `SIZE` parameter from the slicer, and the second one is to call the `ADAPTIVE_BED_MESH` macro to start the probing. Something like that will do the trick:
-     
+
      ```
      {% set FL_SIZE = params.SIZE|default("0_0_0_0")|string %}
      ADAPTIVE_BED_MESH SIZE={FL_SIZE}
@@ -110,7 +110,7 @@ There is two way to use this set of macros and do an adaptive bed mesh. Choose b
      {% set FL_SIZE = params.SIZE|default("0_0_0_0")|string %}
      COMPUTE_MESH_PARAMETERS SIZE={FL_SIZE}
      ```
-             
+
      Then you need to call **in an another macro** the `CALIBRATE_Z` command with the computed mesh center point:
 
      ```
