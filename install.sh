@@ -222,7 +222,7 @@ function install_mcu_templates {
             filename=$(basename "${file_list[$((ercf_template-1))]}")
             cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
             echo "[CONFIG] Template '$filename' inserted into your mcu.cfg user file"
-            printf "[INFO] You should install ERCF Happy Hare from https://github.com/moggieuk/ERCF-Software-V3 to use ERCF with Klippain\n\n"
+            printf "[CONFIG] You must install ERCF Happy Hare from https://github.com/moggieuk/ERCF-Software-V3 to use ERCF with Klippain\n\n"
         else
             printf "[CONFIG] No ERCF template selected. Skip and continuing...\n\n"
         fi
