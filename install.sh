@@ -22,6 +22,8 @@ USER_CONFIG_PATH="${HOME}/printer_data/config"
 FRIX_CONFIG_PATH="${HOME}/klippain_config"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
 BACKUP_PATH="${HOME}/klippain_config_backups"
+# Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
+KLIPPER_PATH="${HOME}/klipper"
 
 
 set -eu
@@ -127,6 +129,9 @@ function install_config {
     for file in graph_vibrations.py plot_graphs.sh; do
         chmod +x ${FRIX_CONFIG_PATH}/scripts/$file
     done
+
+    # Symlink the gcode_shell_command.py file in the correct Klipper folder (erased to always get the last version)
+    ln -fsn ${FRIX_CONFIG_PATH}/scripts/gcode_shell_command.py ${KLIPPER_PATH}/klippy/extras
 
     # Create or update the config version tracking file in the user config directory
     git -C ${FRIX_CONFIG_PATH} rev-parse HEAD > ${USER_CONFIG_PATH}/.VERSION
