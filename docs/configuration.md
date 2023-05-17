@@ -21,6 +21,11 @@ Don't overlook, this section is the most important. Now that your MCU is configu
   1. Then, edit `overrides.cfg` according to the [overrides documentation and examples](./overrides.md). Use overrides to tweak machine dimensions, invert motor directions, change axis limits, currents, sensors type, or anything you feel the need to change.
   1. Once Klipper boots successfully, adjust the `variables.cfg` file to match your machine's configuration. This file provides additional customization for macro behavior (coordinates, enabling/disabling software features, etc.).
 
+  > **Note**:
+  >
+  > If you plan to use an ERCF, Klippain is only compatible with the [Happy Hare](https://github.com/moggieuk/ERCF-Software-V3) software backend.
+  > Enable the ERCF lines in Klippain's `printer.cfg` and then install Happy Hare directly by following its official documention. **When the Happy Hare installer ask if you want to include all the ERCF files into your printer.cfg: answer no** as everything is already included in Klippain!
+
 
 ## 3. Initial startup of the machine
 
@@ -30,10 +35,16 @@ Next, ensure the mechanical probe (if used) can be attached/detached, verify tha
 
 Finally, add custom print start G-code to your slicer. Here's an example for SuperSlicer:  
 ```
-START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
 ```
 
 Also, add custom print end G-code to your slicer:
 ```
 END_PRINT
 ```
+
+  > **Note** for ERCF users:
+  >
+  > By default, Klippain unloads the filament at the end of the print, but you can change the default behavior by modifying the variable `variable_ercf_unload_on_end_print` in your `variables.cfg` file.
+  > You can also specify the wanted behavior directly in your slicer end print custom gcode by using `END_PRINT ERCF_UNLOAD_AT_END=0`.
+
