@@ -40,7 +40,7 @@ END_PRINT
   > **Addition** for case light (fcob white or neopixel) users:
   >
   > By default, Klippain don't turn off case lights on printing progress.
-  > If you want, you can add this two lines in your slicer to turn off caselight at a specific layer. ex: for SuperSlicer in "After layer change G-code" in Printer Settings:
+  > If you want, you can add this two lines in your slicer to turn off caselight at a specific layer. ex: for SuperSlicer in "Before layer change G-code" in Printer Settings:
   >```
   >SET_PRINT_STATS_INFO CURRENT_LAYER={layer_num}
   >_STOP_CASELIGHT_LAYER_CHANGE LAYER=X
