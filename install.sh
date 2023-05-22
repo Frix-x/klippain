@@ -6,8 +6,9 @@
 # @version: 1.3
 
 # CHANGELOG:
-#   v1.3: added a warning on first install to be sure the user wants to install klippain and fixed a bug
-#         where some artefacts of the old user config where still present after the install (harmless bug but not clean)
+#   v1.3: - added a warning on first install to be sure the user wants to install klippain and fixed a bug
+#           where some artefacts of the old user config where still present after the install (harmless bug but not clean)
+#         - automated the install of the Gcode shell commands plugin
 #   v1.2: fixed some bugs and adding small new features:
 #          - now it's ok to use the install script with the user config folder absent
 #          - avoid copying all the existing MCU templates to the user config directory during install to keep it clean
