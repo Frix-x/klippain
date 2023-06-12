@@ -69,7 +69,7 @@ def calc_psd(datas, group, max_freq):
                 data = np.pad(data, [(0, (M-N)+1), (0, 0)], mode='constant', constant_values=0)
 
             freqrsp.add_data(calc_freq_response(data))
-        
+
         if not psd_list:
             # First group, just put it in the result list
             first_freqs = freqrsp.freq_bins
@@ -191,7 +191,7 @@ def sort_and_slice(raw_speeds, raw_datas, remove):
     for data in raw_datas:
         sliced = round((len(data) * remove / 100) / 2)
         datas.append(data[sliced:len(data)-sliced])
-    
+
     return raw_speeds, datas
 
 
@@ -222,14 +222,14 @@ def main():
         opts.error("You must specify an output file.png to use the script (option -o)")
     if options.remove > 50 or options.remove < 0:
         opts.error("You must specify a correct percentage (option -r) in the 0-50 range")
-    
+
     setup_klipper_import(options.klipperdir)
 
     # Parse the raw data and get them ready for analysis
     raw_datas = [parse_log(filename, opts) for filename in args]
     raw_speeds = [extract_speed(filename, opts) for filename in args]
     speeds, datas = sort_and_slice(raw_speeds, raw_datas, options.remove)
-    
+
     # As we assume that we have the same number of file for each speeds. We can group
     # the PSD results by this number (to combine vibrations at given speed on all movements)
     group_by = speeds.count(speeds[0])
