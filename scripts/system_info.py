@@ -55,7 +55,7 @@ def get_unknown_board_info():
     try:
         with open('/proc/cpuinfo', 'r') as f:
             for line in f:
-                if line.startswith('Hardware') or line.startswith('Model name'):
+                if line.startswith('Hardware') or line.startswith('Model'):
                     return line.split(':')[1].strip()
         with open('/etc/os-release', 'r') as f:
             for line in f:
