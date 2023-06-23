@@ -17,6 +17,8 @@ When tuning Input Shaper, keep the following in mind:
   1. Perform the tests when the machine is heat-soaked and close to printing conditions, as belt tension can change with temperature.
   1. Avoid running the toolhead fans during the tests, as they introduce unnecessary noise to the graphs, making them harder to interpret. This means that even if you should heatsoak the printer, you should also refrain from activating the hotend heater during the test, as it will also trigger the hotend fan. However, as a bad fan can introduce some vibrations, feel free to use the test to diagnose an unbalanced fan as seen in the [Examples of Input Shaper graphs](#examples-of-input-shaper-graphs) section.
   1. Ensure the accuracy of your ADXL measurements by running a `MEASURE_AXES_NOISE` test and checking that the result is below 100 for all axes. If it's not, check your ADXL and wiring before continuing.
+  1. The graphs can only show symptoms of possible problems and in different ways. Those symptoms can sometimes suggest causes, but they rarely pinpoint issues.
+  1. Remember why you're running these tests (clean prints) and don't become too obsessive over perfect graphs. 
 
   > **Note**
   >
