@@ -109,8 +109,8 @@ def print_system_info():
     else:
         # This is the case where it is running on a unknown machine type
         # so we use the specific function to try to gather more info...
-        print(f"Machine: {machine} - in an unknown machine")
-        print(f"Unknown system information: {get_unknown_board_info()}")
+        print(f"Machine: {machine}")
+        print(f"System information: {get_unknown_board_info()}")
 
 
     total_ram, available_ram = future_ram_info.result()
