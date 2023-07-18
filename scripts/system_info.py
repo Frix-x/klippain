@@ -42,12 +42,11 @@ def check_wsl():
     return False
 
 def get_pi_model():
-    if "arm" in platform.machine():
-        try:
-            model_info = subprocess.check_output(['cat', '/sys/firmware/devicetree/base/model'], universal_newlines=True)
-            return model_info
-        except subprocess.CalledProcessError:
-            return None
+    try:
+        model_info = subprocess.check_output(['cat', '/sys/firmware/devicetree/base/model'], universal_newlines=True)
+        if 'raspberry pi' in model_info.lower(): return model_info
+    except subprocess.CalledProcessError:
+        return None
     else:
         return None
 
