@@ -45,6 +45,20 @@ function preflight_checks {
         exit -1
     fi
 
+    # Stop the user if it looks like a print is currently running
+
+    # See if the mookraker API is responding on localhost (fail silently if not)
+    if $(curl -fs localhost/server/info -o /dev/null); then 
+        # With a 0 result code from the request to server/info, it appears that klippy is up.
+        # The only acceptable result under these conditions is that the printer is in 'standby' state (other common states are 'printing' and 'error').
+        if [ "$(curl -s localhost/printer/objects/query?print_stats | python3 -c "import json,sys;print(json.load(sys.stdin)['result']['status']['print_stats']['state'])")" = "standby" ]; then
+            printf "[PRE-CHECK] Klipper does not seem to be printing! Continuing...\n\n"
+        else
+            echo "[ERROR] It looks like Klipper is currently printing or in an error state. Installation was canceled!"
+            exit -1
+        fi
+    fi
+
     local install_klippain_answer
     if [ ! -f "${USER_CONFIG_PATH}/.VERSION" ]; then
         echo "[PRE-CHECK] New installation of Klippain detected!"
