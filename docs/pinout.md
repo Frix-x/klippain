@@ -31,7 +31,7 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
   - `[EXYZ1-3]_DIR`: drivers dir pins
   - `[EXYZ1-3]_ENABLE`: drivers enable pins
   - `[EXYZ1-3]_TMCUART`: drivers UART pins
-  - Beside standard axis there is also the support for the `GEAR_...` and `SELECTOR_...` drivers used in the ERCF
+  - Beside standard axis there is also the support for the `MMU_GEAR_...` and `MMU_SEL_...` drivers used in the MMU/ERCF
 
 #### Endstops & Probe
   - `[XYZ]_STOP`: classic axis endstops pins
@@ -62,10 +62,10 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
 
 #### Other I/Os
   - `RUNOUT_SENSOR`: filament motion sensor
-  - `ERCF_ENCODER`: filament motion sensor used in the ERCF carriage
-  - `TOOLHEAD_SENSOR`: toolhead filament sensor used for the ERCF
+  - `MMU_ENCODER`: filament motion sensor used in the MMU/ERCF carriage
+  - `TOOLHEAD_SENSOR`: toolhead filament sensor used for the MMU/ERCF
   - `SERVO_PIN`: for a mechanical and movable probe dock or brush (such as the ones that are commonly found on the Voron V0 mods)
-  - `ERCF_SERVO`: for a the ERCF servo
+  - `MMU_SERVO`: for a the MMU/ERCF servo
 
 
 ## External references
