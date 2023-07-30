@@ -237,11 +237,27 @@ function install_mcu_templates {
 
 
 # Step 5: restarting Klipper
-function restart_klipper {
-    echo "[POST-INSTALL] Restarting Klipper..."
-    sudo systemctl restart klipper
+function post_install {
+    local reply
+    while true; do
+        read -erp "Restart Klipper NOW? This will stop any active prints (obviously)! [y/N]: " -i "N" reply
+        case "${reply}" in
+            [yY]*)
+                echo "Restarting Klipper..."
+                sudo systemctl restart klipper            
+            ;;
+            [nN]*)
+                echo "\n\e[31mKlippain is only active after a Klipper restart"
+                echo "Restart Klipper to start using Klippain\e[0m\n"
+                echo "Goodbye ..."
+                break
+            ;;
+            * )
+                msg "\e[31mERROR:\e[0m Please choose Y or N !"
+            ;;
+        esac
+    done
 }
-
 
 BACKUP_DIR="${BACKUP_PATH}/$(date +'%Y_%m_%d-%H%M%S')"
 
@@ -254,7 +270,7 @@ preflight_checks
 check_download
 backup_config
 install_config
-restart_klipper
+post_install
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
 echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
