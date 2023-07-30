@@ -244,7 +244,8 @@ function post_install {
         case "${reply}" in
             [yY]*)
                 echo "Restarting Klipper..."
-                sudo systemctl restart klipper            
+                sudo systemctl restart klipper
+                break
             ;;
             [nN]*)
                 echo "\n\e[31mKlippain is only active after a Klipper restart"
@@ -258,6 +259,7 @@ function post_install {
         esac
     done
 }
+
 
 BACKUP_DIR="${BACKUP_PATH}/$(date +'%Y_%m_%d-%H%M%S')"
 
