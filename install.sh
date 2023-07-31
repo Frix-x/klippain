@@ -236,8 +236,19 @@ function install_mcu_templates {
 }
 
 
-# Step 5: restarting Klipper
+# Step 5: restarting Klipper, on demand in case of interactive shell, or automatically when non-interactive
 function post_install {
+    if [[ $- == *i* ]]
+    then
+        ask_restart_klipper
+    else 
+        echo "Restarting Klipper..."
+        sudo systemctl restart klipper
+    fi
+}
+
+
+function ask_restart_klipper {
     local reply
     while true; do
         read -erp "Restart Klipper NOW? This will stop any active prints (obviously)! [y/N]: " -i "N" reply
