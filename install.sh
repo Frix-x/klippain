@@ -49,6 +49,7 @@ function preflight_checks {
     if [ ! -f "${USER_CONFIG_PATH}/.VERSION" ]; then
         echo "[PRE-CHECK] New installation of Klippain detected!"
         echo "[PRE-CHECK] This install script will WIPE AND REPLACE your current Klipper config with the full Klippain system (a backup will be kept)"
+        echo "[PRE-CHECK] Be sure that the printer is idle before continuing!"
         
         read < /dev/tty -rp "[PRE-CHECK] Are you sure want to proceed and install Klippain? (y/N) " install_klippain_answer
         if [[ -z "$install_klippain_answer" ]]; then
