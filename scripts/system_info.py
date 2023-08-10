@@ -42,12 +42,11 @@ def check_wsl():
     return False
 
 def get_pi_model():
-    if "arm" in platform.machine():
-        try:
-            model_info = subprocess.check_output(['cat', '/sys/firmware/devicetree/base/model'], universal_newlines=True)
-            return model_info
-        except subprocess.CalledProcessError:
-            return None
+    try:
+        model_info = subprocess.check_output(['cat', '/sys/firmware/devicetree/base/model'], universal_newlines=True)
+        if 'raspberry pi' in model_info.lower(): return model_info
+    except subprocess.CalledProcessError:
+        return None
     else:
         return None
 
@@ -55,7 +54,7 @@ def get_unknown_board_info():
     try:
         with open('/proc/cpuinfo', 'r') as f:
             for line in f:
-                if line.startswith('Hardware') or line.startswith('Model name'):
+                if line.startswith('Hardware') or line.startswith('Model'):
                     return line.split(':')[1].strip()
         with open('/etc/os-release', 'r') as f:
             for line in f:
@@ -109,8 +108,8 @@ def print_system_info():
     else:
         # This is the case where it is running on a unknown machine type
         # so we use the specific function to try to gather more info...
-        print(f"Machine: {machine} - in an unknown machine")
-        print(f"Unknown system information: {get_unknown_board_info()}")
+        print(f"Machine: {machine}")
+        print(f"System information: {get_unknown_board_info()}")
 
 
     total_ram, available_ram = future_ram_info.result()

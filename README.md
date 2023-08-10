@@ -2,11 +2,11 @@
 
 > Klippain - The pain-free recipe for (french)bread and butter Klipper configuration!
 
-Klippain is a generic, modular, and highly customizable Klipper configuration for CoreXY 3D printers. Designed for use on various machines, it has been reported working correctly on Voron V2.4, Voron Trident, Voron V0, TriZero, VZbot, Ender5, etc... I even use it myself on an heavily modified Prusa i3 MK3s.
+Klippain is a generic, modular, and highly customizable Klipper configuration for 3D printers. Designed for use on various machines such as Cartesian, CoreXY and CoreXZ, it has been reported working correctly on Voron V2.4, Voron Trident, Voron V0, Voron SwitchWire, TriZero, VZbot, Ender5, Ender3, Prusas, etc...
 
 ![Klippain](./docs/klippain.png)
 
-The configuration is regularly updated with new features and merged PRs from users. You can reach me on the Voron Discord as **Frix_x#0161**.
+Klippain is regularly updated with new features and merged PRs from users. You can reach me on the Voron Discord as **Frix_x#0161**.
 
 Fun fact: "pain" \pɛ̃\ is the French word for bread, so there's no pain in this pain—only joy! Thanks to the French channel "honhonhonbaguette-FR" on the Voron Discord for the joke and name suggestion!
 
