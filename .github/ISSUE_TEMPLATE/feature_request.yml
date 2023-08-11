@@ -1,0 +1,29 @@
+name: "\U0001F680 Feature request"
+description: Suggest a new feature or hardware support for Klippain.
+labels: ["enhancement", "triage"]
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      This issue form is for suggesting features or hardware support only!
+      If you're facing a bug, please use the [bug_report](/new?template=bug_report.yml) instead.
+- type: textarea
+  id: feature-description
+  attributes:
+    label: Describe the feature or hardware support you'd like
+    description: >-
+      Provide a clear and detailed description of the feature, mod, macro, or hardware you'd like to see in Klippain.
+      Also do not hesistate to explain how your suggestion can enhance Klippain and benefit its users.
+    placeholder: E.g., "I'd love to see support for this XXX new MCU model..."
+  validations:
+    required: true
+- type: textarea
+  id: additional-context
+  attributes:
+    label: Additional context or information
+    description: |
+      If you have any more information, references, or context about your suggestion, please provide it here.
+      This can include use-cases, diagrams, documentation, links or any other helpful details.
+
+      Please note, you can attach files or screenshots by dragging and dropping them directly in the field.
