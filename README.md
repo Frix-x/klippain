@@ -1,3 +1,7 @@
+  > **Warning**
+  >
+  > This branch of klippain is in beta state for using with the neta Happy_Hare v2 for MMU/ERCF module https://github.com/moggieuk/Happy-Hare.git **use it as you risk and make a backup of your config before using it** 
+
 # Klippain
 
 > Klippain - The pain-free recipe for (french)bread and butter Klipper configuration!
