@@ -4,7 +4,7 @@ Klippain requires a few simple steps to configure and customize it for your prin
 
   > **Warning**
   >
-  > General rule to keep the auto-update feature working: **never modify Klippain files directly**, but instead add overrides as per the following documentation. To proceed, you can modify all the pre-installed templates in your config root folder (`printer.cfg`, `mcu.cfg`, `variables.cfg` and `overrides.cfg`) as they will be preserved on update.
+  > General rule to keep the auto-update feature working: **never modify Klippain files directly**, but instead add overrides as per the following documentation. To proceed, you can modify all the pre-installed templates in your config root folder (`printer.cfg`, `mcu.cfg`, `variables.cfg` and `overrides.cfg` and the MMU configs files in mmu directory created when you install Happy-Hare v2) as they will be preserved on update.
 
 
 ## 1. MCU Settings
@@ -21,10 +21,10 @@ Don't overlook, this section is the most important. Now that your MCU is configu
   1. Then, edit `overrides.cfg` according to the [overrides documentation and examples](./overrides.md). Use overrides to tweak machine dimensions, invert motor directions, change axis limits, currents, sensors type, or anything you feel the need to change.
   1. Once Klipper boots successfully, adjust the `variables.cfg` file to match your machine's configuration. This file provides additional customization for macro behavior (coordinates, enabling/disabling software features, etc.).
 
-  > **Note**:
+  > **Important Note**:
   >
-  > If you plan to use an ERCF, Klippain is only compatible with the [Happy Hare](https://github.com/moggieuk/ERCF-Software-V3) software backend.
-  > Enable the ERCF lines in Klippain's `printer.cfg` and then install Happy Hare directly by following its official documention. **When the Happy Hare installer ask if you want to include all the ERCF files into your printer.cfg: answer no** as everything is already included in Klippain!
+  > This branch of Klippain is for using whith MMU/ERCF, it's only compatible with the [Happy Hare v2] (https://github.com/moggieuk/Happy-Hare.git) software backend.
+  > Enable the MMU/ERCF lines in Klippain's `printer.cfg` and then install Happy Hare directly by following its official documention. **When the Happy Hare installer ask if you want to include all the MMU files into your printer.cfg: answer no** as everything is already included in Klippain!
 
 
 ## 3. Initial startup of the machine
