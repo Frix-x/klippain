@@ -1,0 +1,44 @@
+name: "\U0001F41B Bug report"
+description: Report a bug or problem with Klippain.
+labels: ["bug", "triage"]
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      This issue form is for reporting bugs only!
+      If you have a feature request, please use [feature_request](/new?template=feature_request.yml) instead.
+- type: checkboxes
+  id: klippain-branch
+  attributes:
+    label: Klippain branch
+    description: By submitting this issue, you confirm using a "public" release of Klippain from the main branch. We do not provide support for the dev version from other branches as they are known to be unstable.
+    options:
+      - label: I confirm using the main branch
+        required: true
+- type: input
+  id: klippain-version
+  attributes:
+    label: Version
+    description: Specify the version of Klippain used on your printer. You can find this in the update section of Mainsail/Fluidd.
+    placeholder: ex. v4.0.1-44-g84aba96
+  validations:
+    required: true
+- type: textarea
+  id: what-happened
+  attributes:
+    label: Describe the bug and expected behavior
+    description: >-
+      Provide a clear and concise description of the bug and why it's problematic.
+      If applicable, suggest a desired solution.
+  validations:
+    required: true
+- type: textarea
+  id: additional-info
+  attributes:
+    label: Additional information and klippy.log
+    description: |
+      If possible, attach a klippy.log to help us diagnose your issue!
+      You can also provide any additional helpful details.
+
+      Please note, you can attach files or screenshots by dragging and dropping them directly in the field.
