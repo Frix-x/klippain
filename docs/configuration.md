@@ -23,7 +23,7 @@ Don't overlook, this section is the most important. Now that your MCU is configu
 
   > **Important Note**:
   >
-  > This branch of Klippain is for using whith MMU/ERCF, it's only compatible with the [Happy Hare v2] (https://github.com/moggieuk/Happy-Hare.git) software backend.
+  > This branch of Klippain is for using with MMU/ERCF, it's only compatible with the [Happy Hare v2] (https://github.com/moggieuk/Happy-Hare.git) software backend.
   > Enable the MMU/ERCF lines in Klippain's `printer.cfg` and then install Happy Hare directly by following its official documention. **When the Happy Hare installer ask if you want to include all the MMU files into your printer.cfg: answer no** as everything is already included in Klippain!
 
 
