@@ -1,6 +1,10 @@
   > **Warning**
   >
-  > This branch of klippain is in beta state for using with the new BETA Happy_Hare v2 for MMU/ERCF module https://github.com/moggieuk/Happy-Hare.git **use it at your own risks and make sur to have a backup of your config before using it**.
+  > This branch of klippain is in beta state for using with the new BETA Happy_Hare v2 for MMU/ERCF module https://github.com/moggieuk/Happy-Hare.git **use it at your own risks and make sure to have a backup of your config before using it**.
+
+  > Here is the initial procedure to remove the old ERCF-Software-V3 (if you already have it):
+  > (a) backup your old ercf_***.cfg files for future reference,
+  > (b) Cleanly REMOVE ERCF-Software-V3 (**./install.sh -u** in ERCF-Software-V3 folder) and remove the cloned git source tree
 
   > Take in mind that HHv2 use a new extruder section (define in `/mmu/base/mmu_hardware.cfg` file): especialy take care about `[tmc2209 manual_extruder_stepper extruder]` for replacement of `[tmc2209 extruder]` so **all the [tmc2209 extruder] section in klippain must be comment out (see in `mcu.cfg`)  and report in `[tmc2209 manual_extruder_stepper extruder]` section of mmu_hardware.cfg !!!**.
 
@@ -32,11 +36,13 @@ To install Klippain, first ensure you have already Klipper, Moonraker, and a Web
 
 Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
 
+  > before install this branch of klippain I recommand to make a clear install... So remove **.VERSION** in config folder and then remove the klippain_config (cloned git source tree). Then you can reinstall klippain Happy_Hare branch with:
+
 ```bash
 wget -O - https://raw.githubusercontent.com/Frix-x/klippain/Happy_Hare/install.sh | bash
 ```
 
-Then you need to install Happy_Hare V2 from it's own repo: https://github.com/moggieuk/Happy-Hare.git (one more time: don't forget to **answer no** When the Happy Hare installer ask if you want to include all the MMU files into your printer.cfg)
+After this you need to install Happy_Hare V2 from it's own repo: https://github.com/moggieuk/Happy-Hare.git (one more time: don't forget to **answer no** When the Happy Hare installer ask if you want to include all the MMU files into your printer.cfg)
 
 Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./docs/configuration.md).
 
