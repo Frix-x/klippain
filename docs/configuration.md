@@ -24,7 +24,9 @@ Don't overlook, this section is the most important. Now that your MCU is configu
   > **Important Note**:
   >
   > This branch of Klippain is for using with MMU/ERCF, it's only compatible with the [Happy Hare v2] (https://github.com/moggieuk/Happy-Hare.git) software backend.
-  > Enable the MMU/ERCF lines in Klippain's `printer.cfg` and then install Happy Hare directly by following its official documention. **When the Happy Hare installer ask if you want to include all the MMU files into your printer.cfg: answer no** as everything is already included in Klippain!
+  > by enable the MMU/ERCF lines in Klippain's `printer.cfg` and then install Happy Hare directly by following its official documention.
+  > Take in mind that HHv2 use a new extruder section (define in `/mmu/base/mmu_hardware.cfg` file): especialy take care about `[tmc2209 manual_extruder_stepper extruder]` for replacement of `[tmc2209 extruder]` so **all the [tmc2209 extruder] section in klippain must be comment out (see in `mcu.cfg`)  and report in `[tmc2209 manual_extruder_stepper extruder]` section of mmu_hardware.cfg !!!**.
+ **If the Happy Hare installer ask if you want to include all the MMU files into your printer.cfg: answer no** as everything is already included in Klippain!
 
 
 ## 3. Initial startup of the machine
