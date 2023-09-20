@@ -1,6 +1,6 @@
   > **Warning**
   >
-  > This branch of klippain is in beta state for using with the new BETA Happy_Hare v2 for MMU/ERCF module https://github.com/moggieuk/Happy-Hare.git **use it at your own risks and make sure to have a backup of your config before using it**.
+  > This branch of klippain is in beta state for using with the new Happy_Hare v2 for MMU/ERCF module from https://github.com/moggieuk/Happy-Hare.git **use it at your own risks and make sure to have a backup of your config before using it**.
 
 
 # Klippain
