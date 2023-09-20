@@ -18,4 +18,6 @@ cd Happy-Hare
 ./install.sh -i
 ```
 
+Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./docs/configuration.md).
+
 ...
