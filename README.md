@@ -29,12 +29,13 @@ To install Klippain, first ensure you have already Klipper, Moonraker, and a Web
 
 Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
 
-  > ONLY IF YOU HAVE PREVIOUSLY INSTALL Klippain: before install this branch of klippain I recommand to make a clear install... So after a backup of your previous config!!!, remove **.VERSION** in config folder and then remove the klippain_config (cloned git source tree). Then you can reinstall klippain Happy_Hare branch so:
+  > **ONLY IF YOU HAVE PREVIOUSLY INSTALL Klippain**: before install this branch of klippain I recommand to make a clear install... **So after saving your previous configuration!!!**, remove **.VERSION** in config folder and then remove the klippain_config (cloned git source tree):
 ```bash
 rm ~/printer_data/config/.VERSION
 rm -rf ~/klippain_config
 ```
-And use this command on ssh to install Happy_Hare branch of klippain:
+  > Then you can install Happy_Hare branch of Klippain over ssh by using this command:
+
 ```bash
 wget -O - https://raw.githubusercontent.com/Frix-x/klippain/Happy_Hare/install.sh | bash
 ```
