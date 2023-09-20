@@ -9,6 +9,13 @@ Uninstall the old ercf ERCF-Software-V3 (if you already have it):
 rm -rf ~/ERCF-Software-V3
 ```
 
+and install the "new" Happy Hare V2 by following instructions in https://github.com/moggieuk/Happy-Hare:
+```
+cd ~
+git clone https://github.com/moggieuk/Happy-Hare.git
+cd Happy-Hare
 
-and Upgrade it now from https://github.com/moggieuk/Happy-Hare
+./install.sh -i
+```
+
 ...
