@@ -61,7 +61,7 @@ Then, call the `VIBRATIONS_CALIBRATION` macro with the direction and speed range
 | parameters | default value | description |
 |-----------:|---------------|-------------|
 |SIZE|60|size in mm of the area where the movements are done|
-|DIRECTION|"XY"|direction vector where you want to do the measurements. Can be set to either "XY", "AB", "ABXY", "A", "B", "X", "Y", "Z"|
+|DIRECTION|"XY"|direction vector where you want to do the measurements. Can be set to either "XY", "AB", "ABXY", "A", "B", "X", "Y", "Z", "E"|
 |Z_HEIGHT|20|z height to put the toolhead before starting the movements. Be careful, if your ADXL is under the nozzle, increase it to avoid a crash of the ADXL on the bed of the machine|
 |VERBOSE|1|Wether to log the current speed in the console|
 |MIN_SPEED|20|minimum speed of the toolhead in mm/s for the movements|
