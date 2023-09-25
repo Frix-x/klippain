@@ -63,7 +63,7 @@ function is_fopen() {
 
 function plot_shaper_graph {
   local generator filename newfilename date axis
-  generator="${KLIPPER_FOLDER}/scripts/calibrate_shaper.py"
+  generator="${SCRIPTS_FOLDER}/graph_shaper.py"
 
   # For each file
   while read filename; do

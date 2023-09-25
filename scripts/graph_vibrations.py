@@ -237,13 +237,13 @@ def main():
     freqs, power_spectral_densities = calc_psd(datas, group_by, options.max_freq)
     power_total = calc_powertot(power_spectral_densities, freqs)
 
-    fig, axs = matplotlib.pyplot.subplots(2, 1, sharex=True)
+    fig, (ax1, ax2) = matplotlib.pyplot.subplots(2, 1, sharex=True)
     fig.suptitle("Machine vibrations - " + options.axisname + " moves", fontsize=16)
 
     # Remove speeds duplicates and graph the processed datas
     speeds = list(OrderedDict((x, True) for x in speeds).keys())
-    plot_total_power(axs[0], speeds, power_total)
-    plot_spectrogram(axs[1], speeds, freqs, power_spectral_densities, options.max_freq)
+    plot_total_power(ax1, speeds, power_total)
+    plot_spectrogram(ax2, speeds, freqs, power_spectral_densities, options.max_freq)
 
     fig.set_size_inches(10, 10)
     fig.tight_layout()
