@@ -174,7 +174,7 @@ def parse_log(logname, opts):
 
 def extract_speed(logname, opts):
     try:
-        speed = re.search('sp(.+?)n', os.path.basename(logname)).group(1)
+        speed = re.search('sp(.+?)n', os.path.basename(logname)).group(1).replace('_','.')
     except AttributeError:
         opts.error("File %s does not contain speed in its name and therefore "
                "is not supported by graph_vibrations.py script." % (logname,))
