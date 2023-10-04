@@ -3,9 +3,10 @@
 ###### GRAPH PLOTTING SCRIPT ######
 ###################################
 # Written by Frix_x#0161 #
-# @version: 1.6
+# @version: 1.7
 
 # CHANGELOG:
+#   v1.7: updated the handling of shaper files to account for the new analysis scripts as we are now using raw data directly
 #   v1.6: - updated the handling of shaper graph files to be able to optionnaly account for added positions in the filenames and remove them
 #         - fixed a bug in the belt graph on slow SD card or Pi clones (Klipper was still writing in the file while we were already reading it)
 #   v1.5: fixed klipper unnexpected fail at the end of the execution, even if graphs were correctly generated (unicode decode error fixed)
@@ -61,8 +62,41 @@ function is_fopen() {
   return 1
 }
 
+# function plot_shaper_graph {
+#   local generator filename newfilename date axis
+#   generator="${SCRIPTS_FOLDER}/graph_shaper.py"
+
+#   # For each file
+#   while read filename; do
+#     # Wait for the file handler to be released by Klipper
+#     while is_fopen "${filename}"; do
+#       sleep 3
+#     done
+
+#     # We remove the /tmp in front of the filename
+#     newfilename="$(echo ${filename} | sed -e "s/\\/tmp\///")"
+
+#     # We check if there is the position added by Klipper and remove it
+#     if [[ ${newfilename} =~ ^resonances_[[:alpha:]]_([0-9]*\.)+[0-9]*_ ]]; then
+#       newfilename="$(echo ${newfilename} | sed -E 's/(^resonances_[[:alpha:]])_(([0-9]*\.)+[0-9]*_)+/\1_/')"
+#     fi
+
+#     # We extract the date and axis name from the filename
+#     date="$(basename "${newfilename}" | cut -d '.' -f1 | awk -F'_' '{print $3"_"$4}')"
+#     axis="$(basename "${newfilename}" | cut -d '_' -f2)"
+
+#     # Then we move the file to the result folder
+#     mv "${filename}" "${isf}"/inputshaper/"${newfilename}"
+#     sync && sleep 2
+
+#     # Finally we compute the shaper graphs
+#     "${generator}" "${isf}"/inputshaper/"${newfilename}" -o "${isf}"/inputshaper/resonances_"${axis}"_"${date}".png
+#   done <<< "$(find /tmp -type f -name "resonances_*.csv" 2>&1 | grep -v "Permission")"
+# }
+
 function plot_shaper_graph {
-  local generator filename newfilename date axis
+  local date_ext generator filename belt
+  date_ext="$(date +%Y%m%d_%H%M%S)"
   generator="${SCRIPTS_FOLDER}/graph_shaper.py"
 
   # For each file
@@ -72,31 +106,22 @@ function plot_shaper_graph {
       sleep 3
     done
 
-    # We remove the /tmp in front of the filename
-    newfilename="$(echo ${filename} | sed -e "s/\\/tmp\///")"
+    # We extract the axis tested from the filename
+    axis="$(basename "${filename}" | cut -d '_' -f4 | cut -d '.' -f1 | sed -e 's/\(.*\)/\U\1/')"
 
-    # We check if there is the position added by Klipper and remove it
-    if [[ ${newfilename} =~ ^resonances_[[:alpha:]]_([0-9]*\.)+[0-9]*_ ]]; then
-      newfilename="$(echo ${newfilename} | sed -E 's/(^resonances_[[:alpha:]])_(([0-9]*\.)+[0-9]*_)+/\1_/')"
-    fi
+    # And we move it to the result folder while injecting the date and axis inside the filename
+    mv "${filename}" "${isf}"/inputshaper/resonances_"${date_ext}"_"${axis}".csv
+  done <<< "$(find /tmp -type f -name "raw_data_axis*.csv" 2>&1 | grep -v "Permission")"
+  sync && sleep 2
 
-    # We extract the date and axis name from the filename
-    date="$(basename "${newfilename}" | cut -d '.' -f1 | awk -F'_' '{print $3"_"$4}')"
-    axis="$(basename "${newfilename}" | cut -d '_' -f2)"
-
-    # Then we move the file to the result folder
-    mv "${filename}" "${isf}"/inputshaper/"${newfilename}"
-    sync && sleep 2
-
-    # Finally we compute the shaper graphs
-    "${generator}" "${isf}"/inputshaper/"${newfilename}" -o "${isf}"/inputshaper/resonances_"${axis}"_"${date}".png
-  done <<< "$(find /tmp -type f -name "resonances_*.csv" 2>&1 | grep -v "Permission")"
+  # Finally we compute the shaper graph
+  "${generator}" "${isf}"/inputshaper/resonances_"${date_ext}"_"${axis}".csv -o "${isf}"/inputshaper/resonances_"${date_ext}"_"${axis}".png -k "${KLIPPER_FOLDER}"
 }
 
 function plot_belts_graph {
   local date_ext generator filename belt
   date_ext="$(date +%Y%m%d_%H%M%S)"
-  generator="${KLIPPER_FOLDER}/scripts/graph_accelerometer.py"
+  generator="${SCRIPTS_FOLDER}/graph_belts.py"
 
   # For each file
   while read filename; do
@@ -114,7 +139,7 @@ function plot_belts_graph {
   sync && sleep 2
 
   # Finally we compute the belts graph
-  "${generator}" -c "${isf}"/belts/belt_"${date_ext}"_*.csv -o "${isf}"/belts/belts_"${date_ext}".png
+  "${generator}" "${isf}"/belts/belt_"${date_ext}"_*.csv -o "${isf}"/belts/belts_"${date_ext}".png -k "${KLIPPER_FOLDER}"
 }
 
 function plot_vibr_graph {
@@ -209,8 +234,8 @@ case ${1} in
   *)
   echo -e "\nUsage:"
   echo -e "\t${0} SHAPER, BELTS or VIBRATIONS"
-  echo -e "\t\tSHAPER\tGenerate input shaper diagram"
-  echo -e "\t\tBELT\tGenerate belt tension diagram"
+  echo -e "\t\tSHAPER\tGenerate input shaper diagram (supercharged with Klippain)"
+  echo -e "\t\tBELT\tGenerate belt tension diagram (supercharged with Klippain)"
   echo -e "\t\tVIBRATIONS axis-name\tGenerate vibration response diagram\n"
   exit 1
 esac
