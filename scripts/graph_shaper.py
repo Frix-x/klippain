@@ -11,9 +11,10 @@
 # @version: 1.1
 
 # CHANGELOG:
-#   v1.1: - reworked the top graph to add more information to it with
-#           colored zones, and automatically detected peaks, etc...
-#         - added the full spectrogram of the signal on the bottom to allow deeper analysis
+#   v1.1: - improved the damping ratio computation with linear approximation for more precision
+#         - reworked the top graph to add more information to it with colored zones,
+#           automated peak detection, etc...
+#         - added a full spectrogram of the signal on the bottom to allow deeper analysis
 #   v1.0: first version of this script inspired from the official Klipper
 #         shaper calibration script to add an automatic damping ratio estimation to it
 
@@ -42,7 +43,7 @@ SPECTROGRAM_LOW_PERCENTILE_FILTER=5
 # Computation
 ######################################################################
 
-# Find the best shaper parameters
+# Find the best shaper parameters using Klipper's official algorithm selection
 def calibrate_shaper_with_damping(datas, max_smoothing):
     helper = shaper_calibrate.ShaperCalibrate(printer=None)
 
@@ -56,60 +57,30 @@ def calibrate_shaper_with_damping(datas, max_smoothing):
 
     freqs = calibration_data.freq_bins
     psd = calibration_data.psd_sum
-    fr, zeta, confidence = compute_damping_ratio(psd, freqs)
+    fr, zeta = compute_damping_ratio(psd, freqs)
 
     print("Recommended shaper is %s @ %.1f Hz" % (shaper.name, shaper.freq))
     print("Axis has a resonant frequency ω0=%.1fHz with an estimated damping ratio ζ=%.3f" % (fr, zeta))
 
-    return shaper.name, all_shapers, calibration_data, fr, zeta, confidence
+    return shaper.name, all_shapers, calibration_data, fr, zeta
 
 
-# Compute damping ratio
+# Compute damping ratio by using the half power bandwidth method with interpolated frequencies
 def compute_damping_ratio(psd, freqs):
-    # Find the peak frequency (resonant frequency) and its power
     max_power_index = np.argmax(psd)
     fr = freqs[max_power_index]
     max_power = psd[max_power_index]
 
-    # Find the half power and corresponding frequencies
     half_power = max_power / 2.0
     idx_below = np.where(psd[:max_power_index] <= half_power)[0][-1]
     idx_above = np.where(psd[max_power_index:] <= half_power)[0][0] + max_power_index
-
-    # Linear interpolation for half-power points
     freq_below_half_power = freqs[idx_below] + (half_power - psd[idx_below]) * (freqs[idx_below + 1] - freqs[idx_below]) / (psd[idx_below + 1] - psd[idx_below])
     freq_above_half_power = freqs[idx_above - 1] + (half_power - psd[idx_above - 1]) * (freqs[idx_above] - freqs[idx_above - 1]) / (psd[idx_above] - psd[idx_above - 1])
 
-    # Compute damping ratio (zeta) using the interpolated half-power points
     bandwidth = freq_above_half_power - freq_below_half_power
     zeta = bandwidth / fr
 
-    # Confidence score computations
-    # 1. Signal-to-Noise Ratio around the peak
-    window_size = 10  # Number of frequencies to consider on either side of the peak for SNR
-    noise_region = psd[max_power_index-window_size:max_power_index].tolist() + psd[max_power_index+1:max_power_index+1+window_size].tolist()
-    signal_power = max_power
-    noise_power = np.mean(noise_region)
-    snr = signal_power / noise_power
-
-    # 2. Peak Prominence
-    left_base = psd[max_power_index - 1]
-    right_base = psd[max_power_index + 1]
-    avg_base = (left_base + right_base) / 2.0
-    prominence = max_power - avg_base
-
-    # 3. Bandwidth Consistency
-    bandwidth_region = psd[idx_below+1:idx_above]
-    secondary_peaks = np.sum(bandwidth_region > half_power)
-
-    # Combine metrics into a confidence score (simplified for now)
-    snr_confidence = min(snr / 10.0, 1)  # Normalize to [0, 1], assuming 10 as a good SNR value
-    prominence_confidence = prominence / max_power  # Normalize to [0, 1]
-    bandwidth_confidence = 1.0 if secondary_peaks == 0 else 0.5
-
-    confidence_score = (snr_confidence + prominence_confidence + bandwidth_confidence) / 3.0
-
-    return fr, zeta, confidence_score
+    return fr, zeta
 
 
 def compute_spectrogram(data):
@@ -130,6 +101,10 @@ def compute_spectrogram(data):
     return pdata, bins, t
 
 
+# This find all the peaks in a curve by looking at when the derivative term goes from positive to negative
+# Then only the peaks found above a threshold are kept to avoid capturing peaks in the low amplitude noise of a signal
+# An added "virtual" threshold allow me to quantify in an opiniated way the peaks that "could have" effect on the printer
+# behavior and are likely known to produce or contribute to the ringing/ghosting in printed parts
 def detect_peaks(psd, freqs):
     peaks = np.where((psd[:-2] < psd[1:-1]) & (psd[1:-1] > psd[2:]))[0] + 1
     detection_threshold  = PEAKS_DETECTION_THRESHOLD * psd.max()
@@ -150,7 +125,7 @@ def detect_peaks(psd, freqs):
 # Graphing
 ######################################################################
 
-def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shaper, fr, zeta, confidence, max_freq):
+def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shaper, fr, zeta, max_freq):
     freqs = calibration_data.freq_bins
     psd = calibration_data.psd_sum[freqs <= max_freq]
     px = calibration_data.psd_x[freqs <= max_freq]
@@ -164,6 +139,7 @@ def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shap
     ax.set_xlabel('Frequency (Hz)')
     ax.set_xlim([0, max_freq])
     ax.set_ylabel('Power spectral density')
+    ax.set_ylim([0, psd.max() + psd.max() * 0.05])
 
     ax.plot(freqs, psd, label='X+Y+Z', color='purple')
     ax.plot(freqs, px, label='X', color='red')
@@ -184,6 +160,8 @@ def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shap
     no_vibr_shaper_freq = None
     no_vibr_shaper_accel = 0
     
+    # Draw the shappers curves and add their specific parameters in the legend
+    # This adds also a way to find the best shaper with 0% of vibrations (to be printed in the legend later)
     for shaper in shapers:
         shaper_max_accel = round(shaper.max_accel / 100.) * 100.
         label = "%s (%.1f Hz, vibr=%.1f%%, sm~=%.2f, accel<=%.f)" % (
@@ -202,6 +180,8 @@ def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shap
         ax2.plot(freqs, shaper.vals, label=label, linestyle=linestyle)
     ax.plot(freqs, psd * best_shaper_vals, label='With %s applied' % (selected_shaper.upper()), color='cyan')
 
+    # Draw the detected peaks and name them
+    # This also draw the detection threshold and warning threshold (aka "effect zone")
     peaks, _, _ = detect_peaks(psd, freqs)
     peaks_warning_threshold = PEAKS_DETECTION_THRESHOLD * psd.max()
     peaks_effect_threshold = PEAKS_EFFECT_THRESHOLD * psd.max()
@@ -222,17 +202,20 @@ def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shap
     ax.fill_between(freqs, 0, peaks_warning_threshold, color='green', alpha=0.15, label='Relax Region')
     ax.fill_between(freqs, peaks_warning_threshold, peaks_effect_threshold, color='orange', alpha=0.2, label='Warning Region')
 
+    # Final user recommendations added to the legend with an added 0% vibration shaper and the estimated damping ratio over stock Klipper's algorithms
     ax2.plot([], [], ' ', label="Recommended shaper: %s @ %.1f Hz" % (selected_shaper.upper(), selected_shaper_freq))
     ax2.plot([], [], ' ', label="Recommended low vibrations shaper: %s @ %.1f Hz" % (no_vibr_shaper.upper(), no_vibr_shaper_freq))
-    ax2.plot([], [], ' ', label="Estimated damping ratio (ζ): %.3f (confidence: %.1f)" % (zeta, confidence))
+    ax2.plot([], [], ' ', label="Estimated damping ratio (ζ): %.3f" % (zeta))
 
+    # Add the main resonant frequency and damping ratio of the axis to the graph title
     ax.set_title("Axis Frequency Profile (ω0=%.1fHz, ζ=%.3f)" % (fr, zeta), fontsize=14)
     ax.legend(loc='upper left', prop=fontP)
     ax2.legend(loc='upper right', prop=fontP)
 
     return freqs[peaks]
 
-
+# Plot a time-frequency spectrogram to see how the system respond over time during the
+# resonnance test. This can highlight hidden spots from the standard PSD graph from other harmonics
 def plot_spectrogram(ax, data, peaks, max_freq):
     pdata, bins, t = compute_spectrogram(data)
 
@@ -246,7 +229,7 @@ def plot_spectrogram(ax, data, peaks, max_freq):
     ax.pcolormesh(bins, t, pdata.T, norm=matplotlib.colors.LogNorm(vmin=vmin_value),
                   cmap='inferno', shading='gouraud')
 
-    # Annotating the detected peaks
+    # Add peaks lines in the spectrogram to get hint from peaks found in the first graph
     if peaks is not None:
         for idx, peak in enumerate(peaks):
             ax.axvline(peak, color='cyan', linestyle='dotted', linewidth=0.75)
@@ -309,7 +292,7 @@ def main():
     datas = [parse_log(fn, opts) for fn in args]
 
     # Calibrate shaper and generate outputs
-    selected_shaper, shapers, calibration_data, fr, zeta, confidence = calibrate_shaper_with_damping(datas, options.max_smoothing)
+    selected_shaper, shapers, calibration_data, fr, zeta = calibrate_shaper_with_damping(datas, options.max_smoothing)
 
     fig = matplotlib.pyplot.figure()
     gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 3])
@@ -318,7 +301,7 @@ def main():
     fig.suptitle("\n".join(wrap(
         "Input Shaper calibration (%s)" % (', '.join(args)), MAX_TITLE_LENGTH)), fontsize=16)
 
-    peaks = plot_freq_response_with_damping(ax1, calibration_data, shapers, selected_shaper, fr, zeta, confidence, options.max_freq)
+    peaks = plot_freq_response_with_damping(ax1, calibration_data, shapers, selected_shaper, fr, zeta, options.max_freq)
     plot_spectrogram(ax2, datas[0], peaks, options.max_freq)
 
     if options.output is None:
