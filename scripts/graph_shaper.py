@@ -105,20 +105,31 @@ def compute_spectrogram(data):
 # Then only the peaks found above a threshold are kept to avoid capturing peaks in the low amplitude noise of a signal
 # An added "virtual" threshold allow me to quantify in an opiniated way the peaks that "could have" effect on the printer
 # behavior and are likely known to produce or contribute to the ringing/ghosting in printed parts
-def detect_peaks(psd, freqs):
-    peaks = np.where((psd[:-2] < psd[1:-1]) & (psd[1:-1] > psd[2:]))[0] + 1
-    detection_threshold  = PEAKS_DETECTION_THRESHOLD * psd.max()
+def detect_peaks(psd, freqs, window_size=5, vicinity=3):
+    # Smooth the curve using a moving average to avoid catching peaks everywhere in noisy signals
+    kernel = np.ones(window_size) / window_size
+    smoothed_psd = np.convolve(psd, kernel, mode='same')
+
+    # Find peaks on the smoothed curve
+    smoothed_peaks = np.where((smoothed_psd[:-2] < smoothed_psd[1:-1]) & (smoothed_psd[1:-1] > smoothed_psd[2:]))[0] + 1
+    detection_threshold = PEAKS_DETECTION_THRESHOLD * psd.max()
     effect_threshold = PEAKS_EFFECT_THRESHOLD * psd.max()
+    smoothed_peaks = smoothed_peaks[smoothed_psd[smoothed_peaks] > detection_threshold]
+ 
+    # Refine peak positions on the original curve
+    refined_peaks = []
+    for peak in smoothed_peaks:
+        local_max = peak + np.argmax(psd[max(0, peak-vicinity):min(len(psd), peak+vicinity+1)]) - vicinity
+        refined_peaks.append(local_max)
 
-    peaks = peaks[psd[peaks] > detection_threshold]
-    peak_freqs = ["{:.1f}".format(f) for f in freqs[peaks]]
+    peak_freqs = ["{:.1f}".format(f) for f in freqs[refined_peaks]]
 
-    num_peaks = len(peaks)
-    num_peaks_above_effect_threshold = np.sum(psd[peaks] > effect_threshold)
+    num_peaks = len(refined_peaks)
+    num_peaks_above_effect_threshold = np.sum(psd[refined_peaks] > effect_threshold)
     
     print("Peaks detected on the graph: %d @ %s Hz (%d above effect threshold)" % (num_peaks, ", ".join(map(str, peak_freqs)), num_peaks_above_effect_threshold))
 
-    return peaks, num_peaks, num_peaks_above_effect_threshold
+    return np.array(refined_peaks), num_peaks, num_peaks_above_effect_threshold
 
 
 ######################################################################

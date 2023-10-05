@@ -73,11 +73,23 @@ def compute_curve_similarity_factor(signal1, signal2):
 
 # This find all the peaks in a curve by looking at when the derivative term goes from positive to negative
 # Then only the peaks found above a threshold are kept to avoid capturing peaks in the low amplitude noise of a signal
-def detect_peaks(psd, freqs):
-    peaks = np.where((psd[:-2] < psd[1:-1]) & (psd[1:-1] > psd[2:]))[0] + 1
+def detect_peaks(psd, freqs, window_size=5, vicinity=3):
+    # Smooth the curve using a moving average to avoid catching peaks everywhere in noisy signals
+    kernel = np.ones(window_size) / window_size
+    smoothed_psd = np.convolve(psd, kernel, mode='same')
+    
+    # Find peaks on the smoothed curve
+    smoothed_peaks = np.where((smoothed_psd[:-2] < smoothed_psd[1:-1]) & (smoothed_psd[1:-1] > smoothed_psd[2:]))[0] + 1
     detection_threshold = PEAKS_DETECTION_THRESHOLD * psd.max()
-    peaks = peaks[psd[peaks] > detection_threshold]
-    return peaks, freqs[peaks]
+    smoothed_peaks = smoothed_peaks[smoothed_psd[smoothed_peaks] > detection_threshold]
+    
+    # Refine peak positions on the original curve
+    refined_peaks = []
+    for peak in smoothed_peaks:
+        local_max = peak + np.argmax(psd[max(0, peak-vicinity):min(len(psd), peak+vicinity+1)]) - vicinity
+        refined_peaks.append(local_max)
+    
+    return np.array(refined_peaks), freqs[refined_peaks]
 
 
 # This function create pairs of peaks that are close in frequency on two curves (that are known
