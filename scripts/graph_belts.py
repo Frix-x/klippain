@@ -465,7 +465,7 @@ def compute_signal_data(data, max_freq):
     return SignalData(freqs=freqs, psd=psd, peaks=peaks, paired_peaks=None, unpaired_peaks=None)
 
 
-def parse_log(logname, opts):
+def parse_log(logname):
     with open(logname) as f:
         for header in f:
             if not header.startswith('#'):
@@ -474,15 +474,50 @@ def parse_log(logname, opts):
             # Raw accelerometer data
             return np.loadtxt(logname, comments='#', delimiter=',')
     # Power spectral density data or shaper calibration data
-    opts.error("File %s does not contain raw accelerometer data and therefore "
-               "is not supported by this script. Please use the official Klipper"
+    raise ValueError("File %s does not contain raw accelerometer data and therefore "
+               "is not supported by this script. Please use the official Klipper "
                "graph_accelerometer.py script to process it instead." % (logname,))
 
 
 def setup_klipper_import(kdir):
     global shaper_calibrate
+    kdir = os.path.expanduser(kdir)
     sys.path.append(os.path.join(kdir, 'klippy'))
     shaper_calibrate = importlib.import_module('.shaper_calibrate', 'extras')
+
+
+def belts_calibration(lognames, klipperdir="~/klipper", max_freq=200.):
+    setup_klipper_import(klipperdir)
+
+    # Parse data
+    datas = [parse_log(fn) for fn in lognames]
+    if len(datas) > 2:
+        raise ValueError("Incorrect number of .csv files used (this function needs two files to compare them)")
+
+    # Compute calibration data for the two datasets with automatic peaks detection
+    signal1 = compute_signal_data(datas[0], max_freq)
+    signal2 = compute_signal_data(datas[1], max_freq)
+
+    # Pair the peaks across the two datasets
+    paired_peaks, unpaired_peaks1, unpaired_peaks2 = pair_peaks(signal1.peaks, signal1.freqs, signal1.psd,
+                                                               signal2.peaks, signal2.freqs, signal2.psd)
+    signal1 = signal1._replace(paired_peaks=paired_peaks, unpaired_peaks=unpaired_peaks1)
+    signal2 = signal2._replace(paired_peaks=paired_peaks, unpaired_peaks=unpaired_peaks2)
+
+    fig = matplotlib.pyplot.figure()
+    gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 3])
+    ax1 = fig.add_subplot(gs[0])
+    ax2 = fig.add_subplot(gs[1])
+    fig.suptitle("CoreXY relative belt calibration tool", fontsize=16)
+
+    similarity_factor, _ = plot_compare_frequency(ax1, lognames, signal1, signal2, max_freq)
+    plot_difference_spectrogram(ax2, datas[0], datas[1], signal1, signal2, similarity_factor, max_freq)
+
+    fig.set_size_inches(10, 12)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.93)
+    
+    return fig
 
 
 def main():
@@ -494,44 +529,15 @@ def main():
     opts.add_option("-f", "--max_freq", type="float", default=200.,
                     help="maximum frequency to graph")
     opts.add_option("-k", "--klipper_dir", type="string", dest="klipperdir",
-                    default="/home/pi/klipper", help="main klipper directory")
+                    default="~/klipper", help="main klipper directory")
     options, args = opts.parse_args()
     if len(args) < 1:
         opts.error("Incorrect number of arguments")
-
-    setup_klipper_import(options.klipperdir)
-
-    # Parse data
-    datas = [parse_log(fn, opts) for fn in args]
-    if len(datas) > 2:
-        opts.error("Incorrect number of .csv files used (this script need two files to compare them)")
-
-    # Compute calibration data for the two datasets with automatic peaks detection
-    signal1 = compute_signal_data(datas[0], options.max_freq)
-    signal2 = compute_signal_data(datas[1], options.max_freq)
-
-    # Pair the peaks across the two datasets
-    paired_peaks, unpaired_peaks1, unpaired_peaks2 = pair_peaks(signal1.peaks, signal1.freqs, signal1.psd, 
-                                                               signal2.peaks, signal2.freqs, signal2.psd)
-    signal1 = signal1._replace(paired_peaks=paired_peaks, unpaired_peaks=unpaired_peaks1)
-    signal2 = signal2._replace(paired_peaks=paired_peaks, unpaired_peaks=unpaired_peaks2)
-
-    fig = matplotlib.pyplot.figure()
-    gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 3])
-    ax1 = fig.add_subplot(gs[0])
-    ax2 = fig.add_subplot(gs[1])
-    fig.suptitle("CoreXY relative belt calibration tool", fontsize=16)
-    
-    similarity_factor, _ = plot_compare_frequency(ax1, args, signal1, signal2, options.max_freq)
-    plot_difference_spectrogram(ax2, datas[0], datas[1], signal1, signal2, similarity_factor, options.max_freq)
-
     if options.output is None:
-        matplotlib.pyplot.show()
-    else:
-        fig.set_size_inches(10, 12)
-        fig.tight_layout()
-        fig.subplots_adjust(top=0.93)
-        fig.savefig(options.output)
+        opts.error("You must specify an output file.png to use the script (option -o)")
+
+    fig = belts_calibration(args, options.klipperdir, options.max_freq)
+    fig.savefig(options.output)
 
 
 if __name__ == '__main__':

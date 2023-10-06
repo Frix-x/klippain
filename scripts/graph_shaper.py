@@ -225,6 +225,7 @@ def plot_freq_response_with_damping(ax, calibration_data, shapers, selected_shap
 
     return freqs[peaks]
 
+
 # Plot a time-frequency spectrogram to see how the system respond over time during the
 # resonnance test. This can highlight hidden spots from the standard PSD graph from other harmonics
 def plot_spectrogram(ax, data, peaks, max_freq):
@@ -259,7 +260,7 @@ def plot_spectrogram(ax, data, peaks, max_freq):
 # Startup and main routines
 ######################################################################
 
-def parse_log(logname, opts):
+def parse_log(logname):
     with open(logname) as f:
         for header in f:
             if not header.startswith('#'):
@@ -268,15 +269,42 @@ def parse_log(logname, opts):
             # Raw accelerometer data
             return np.loadtxt(logname, comments='#', delimiter=',')
     # Power spectral density data or shaper calibration data
-    opts.error("File %s does not contain raw accelerometer data and therefore "
-               "is not supported by this script. Please use the official Klipper"
+    raise ValueError("File %s does not contain raw accelerometer data and therefore "
+               "is not supported by this script. Please use the official Klipper "
                "calibrate_shaper.py script to process it instead." % (logname,))
 
 
 def setup_klipper_import(kdir):
     global shaper_calibrate
+    kdir = os.path.expanduser(kdir)
     sys.path.append(os.path.join(kdir, 'klippy'))
     shaper_calibrate = importlib.import_module('.shaper_calibrate', 'extras')
+
+
+def shaper_calibration(lognames, klipperdir="~/klipper", max_smoothing=None, max_freq=200.):
+    setup_klipper_import(klipperdir)
+
+    # Parse data
+    datas = [parse_log(fn) for fn in lognames]
+
+    # Calibrate shaper and generate outputs
+    selected_shaper, shapers, calibration_data, fr, zeta = calibrate_shaper_with_damping(datas, max_smoothing)
+
+    fig = matplotlib.pyplot.figure()
+    gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 3])
+    ax1 = fig.add_subplot(gs[0])
+    ax2 = fig.add_subplot(gs[1])
+    fig.suptitle("\n".join(wrap(
+        "Input Shaper calibration (%s)" % (', '.join(lognames)), MAX_TITLE_LENGTH)), fontsize=16)
+
+    peaks = plot_freq_response_with_damping(ax1, calibration_data, shapers, selected_shaper, fr, zeta, max_freq)
+    plot_spectrogram(ax2, datas[0], peaks, max_freq)
+
+    fig.set_size_inches(10, 12)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.93)
+
+    return fig
 
 
 def main():
@@ -290,38 +318,17 @@ def main():
     opts.add_option("-s", "--max_smoothing", type="float", default=None,
                     help="maximum shaper smoothing to allow")
     opts.add_option("-k", "--klipper_dir", type="string", dest="klipperdir",
-                    default="/home/pi/klipper", help="main klipper directory")
+                    default="~/klipper", help="main klipper directory")
     options, args = opts.parse_args()
     if len(args) < 1:
         opts.error("Incorrect number of arguments")
+    if options.output is None:
+        opts.error("You must specify an output file.png to use the script (option -o)")
     if options.max_smoothing is not None and options.max_smoothing < 0.05:
         opts.error("Too small max_smoothing specified (must be at least 0.05)")
 
-    setup_klipper_import(options.klipperdir)
-
-    # Parse data
-    datas = [parse_log(fn, opts) for fn in args]
-
-    # Calibrate shaper and generate outputs
-    selected_shaper, shapers, calibration_data, fr, zeta = calibrate_shaper_with_damping(datas, options.max_smoothing)
-
-    fig = matplotlib.pyplot.figure()
-    gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 3])
-    ax1 = fig.add_subplot(gs[0])
-    ax2 = fig.add_subplot(gs[1])
-    fig.suptitle("\n".join(wrap(
-        "Input Shaper calibration (%s)" % (', '.join(args)), MAX_TITLE_LENGTH)), fontsize=16)
-
-    peaks = plot_freq_response_with_damping(ax1, calibration_data, shapers, selected_shaper, fr, zeta, options.max_freq)
-    plot_spectrogram(ax2, datas[0], peaks, options.max_freq)
-
-    if options.output is None:
-        matplotlib.pyplot.show()
-    else:
-        fig.set_size_inches(10, 12)
-        fig.tight_layout()
-        fig.subplots_adjust(top=0.93)
-        fig.savefig(options.output)
+    fig = shaper_calibration(args, options.klipperdir, options.max_smoothing, options.max_freq)
+    fig.savefig(options.output)
 
 
 if __name__ == '__main__':
