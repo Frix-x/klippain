@@ -24,7 +24,7 @@ with annotations and analysis provided by Frix-x and Reth.
 ### Note
 Interpretation of input shaper graphs may not be straight forward and it is possible to have multiple issues happening at the same time. tighter belt tension is not always the answer. Tightening belts to much can lead to new, and not better, print artifacts
 
-| Comment/Analysis | Belt graphs examples 1 | Belt graphs examples 2 |   Annotated Graphs |
+| Comment/Analysis | Belt graphs examples 1 | Belt graphs examples 2 |   Belt graphs examples 3 |
 | --- | --- | --- | --- |
 | **Both of these two graphs are considered good**. As you can see, the main peak doesn't have to be perfect if you can get both curves to overlap. It is prefered that both graphs overlap in both amplitude and frequency | ![](./images/IS_docs/belt_graphs/perfect%20graph.png) | ![](./images/resonances_belts_example.png) ||
 | **Non-aligned Peaks**. These graphs show where the peaks are not aligned in amplitude and not aligned in frequency. This generally indicates 1) Belts were not cut the same length, 2) belts are not the same length coming out of the carriage, or 3) some other motion system issue. |  ![](images/IS_docs/belt_graphs/Belt_problems3.png)| |
