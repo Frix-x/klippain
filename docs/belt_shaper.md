@@ -24,9 +24,35 @@ with annotations and analysis provided by Frix-x and Reth.
 ### Note
 Interpretation of input shaper graphs may not be straight forward and it is possible to have multiple issues happening at the same time. tighter belt tension is not always the answer. Tightening belts to much can lead to new, and not better, print artifacts
 
-| Comment/Analysis | Belt graphs examples 1 | Belt graphs examples 2 |   Belt graphs examples 3 |
-| --- | --- | --- | --- |
-| **Both of these two graphs are considered good**. As you can see, the main peak doesn't have to be perfect if you can get both curves to overlap. It is prefered that both graphs overlap in both amplitude and frequency | ![](./images/IS_docs/belt_graphs/perfect%20graph.png) | ![](./images/resonances_belts_example.png) ||
-| **Non-aligned Peaks**. These graphs show where the peaks are not aligned in amplitude and not aligned in frequency. This generally indicates 1) Belts were not cut the same length, 2) belts are not the same length coming out of the carriage, or 3) some other motion system issue. |  ![](images/IS_docs/belt_graphs/Belt_problems3.png)| |
-| **These two graphs indicate a belt path problem**: the belt tension could be adequate, but something else is happening in the belt paths. Start by checking the bearings and belt wear, or belt alignment | ![](./images/IS_docs/belt_graphs/belts_problem.png) | ![](./images/IS_docs/belt_graphs/belts_problem2.png) | ![](images/IS_docs/belt_graphs/Belt_problems4.png) |
-| **These two graphs show incorrect belt tension**: in each case, one of the belts has insufficient tension (first is B belt, second is A belt). Begin by tightening it half a turn and measuring again | ![](./images/IS_docs/belt_graphs/different_tensions.png) | ![](./images/IS_docs/belt_graphs/different_tensions2.png) |
+## Good Graph
+ **Both of these two graphs are considered good**. As you can see, the main peak doesn't have to be perfect if you can get both curves to overlap. It is prefered that both graphs overlap in both amplitude and frequency 
+ 
+| Good Belt Shaper 1 | Good Belt Shaper 2 | 
+| --- | --- | 
+ | ![](./images/IS_docs/belt_graphs/perfect%20graph.png) | ![](./images/resonances_belts_example.png) |
+
+
+## Non-aligned Peaks 
+These graphs show where the peaks are not aligned in amplitude and not aligned in frequency. This generally indicates 
+1. Belts were not cut the same length, 
+1. Belts are not the same length coming out of the carriage, or 
+1. Some other motion system issue. 
+ ![](images/IS_docs/belt_graphs/Belt_problems3.png) 
+
+## Belt Path Problem
+**These two graphs indicate a belt path problem**: the belt tension could be adequate, but something else is happening in the belt paths. Start by checking the bearings and belt wear, or belt alignment 
+| Belt Path 1 | Belt Path 1 | 
+| --- | --- | 
+| ![](./images/IS_docs/belt_graphs/belts_problem2.png)| ![](./images/IS_docs/belt_graphs/belts_problem.png)  |
+
+Analysis of Belt Path problems
+ ![](images/IS_docs/belt_graphs/Belt_problems4.png) |
+
+## Incorrect Belt Tension
+**These two graphs show incorrect belt tension**: in each case, one of the belts has insufficient tension (first is B belt, second is A belt). Begin by tightening it half a turn and measuring again 
+| Incorrect Belt Tension 1 | Incorrect Belt Tension 1 | 
+| --- | --- | 
+| ![](./images/IS_docs/belt_graphs/different_tensions.png) | ![](./images/IS_docs/belt_graphs/different_tensions2.png) |
+
+**Analysis of Belt Path problems**
+ ![](images/IS_docs/belt_graphs/Belt_problems4.png) |
