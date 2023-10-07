@@ -105,7 +105,7 @@ def get_shaper_graph():
     shutil.move(filename, new_file)
     
     # Generate the shaper graph and its name
-    fig = shaper_calibration(new_file, KLIPPER_FOLDER)
+    fig = shaper_calibration([new_file], KLIPPER_FOLDER)
     png_filename = os.path.join(RESULTS_FOLDER, RESULTS_SUBFOLDERS[1], f'resonances_{current_date}_{axis}.png')
     
     return fig, png_filename
@@ -208,7 +208,7 @@ def main():
     fig.savefig(png_filename)
 
     clean_files()
-    print(f"Graph created. You will find the results in {RESULTS_FOLDER}")
+    print(f"Graphs created. You will find the results in {RESULTS_FOLDER}")
 
 
 if __name__ == '__main__':

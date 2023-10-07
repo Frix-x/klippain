@@ -178,7 +178,7 @@ def extract_speed(logname):
     except AttributeError:
         raise ValueError("File %s does not contain speed in its name and therefore "
                "is not supported by graph_vibrations.py script." % (logname,))
-    return int(speed)
+    return float(speed)
 
 
 def sort_and_slice(raw_speeds, raw_datas, remove):

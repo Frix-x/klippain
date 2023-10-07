@@ -401,9 +401,9 @@ def plot_difference_spectrogram(ax, data1, data2, signal1, signal2, similarity_f
     # the similarity factor and the number or unpaired peaks from the belts frequency profile
     # Be careful, this value is highly opinionated and is pretty experimental!
     comi = compute_comi(combined_data, similarity_factor, len(signal1.unpaired_peaks) + len(signal2.unpaired_peaks))
-    print(f"Chance of mechanical issues: {comi:.1f}%")
+    print(f"Chances of mechanical issues: {comi:.1f}%")
     ax.set_title(f"Differential Spectrogram (COMI: {comi:.1f}%)", fontsize=14)
-    ax.plot([], [], ' ', label=f'Chance of mechanical issues (COMI): {comi:.1f}%')
+    ax.plot([], [], ' ', label=f'Chances of mechanical issues (COMI): {comi:.1f}%')
     
     # Draw the differential spectrogram with a specific norm to get light grey zero values and red for max values (vmin to vcenter is not used)
     norm = matplotlib.colors.TwoSlopeNorm(vcenter=np.min(combined_data), vmax=np.max(combined_data))
@@ -446,10 +446,10 @@ def plot_difference_spectrogram(ax, data1, data2, signal1, signal2, similarity_f
                 verticalalignment='bottom', horizontalalignment='right')
 
     return
- 
+
 
 ######################################################################
-# Startup and main routines
+# Custom tools 
 ######################################################################
 
 # Simple helper to compute a sigmoid scalling (from 0 to 100%)
@@ -463,7 +463,11 @@ def compute_signal_data(data, max_freq):
     psd = calibration_data.get_psd('all')[calibration_data.freq_bins <= max_freq]
     peaks, _ = detect_peaks(psd, freqs)
     return SignalData(freqs=freqs, psd=psd, peaks=peaks, paired_peaks=None, unpaired_peaks=None)
+ 
 
+######################################################################
+# Startup and main routines
+######################################################################
 
 def parse_log(logname):
     with open(logname) as f:
