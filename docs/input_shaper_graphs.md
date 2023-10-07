@@ -112,14 +112,25 @@ The first loose bolt picture can also be a canbus problem if canbus is being use
 ## Tool Head, or Tap
 These two graphs show **the TAP wobble problem**: check that the TAP MGN rail has the correct preload for stiffness and that the magnets are correct N52. Also pay attention to the assembly to make sure that everything is properly tightened.
 
+It has been obvserved that, at least for voron printers, 125hz is also assocated with the toolhead in general. Toolhead issues may not be as spiky as the graphs below. The could also produce a more hump version. If you see a 125hz bump, hump, or spike the toolhead needs to be investigated.
 
+**Troubleshooting:**
+1. Break down the toolhead down to the belts. You do not need to remove the belts
+2. make sure all screws are tight as you rebuilt the toolhead. Make sure TAP magnets are engaged
+3. check the extruder. Make sure you do not have loose screw in it.
 
 | Tap Wobble | |
 | --- | --- |
 | ![](./images/IS_docs/shaper_graphs/TAP_125hz.png) | ![](./images/IS_docs/shaper_graphs/TAP_125hz_2.png) |
 
 
+## Unbalanced Fan
+Here you can see **the effect of an unbalanced fan**: even if you should let the fan off during the final IS tuning, you can use this test to validate their correct behavior: an unbalanced fan usually add some very thin peak around 100-150Hz that disapear when the fan is off during the measurement 
 
+It should be noted that the unbalanced fan will have a greater peak than a loose screw in the toolhead or TAP issues.
 
-| Here you can see **the effect of an unbalanced fan**: even if you should let the fan off during the final IS tuning, you can use this test to validate their correct behavior: an unbalanced fan usually add some very thin peak around 100-150Hz that disapear when the fan is off during the measurement | ![](./images/IS_docs/shaper_graphs/fan-on.png) | ![](./images/IS_docs/shaper_graphs/fan-off.png) |
-| The graph on the left shows **a CANbus problem** (problem solved on the right): although the general shape looks good, the graph is not smooth but spiky. There is also usually some low frequency energy. This happens when the bus speed is too low: set it to 1M to solve the problem | ![](./images/IS_docs/shaper_graphs/low_canbus.png) | ![](./images/IS_docs/shaper_graphs/low_canbus_solved.png) |
+It should be further noted that the graph below shows another issue besides unbalanced fan. This other issue could be a wobbly table, a loose screw, or low frequency binding.
+
+| unbalanced fan when on | unbalanced fan when off|
+| --- | --- |
+| ![](./images/IS_docs/shaper_graphs/fan-on.png) | ![](./images/IS_docs/shaper_graphs/fan-off.png) |
