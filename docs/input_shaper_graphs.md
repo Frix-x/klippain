@@ -3,7 +3,7 @@
 
 Next, generate the Input Shaper graphs using the `AXES_SHAPER_CALIBRATION` macro. Refer to the [IS workflow documentation](./features/is_workflow.md) for more information.
 
-#### Read the graphs
+### Reading the graphs
 
 To effectively analyze input shaper graphs, there is no one-size-fits-all approach due to the variety of factors that can impact the 3D printer's performance or input shaper measurements. However, here are some hints on reading the graphs:
   - A graph with a **single and thin peak** well detached from the background noise is ideal, as it can be easily filtered by input shaping. But depending on the machine and its mechanical configuration, it's not always possible to obtain this shape. The key to getting better graphs is a clean mechanical assembly with a special focus on the rigidity and stiffness of everything, from the table through the frame of the printer to the toolhead.
@@ -41,7 +41,7 @@ shaper_type_y: ... # filter type for the Y axis
 damping_ratio_y... # Damping Ratio reported in Y graph
 ```
 
-#### Useful facts and myths debunking
+### Useful facts and myths debunking
 
 Sometimes people advise limiting the data to 100 Hz by manually editing the resulting .csv file because excitation does not go that high and these values should be ignored and considered wrong. This is a misconception and a bad idea because the excitation frequency is very different from the response frequency of the system, and they are not correlated at all. Indeed, it's plausible to get higher vibration frequencies, and editing the file manually will just "ignore" them and make them invisible even if they are still there on your printer. While higher frequency vibrations may not have a substantial effect on print quality, they can still indicate other issues within the system, likely noise and wear to the mechanical parts. Instead, focus on addressing the mechanical issues causing these problems.
 
@@ -49,7 +49,21 @@ Another point is that I do not recommend using an extra-light X-beam (aluminum o
 
 Finally, keep in mind that each axis has its own properties, such as mass and geometry, which will lead to different behaviors for each of them and will require different filters. Using the same input shaping settings for both axes is only valid if both axes are similar mechanically: this may be true for some machines, mainly Cross gantry configurations such as [CroXY](https://github.com/CroXY3D/CroXY) or [Annex-Engineering](https://github.com/Annex-Engineering) printers, but not for others.
 
-#### Examples of Input Shaper graphs
+### Special note on accelerometer (ADXL) mounting point
+
+Input Shaping algorithms work by suppressing a single resonant frequency (or a range around a single resonant frequency). When setting the filter, **the primary goal is to target the resonant frequency of the toolhead and belts system** (see the [theory behind it](#theory-behind-it)), as this system has the most significant impact on print quality and is the root cause of ringing.
+
+When setting up Input Shaper, it is important to consider the accelerometer mounting point. There are mainly two possibilities, each with its pros and cons:
+  1. **Directly at the nozzle tip**: This method provides a more accurate and comprehensive measurement of everything in your machine. It captures the main resonant frequency along with other vibrations and movements, such as toolhead wobbling and printer frame movements. This approach is excellent for diagnosing your machine's kinematics and troubleshooting problems. However, it also leads to noisier graphs, making it harder for the algorithm to select the correct filter for input shaping. Graphs may appear worse, but this is due to the different "point of view" of the printer's behavior.
+  1. **At the toolhead's center of gravity**: I personally recommend mounting the accelerometer in this way, as it provides a clear view of the main resonant frequency you want to target, allowing for accurate input shaper filter settings. This approach results in cleaner graphs with less visible noise from other subsystem vibrations, making interpretation easier for both automatic algorithms and users. However, this method provides less detail in the graphs and may be slightly less effective for troubleshooting printer problems.
+
+A suggested workflow is to first use the nozzle mount to diagnose mechanical issues, such as loose screws or a bad X carriage. Once the mechanics are in good condition, switch to a mounting point closer to the toolhead's center of gravity for setting the input shaper filter settings by using cleaner graphs that highlights the most impactful frequency.
+
+</details>
+
+
+
+## Examples of Input Shaper graphs
 
 In the following examples, the graphs are random graphs found online or sent to me for analysis. The graphs are here to illustrate the issue with more than one example.
 
@@ -57,14 +71,14 @@ In the following examples, the graphs are random graphs found online or sent to 
 
 As of right now Input Shaper is not a science. Yes we can draw some conclusions based upon the graph, but for the most part by looking at the graph one cannot draw definitive explainations for what is causing your imperfect graphs. Further, it is possible that different issues will show up as the same issue on graphs. Therefore, the graph examples below are meant as a guide on some possible causes. There are not meant to be taken as fact. Merely guidepost in your input shaper adventure.
 
-## Good Graphs
+### Good Graphs
 **These two graphs are considered good**. As you can see, there is only one thin peak, well separated from the background noise 
 | Good Graph  |  | 
 | --- | --- |
  ![](./images/IS_docs/shaper_graphs/reso_good_x.png) | ![](./images/IS_docs/shaper_graphs/reso_good_y.png) |
 
 
-## Crazy graphs - Binding, Relative Belt Tension, Wobbly Table, Canbus
+### Crazy graphs - Binding, Relative Belt Tension, Wobbly Table, Canbus
 This graph shows a main peak without the amplitude going down to, or approachings zero, before rising again into a secondary peak before finally going down to zero. This could be indicative of a binding of the motion system, relative belt tension being off, or a wobbly table. As will be shown later below this could also be caused by to low a frequency on canbus. 
 * Troubleshooting: 
 1. start by placing the printer on a stable surface such as the floor. 
@@ -85,14 +99,14 @@ This graph shows a main peak without the amplitude going down to, or approaching
 
 As one can see the wobbly table has a similar graph as the Crazy Graphs. This is why the first step in troubleshooting one of these graphs is to put the printer on a solid surface. Hardwood, or tile floor preferred. Carpet is not preferred. To squishy
 
-## Low Frequency - Binding or Grinding
+### Low Frequency - Binding or Grinding
 These two graphs have some **low frequency energy**. This usually means that there is some binding or grinding in the kinematics: something isn't moving freely. Check the belt alignment on the idlers, bearings, etc... 
 | Low Frequency | Low Frequency |
 | --- | --- |
 | ![](./images/IS_docs/shaper_graphs/low_freq_bad.png) | ![](./images/IS_docs/shaper_graphs/low_freq_bad2.png) |
 | | ![](./images/IS_docs/shaper_graphs/input_shaper_lowfreq3.png) | 
 
-## Potentially Loose Bolt 
+### Potentially Loose Bolt 
 This graph shows a main peak without the amplitude going down to, or approachings zero, before rising again into a secondary peak before finally going down to zero. This could be indicative of a binding of the motion system, relative belt tension being off, or a **loose bolt**. As will be shown later below this could also be caused by to low a frequency on canbus. 
 | Loose Bolt |  |
 | --- | --- |
@@ -102,14 +116,14 @@ This graph shows a main peak without the amplitude going down to, or approaching
 | ![](./images/IS_docs/shaper_graphs/input_shaper_loose_bolt2.png) | |
 
 
-## Canbus Problems
+### Canbus Problems
 The first loose bolt picture can also be a canbus problem if canbus is being used. Please focus on the middle spike for canbus problems. See how the middle spike comprises a secondary spike. This could be indicative of canbus. Although the general shape looks good, the graph is not smooth but spiky. There is also usually some low frequency energy. This happens when the bus speed is too low: set it to 1M to solve the problem 
 |Canbus problem | Canbus solved |
 | --- | --- |
 | ![](./images/IS_docs/shaper_graphs/low_canbus.png) | ![](./images/IS_docs/shaper_graphs/low_canbus_solved.png) |
 
 
-## Tool Head, or Tap
+### Tool Head, or Tap
 These two graphs show **the TAP wobble problem**: check that the TAP MGN rail has the correct preload for stiffness and that the magnets are correct N52. Also pay attention to the assembly to make sure that everything is properly tightened.
 
 It has been obvserved that, at least for voron printers, 125hz is also assocated with the toolhead in general. Toolhead issues may not be as spiky as the graphs below. The could also produce a more hump version. If you see a 125hz bump, hump, or spike the toolhead needs to be investigated.
@@ -124,7 +138,7 @@ It has been obvserved that, at least for voron printers, 125hz is also assocated
 | ![](./images/IS_docs/shaper_graphs/TAP_125hz.png) | ![](./images/IS_docs/shaper_graphs/TAP_125hz_2.png) |
 
 
-## Unbalanced Fan
+### Unbalanced Fan
 Here you can see **the effect of an unbalanced fan**: even if you should let the fan off during the final IS tuning, you can use this test to validate their correct behavior: an unbalanced fan usually add some very thin peak around 100-150Hz that disapear when the fan is off during the measurement 
 
 It should be noted that the unbalanced fan will have a greater peak than a loose screw in the toolhead or TAP issues.

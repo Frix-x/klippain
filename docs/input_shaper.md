@@ -22,39 +22,9 @@ When tuning Input Shaper, keep the following in mind:
 
 [Belt Shaper Graphs](./belt_shaper.md) 
 
-[Input Shaper Graphs](./input_shaper.md)
+[Input Shaper Graphs](./input_shaper_graphs.md)
 
-
-<details>
-<summary>2. Input Shaper graphs</summary><br />
-
-
-
-
-
-</details>
-
-
-<details>
-<summary>3. Klippain vibrations graphs</summary><br />
-
-More details to be added later in this section...
-
-</details>
-
-
-<details>
-<summary>Special note on accelerometer (ADXL) mounting point</summary><br />
-
-Input Shaping algorithms work by suppressing a single resonant frequency (or a range around a single resonant frequency). When setting the filter, **the primary goal is to target the resonant frequency of the toolhead and belts system** (see the [theory behind it](#theory-behind-it)), as this system has the most significant impact on print quality and is the root cause of ringing.
-
-When setting up Input Shaper, it is important to consider the accelerometer mounting point. There are mainly two possibilities, each with its pros and cons:
-  1. **Directly at the nozzle tip**: This method provides a more accurate and comprehensive measurement of everything in your machine. It captures the main resonant frequency along with other vibrations and movements, such as toolhead wobbling and printer frame movements. This approach is excellent for diagnosing your machine's kinematics and troubleshooting problems. However, it also leads to noisier graphs, making it harder for the algorithm to select the correct filter for input shaping. Graphs may appear worse, but this is due to the different "point of view" of the printer's behavior.
-  1. **At the toolhead's center of gravity**: I personally recommend mounting the accelerometer in this way, as it provides a clear view of the main resonant frequency you want to target, allowing for accurate input shaper filter settings. This approach results in cleaner graphs with less visible noise from other subsystem vibrations, making interpretation easier for both automatic algorithms and users. However, this method provides less detail in the graphs and may be slightly less effective for troubleshooting printer problems.
-
-A suggested workflow is to first use the nozzle mount to diagnose mechanical issues, such as loose screws or a bad X carriage. Once the mechanics are in good condition, switch to a mounting point closer to the toolhead's center of gravity for setting the input shaper filter settings by using cleaner graphs that highlights the most impactful frequency.
-
-</details>
+[vibrations Graphs] coming soon
 
 
 ## Theory behind it
