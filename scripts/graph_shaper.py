@@ -25,7 +25,7 @@
 ################ !!! DO NOT EDIT BELOW THIS LINE !!! ################
 #####################################################################
 
-import optparse, matplotlib, sys, importlib, os
+import optparse, matplotlib, sys, importlib, os, math
 from textwrap import wrap
 import numpy as np
 import matplotlib.pyplot, matplotlib.dates, matplotlib.font_manager
@@ -71,14 +71,14 @@ def compute_damping_ratio(psd, freqs):
     fr = freqs[max_power_index]
     max_power = psd[max_power_index]
 
-    half_power = max_power / 2.0
+    half_power = max_power / math.sqrt(2)
     idx_below = np.where(psd[:max_power_index] <= half_power)[0][-1]
     idx_above = np.where(psd[max_power_index:] <= half_power)[0][0] + max_power_index
     freq_below_half_power = freqs[idx_below] + (half_power - psd[idx_below]) * (freqs[idx_below + 1] - freqs[idx_below]) / (psd[idx_below + 1] - psd[idx_below])
     freq_above_half_power = freqs[idx_above - 1] + (half_power - psd[idx_above - 1]) * (freqs[idx_above] - freqs[idx_above - 1]) / (psd[idx_above] - psd[idx_above - 1])
 
     bandwidth = freq_above_half_power - freq_below_half_power
-    zeta = bandwidth / fr
+    zeta = bandwidth / (2 * fr)
 
     return fr, zeta
 
