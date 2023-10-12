@@ -158,7 +158,7 @@ def plot_spectrogram(ax, speeds, freqs, power_spectral_densities, max_freq):
 # Startup and main routines
 ######################################################################
 
-def parse_log(logname, opts):
+def parse_log(logname):
     with open(logname) as f:
         for header in f:
             if not header.startswith('#'):
@@ -167,18 +167,18 @@ def parse_log(logname, opts):
             # Raw accelerometer data
             return np.loadtxt(logname, comments='#', delimiter=',')
     # Power spectral density data or shaper calibration data
-    opts.error("File %s does not contain raw accelerometer data and therefore "
+    raise ValueError("File %s does not contain raw accelerometer data and therefore "
                "is not supported by graph_vibrations.py script. Please use "
                "calibrate_shaper.py script to process it instead." % (logname,))
 
 
-def extract_speed(logname, opts):
+def extract_speed(logname):
     try:
-        speed = re.search('sp(.+?)n', os.path.basename(logname)).group(1)
+        speed = re.search('sp(.+?)n', os.path.basename(logname)).group(1).replace('_','.')
     except AttributeError:
-        opts.error("File %s does not contain speed in its name and therefore "
+        raise ValueError("File %s does not contain speed in its name and therefore "
                "is not supported by graph_vibrations.py script." % (logname,))
-    return int(speed)
+    return float(speed)
 
 
 def sort_and_slice(raw_speeds, raw_datas, remove):
@@ -197,8 +197,39 @@ def sort_and_slice(raw_speeds, raw_datas, remove):
 
 def setup_klipper_import(kdir):
     global shaper_calibrate
+    kdir = os.path.expanduser(kdir)
     sys.path.append(os.path.join(kdir, 'klippy'))
     shaper_calibrate = importlib.import_module('.shaper_calibrate', 'extras')
+
+
+def vibrations_calibration(lognames, klipperdir="~/klipper", axisname=None, max_freq=200., remove=0):
+    setup_klipper_import(klipperdir)
+
+    # Parse the raw data and get them ready for analysis
+    raw_datas = [parse_log(filename) for filename in lognames]
+    raw_speeds = [extract_speed(filename) for filename in lognames]
+    speeds, datas = sort_and_slice(raw_speeds, raw_datas, remove)
+
+    # As we assume that we have the same number of file for each speeds. We can group
+    # the PSD results by this number (to combine vibrations at given speed on all movements)
+    group_by = speeds.count(speeds[0])
+    # Compute psd and total power of the signal
+    freqs, power_spectral_densities = calc_psd(datas, group_by, max_freq)
+    power_total = calc_powertot(power_spectral_densities, freqs)
+
+    fig, (ax1, ax2) = matplotlib.pyplot.subplots(2, 1, sharex=True)
+    fig.suptitle("Machine vibrations - " + axisname + " moves", fontsize=16)
+
+    # Remove speeds duplicates and graph the processed datas
+    speeds = list(OrderedDict((x, True) for x in speeds).keys())
+    plot_total_power(ax1, speeds, power_total)
+    plot_spectrogram(ax2, speeds, freqs, power_spectral_densities, max_freq)
+
+    fig.set_size_inches(10, 10)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.92)
+
+    return fig
 
 
 def main():
@@ -214,7 +245,7 @@ def main():
     opts.add_option("-r", "--remove", type="int", default=0,
                     help="percentage of data removed at start/end of each files")
     opts.add_option("-k", "--klipper_dir", type="string", dest="klipperdir",
-                    default="/home/pi/klipper", help="main klipper directory")
+                    default="~/klipper", help="main klipper directory")
     options, args = opts.parse_args()
     if len(args) < 1:
         opts.error("No CSV file(s) to analyse")
@@ -223,33 +254,9 @@ def main():
     if options.remove > 50 or options.remove < 0:
         opts.error("You must specify a correct percentage (option -r) in the 0-50 range")
 
-    setup_klipper_import(options.klipperdir)
-
-    # Parse the raw data and get them ready for analysis
-    raw_datas = [parse_log(filename, opts) for filename in args]
-    raw_speeds = [extract_speed(filename, opts) for filename in args]
-    speeds, datas = sort_and_slice(raw_speeds, raw_datas, options.remove)
-
-    # As we assume that we have the same number of file for each speeds. We can group
-    # the PSD results by this number (to combine vibrations at given speed on all movements)
-    group_by = speeds.count(speeds[0])
-    # Compute psd and total power of the signal
-    freqs, power_spectral_densities = calc_psd(datas, group_by, options.max_freq)
-    power_total = calc_powertot(power_spectral_densities, freqs)
-
-    fig, axs = matplotlib.pyplot.subplots(2, 1, sharex=True)
-    fig.suptitle("Machine vibrations - " + options.axisname + " moves", fontsize=16)
-
-    # Remove speeds duplicates and graph the processed datas
-    speeds = list(OrderedDict((x, True) for x in speeds).keys())
-    plot_total_power(axs[0], speeds, power_total)
-    plot_spectrogram(axs[1], speeds, freqs, power_spectral_densities, options.max_freq)
-
-    fig.set_size_inches(10, 10)
-    fig.tight_layout()
-    fig.subplots_adjust(top=0.92)
-
+    fig = vibrations_calibration(args, options.klipperdir, options.axisname, options.max_freq, options.remove)
     fig.savefig(options.output)
+
 
 if __name__ == '__main__':
     main()
