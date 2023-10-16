@@ -4,9 +4,11 @@
 ###### SPEED AND VIBRATIONS PLOTTING SCRIPT ######
 ##################################################
 # Written by Frix_x#0161 #
-# @version: 1.2
+# @version: 2.0
 
 # CHANGELOG:
+#   v2.0: - updated the script to align it to the new K-Shake&Tune module
+#         - new features for peaks detection and advised speed zones
 #   v1.2: fixed a bug that could happen when username is not "pi" (thanks @spikeygg)
 #   v1.1: better graph formatting
 #   v1.0: first version of the script
@@ -22,9 +24,26 @@ import optparse, matplotlib, re, sys, importlib, os, operator
 from collections import OrderedDict
 import numpy as np
 import matplotlib.pyplot, matplotlib.dates, matplotlib.font_manager
-import matplotlib.ticker
+import matplotlib.ticker, matplotlib.gridspec
+import locale
+from datetime import datetime
 
 matplotlib.use('Agg')
+try:
+    locale.setlocale(locale.LC_TIME, locale.getdefaultlocale())
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, 'C')
+
+
+PEAKS_DETECTION_THRESHOLD = 0.05
+PEAKS_RELATIVE_HEIGHT_THRESHOLD = 0.04
+VALLEY_DETECTION_THRESHOLD = 0.1 # Lower is more sensitive
+
+KLIPPAIN_COLORS = {
+    "purple": "#70088C",
+    "dark_purple": "#150140",
+    "dark_orange": "#F24130"
+}
 
 
 ######################################################################
@@ -112,41 +131,168 @@ def calc_powertot(psd_list, freqs):
     return [pwrtot_sum, pwrtot_x, pwrtot_y, pwrtot_z]
 
 
+# This find all the peaks in a curve by looking at when the derivative term goes from positive to negative
+# Then only the peaks found above a threshold are kept to avoid capturing peaks in the low amplitude noise of a signal
+# Additionaly, we validate that a peak is a real peak based of its neighbors as we can have pretty flat zones in vibration
+# graphs with a lot of false positive due to small "noise" in these flat zones
+def detect_peaks(power_total, speeds, window_size=10, vicinity=10):
+    # Smooth the curve using a moving average to avoid catching peaks everywhere in noisy signals
+    kernel = np.ones(window_size) / window_size
+    smoothed_psd = np.convolve(power_total, kernel, mode='valid')
+    mean_pad = [np.mean(power_total[:window_size])] * (window_size // 2)
+    smoothed_psd = np.concatenate((mean_pad, smoothed_psd))
+
+    # Find peaks on the smoothed curve (and excluding the last value of the serie often detected when in a flat zone)
+    smoothed_peaks = np.where((smoothed_psd[:-3] < smoothed_psd[1:-2]) & (smoothed_psd[1:-2] > smoothed_psd[2:-1]))[0] + 1
+    detection_threshold = PEAKS_DETECTION_THRESHOLD * power_total.max()
+    
+    valid_peaks = []
+    for peak in smoothed_peaks:
+        peak_height = smoothed_psd[peak] - np.min(smoothed_psd[max(0, peak-vicinity):min(len(smoothed_psd), peak+vicinity+1)])
+        if peak_height > PEAKS_RELATIVE_HEIGHT_THRESHOLD * smoothed_psd[peak] and smoothed_psd[peak] > detection_threshold:
+            valid_peaks.append(peak)
+ 
+    # Refine peak positions on the original curve
+    refined_peaks = []
+    for peak in valid_peaks:
+        local_max = peak + np.argmax(power_total[max(0, peak-vicinity):min(len(power_total), peak+vicinity+1)]) - vicinity
+        refined_peaks.append(local_max)
+
+    peak_speeds = ["{:.1f}".format(speeds[i]) for i in refined_peaks]
+    num_peaks = len(refined_peaks)
+    print("Vibrations peaks detected: %d @ %s mm/s (avoid running these speeds in your slicer profile)" % (num_peaks, ", ".join(map(str, peak_speeds))))
+
+    return np.array(refined_peaks), num_peaks
+
+
+# The goal is to find zone outside of peaks (flat low energy zones) to advise them as good speeds range to use in the slicer
+def identify_low_energy_zones(power_total):
+    valleys = []
+
+    # Calculate the mean and standard deviation of the entire power_total
+    mean_energy = np.mean(power_total)
+    std_energy = np.std(power_total)
+
+    # Define a threshold value as mean minus a certain number of standard deviations
+    threshold_value = mean_energy - VALLEY_DETECTION_THRESHOLD * std_energy
+
+    # Find valleys in power_total based on the threshold
+    in_valley = False
+    start_idx = 0
+    for i, value in enumerate(power_total):
+        if not in_valley and value < threshold_value:
+            in_valley = True
+            start_idx = i
+        elif in_valley and value >= threshold_value:
+            in_valley = False
+            valleys.append((start_idx, i))
+
+    # If the last point is still in a valley, close the valley
+    if in_valley:
+        valleys.append((start_idx, len(power_total) - 1))
+
+    max_signal = np.max(power_total)
+
+    # Calculate mean energy for each valley as a percentage of the maximum of the signal
+    valley_means_percentage = []
+    for start, end in valleys:
+        if not np.isnan(np.mean(power_total[start:end])):
+            valley_means_percentage.append((start, end, (np.mean(power_total[start:end]) / max_signal) * 100))
+
+    # Sort valleys based on mean percentage values
+    sorted_valleys = sorted(valley_means_percentage, key=lambda x: x[2])
+
+    return sorted_valleys
+
+
+# Resample the signal to achieve denser data points in order to get more precise valley placing and
+# avoid having to use the original sampling of the signal (that is equal to the speed increment used for the test)
+def resample_signal(speeds, power_total, new_spacing=0.1):
+    new_speeds = np.arange(speeds[0], speeds[-1] + new_spacing, new_spacing)
+    new_power_total = np.interp(new_speeds, speeds, power_total)
+    return new_speeds, new_power_total
+
+
 ######################################################################
 # Graphing
 ######################################################################
 
 def plot_total_power(ax, speeds, power_total):
-    ax.set_title('Vibrations decomposition')
+    resampled_speeds, resampled_power_total = resample_signal(speeds, power_total[0])
+
+    ax.set_title("Vibrations decomposition", fontsize=14, color=KLIPPAIN_COLORS['dark_orange'], weight='bold')
     ax.set_xlabel('Speed (mm/s)')
     ax.set_ylabel('Energy')
+    
+    ax2 = ax.twinx()
+    ax2.yaxis.set_visible(False)
+    
+    power_total_sum = np.array(resampled_power_total)
+    speed_array = np.array(resampled_speeds)
+    max_y = power_total_sum.max() + power_total_sum.max() * 0.05
+    ax.set_xlim([speed_array.min(), speed_array.max()])
+    ax.set_ylim([0, max_y])
+    ax2.set_ylim([0, max_y])
 
-    ax.plot(speeds, power_total[0], label="X+Y+Z", alpha=0.6)
-    ax.plot(speeds, power_total[1], label="X", alpha=0.6)
-    ax.plot(speeds, power_total[2], label="Y", alpha=0.6)
-    ax.plot(speeds, power_total[3], label="Z", alpha=0.6)
+    ax.plot(resampled_speeds, resampled_power_total, label="X+Y+Z", color='purple')
+    ax.plot(speeds, power_total[1], label="X", color='red')
+    ax.plot(speeds, power_total[2], label="Y", color='green')
+    ax.plot(speeds, power_total[3], label="Z", color='blue')
+
+    peaks, num_peaks = detect_peaks(resampled_power_total, resampled_speeds)
+    low_energy_zones = identify_low_energy_zones(resampled_power_total)
+
+    if peaks.size:
+        ax.plot(speed_array[peaks], power_total_sum[peaks], "x", color='black', markersize=8)
+        for idx, peak in enumerate(peaks):
+            fontcolor = 'red'
+            fontweight = 'bold'
+            ax.annotate(f"{idx+1}", (speed_array[peak], power_total_sum[peak]), 
+                        textcoords="offset points", xytext=(8, 5), 
+                        ha='left', fontsize=13, color=fontcolor, weight=fontweight)
+        ax2.plot([], [], ' ', label=f'Number of peaks: {num_peaks}')
+    else:
+        ax2.plot([], [], ' ', label=f'No peaks detected')
+
+    for idx, (start, end, energy) in enumerate(low_energy_zones):
+        ax.axvline(speed_array[start], color='red', linestyle='dotted', linewidth=1.5)
+        ax.axvline(speed_array[end], color='red', linestyle='dotted', linewidth=1.5)
+        ax2.fill_between(speed_array[start:end], 0, power_total_sum[start:end], color='green', alpha=0.2, label=f'Zone {idx+1}: {speed_array[start]:.1f} to {speed_array[end]:.1f} mm/s (mean energy: {energy:.2f}%)')
 
     ax.xaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
     ax.yaxis.set_minor_locator(matplotlib.ticker.AutoMinorLocator())
     ax.grid(which='major', color='grey')
     ax.grid(which='minor', color='lightgrey')
     fontP = matplotlib.font_manager.FontProperties()
-    fontP.set_size('medium')
-    ax.legend(loc='best', prop=fontP)
+    fontP.set_size('small')
+    ax.legend(loc='upper left', prop=fontP)
+    ax2.legend(loc='upper right', prop=fontP)
 
-    return
+    if peaks.size:
+        return speed_array[peaks]
+    else:
+        return None
 
 
-def plot_spectrogram(ax, speeds, freqs, power_spectral_densities, max_freq):
+def plot_spectrogram(ax, speeds, freqs, power_spectral_densities, peaks, max_freq):
     spectrum = np.empty([len(freqs), len(speeds)])
 
     for i in range(len(speeds)):
         for j in range(len(freqs)):
             spectrum[j, i] = power_spectral_densities[i][0][j]
 
-    ax.set_title("Summed vibrations spectrogram")
+    ax.set_title("Vibrations spectrogram", fontsize=14, color=KLIPPAIN_COLORS['dark_orange'], weight='bold')
     ax.pcolormesh(speeds, freqs, spectrum, norm=matplotlib.colors.LogNorm(),
             cmap='inferno', shading='gouraud')
+
+    # Add peaks lines in the spectrogram to get hint from peaks found in the first graph
+    if peaks is not None:
+        for idx, peak in enumerate(peaks):
+            ax.axvline(peak, color='cyan', linestyle='dotted', linewidth=0.75)
+            ax.annotate(f"Peak {idx+1}", (peak, freqs[-1]*0.9), 
+                        textcoords="data", color='cyan', rotation=90, fontsize=10,
+                        verticalalignment='top', horizontalalignment='right')
+    
     ax.set_ylim([0., max_freq])
     ax.set_ylabel('Frequency (hz)')
     ax.set_xlabel('Speed (mm/s)')
@@ -217,17 +363,32 @@ def vibrations_calibration(lognames, klipperdir="~/klipper", axisname=None, max_
     freqs, power_spectral_densities = calc_psd(datas, group_by, max_freq)
     power_total = calc_powertot(power_spectral_densities, freqs)
 
-    fig, (ax1, ax2) = matplotlib.pyplot.subplots(2, 1, sharex=True)
-    fig.suptitle("Machine vibrations - " + axisname + " moves", fontsize=16)
+    fig = matplotlib.pyplot.figure()
+    gs = matplotlib.gridspec.GridSpec(2, 1, height_ratios=[4, 3])
+    ax1 = fig.add_subplot(gs[0])
+    ax2 = fig.add_subplot(gs[1])
+
+    filename_parts = (lognames[0].split('/')[-1]).split('_')
+    dt = datetime.strptime(f"{filename_parts[1]} {filename_parts[2].split('-')[0]}", "%Y%m%d %H%M%S")
+    title_line1 = "VIBRATIONS MEASUREMENT TOOL"
+    title_line2 = dt.strftime('%x %X') + ' -- ' + axisname.upper() + ' axis'
+    fig.text(0.12, 0.965, title_line1, ha='left', va='bottom', fontsize=20, color=KLIPPAIN_COLORS['purple'], weight='bold')
+    fig.text(0.12, 0.957, title_line2, ha='left', va='top', fontsize=16, color=KLIPPAIN_COLORS['dark_purple'])
 
     # Remove speeds duplicates and graph the processed datas
     speeds = list(OrderedDict((x, True) for x in speeds).keys())
-    plot_total_power(ax1, speeds, power_total)
-    plot_spectrogram(ax2, speeds, freqs, power_spectral_densities, max_freq)
 
-    fig.set_size_inches(10, 10)
+    peaks = plot_total_power(ax1, speeds, power_total)
+    plot_spectrogram(ax2, speeds, freqs, power_spectral_densities, peaks, max_freq)
+
+    fig.set_size_inches(8.3, 11.6)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.92)
+    fig.subplots_adjust(top=0.89)
+
+    # Adding a small Klippain logo to the top left corner of the figure
+    ax_logo = fig.add_axes([0.001, 0.899, 0.1, 0.1], anchor='NW', zorder=-1)
+    ax_logo.imshow(matplotlib.pyplot.imread(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'klippain.png')))
+    ax_logo.axis('off')
 
     return fig
 
