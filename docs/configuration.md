@@ -51,6 +51,6 @@ END_PRINT
 
   > **Note** for MMU/ERCF users:
   >
-  > By default, Klippain unloads the filament at the end of the print, but you can change the default behavior by modifying the variable `variable_ercf_unload_on_end_print` in your `variables.cfg` file.
+  > By default, Klippain unloads the filament at the end of the print, but you can change the default behavior by modifying the variable `variable_mmu_unload_on_end_print` in your `variables.cfg` file.
   > You can also specify the wanted behavior directly in your slicer end print custom gcode by using `END_PRINT MMU_UNLOAD_AT_END=0`.
 

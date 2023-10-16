@@ -146,7 +146,7 @@ function install_config {
 
 # Helper function to ask and install the MCU templates if needed
 function install_mcu_templates {
-    local install_template file_list main_template install_toolhead_template toolhead_template install_ercf_template
+    local install_template file_list main_template install_toolhead_template toolhead_template install_mmu_template
 
     read < /dev/tty -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
     if [[ -z "$install_template" ]]; then
