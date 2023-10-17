@@ -39,6 +39,11 @@ Finally, add custom print start G-code to your slicer. Here's an example for Sup
 ```
 START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder} TOOLS_USED=!referenced_tools!
 ```
+  > **Note** for MMU/ERCF users:
+  >
+  > You can add `SYNC_MMU_EXTRUDER=0` or `1` and `CHECK_GATES=0` or `1` to override the one define in HHv2 `mmu_parameters.cfg` and in Klippain `variables.cfg`.
+  > The `TOOLS_USED=!referenced_tools!` parameter is for the [HHv2 moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md) to check only the used tools.
+
 Another example for OrcaSlicer:
 ```
 START_PRINT EXTRUDER_TEMP=[nozzle_temperature_initial_layer] BED_TEMP=[bed_temperature_initial_layer_single] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL=[initial_tool] TOOLS_USED=!referenced_tools!
