@@ -26,7 +26,7 @@ BACKUP_PATH="${HOME}/klippain_config_backups"
 # Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
 KLIPPER_PATH="${HOME}/klipper"
 # Branch on Frix-x repo to use (default: main)
-FRIX_BRANCH="Happy_Hare_Benoit"
+FRIX_BRANCH="Happy_Hare"
 
 
 set -eu
