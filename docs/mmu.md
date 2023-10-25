@@ -76,7 +76,7 @@ If the gate is "correctly" loaded and this error appears, this is generally due 
 To correct during print for example you can use the command: `MMU_GATE_MAP GATE=1 AVAILABLE=1` (adapt for your GATE number...)
 
 a good practice is to check the gates state after make changes in filaments with the command `MMU_GATE_MAP` to be sure all your setup is correct.  
-The command `MMU_CHECK_GATES` can update the MAP for all MMU gates. But you can also use for exemple `MMU__CHECK_GATES GATE="0 2 5"` to check and update only gates 0, 2 and 5.
+The command `MMU_CHECK_GATES` can update the MAP for all MMU gates. But you can also use for exemple `MMU_CHECK_GATES TOOLS=0,2,5` to check and update only tools 0, 2 and 5.
 
 </details>
 
