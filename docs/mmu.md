@@ -46,8 +46,8 @@ But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, 
 &nbsp;&nbsp;If you want to use the MMU bypass for a print you must load the filament to the extruder before start your print:  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> First Home the MMU by running `MMU_HOME FORCE_UNLOAD=1` ;  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> and select bypass with `MMU_SELECT_BYPASS` command ;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> finaly manualy insert the filament in the bowden to the extruder and load the filament to the nozzle by using `MMU_LOAD` command.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* At the end of the print you can use the `MMU_EJECT` command to unload filament out of the extruder and then manualy unload the bowden.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> finaly manualy insert the filament in the bowden to the extruder and load the filament to the nozzle by using `MMU_LOAD` command. You can also just insert manualy the filament in the bowden until contact with the extruder and then run the print (the `start_print` macro will try to load filament in the toolhead).  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* At the end of the print you can use the `MMU_EJECT` command to unload filament out of the extruder and then manualy unload the bowden. (Automatic if `variable_mmu_unload_on_end_print` is set to True in Klippain `variables.cfg`).
 
 ‎ 
 
