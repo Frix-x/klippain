@@ -80,4 +80,16 @@ The command `MMU_CHECK_GATES` can update the MAP for all MMU gates. But you can 
 
 </details>
 
+‎ 
+----
+![img](images/mmu/HHv2_error_tmc.png)  
+<details>
+<summary><sub>🔸 Read more about this error...</sub></summary>
+
+After installing HHv2 or upgrade it if you have this error, you must check and modify your Klippain `mcu.cfg` file to uncomment the correct line in the EXTRUDER DRIVER section:
+
+![img](images/mmu/HHv2_mcu_tmc.png)
+
+</details>
+
 ----
