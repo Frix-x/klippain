@@ -76,7 +76,7 @@ But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, 
 To correct during print for example you can use the command: `MMU_GATE_MAP GATE=1 AVAILABLE=1` (adapt for your GATE number...)
 
 &nbsp;&nbsp;A good practice is to check the gates state after make changes in filaments with the command `MMU_GATE_MAP` to be sure all your setup is correct.  
-The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can also use for exemple `MMU_CHECK_GATE TOOLS=0,2,5` to check and update only tools 0, 2 and 5.
+The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can also use for exemple `MMU_CHECK_GATE TOOLS=0,2,5` to check and update only tools 0, 2 and 5 or `MMU_CHECK_GATE GATES=0,2,5` to check and update only gates 0, 2 and 5.
 
 </details>
 
