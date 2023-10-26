@@ -57,7 +57,7 @@ But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, 
 <details>
 <summary><sub>🔸 Read more about this error...</sub></summary>
 
-If you have this message at bootup in the console you must check your Klippain variables in `variables.cfg` !!! 
+&nbsp;&nbsp;If you have this message at bootup in the console you must check your Klippain variables in `variables.cfg` !!! 
 
     - variable_mmu_force_homing_in_start_print: True or False
     - variable_mmu_unload_on_cancel_print: True or False
@@ -72,10 +72,10 @@ If you have this message at bootup in the console you must check your Klippain v
 <details>
 <summary><sub>🔸 Read more about this error...</sub></summary>
 
-If the gate is "correctly" loaded and this error appears, this is generally due to the fact that the gate was previously marked as empty and its state has not been updated.
+&nbsp;&nbsp;If the gate is "correctly" loaded and this error appears, this is generally due to the fact that the gate was previously marked as empty and its state has not been updated.
 To correct during print for example you can use the command: `MMU_GATE_MAP GATE=1 AVAILABLE=1` (adapt for your GATE number...)
 
-a good practice is to check the gates state after make changes in filaments with the command `MMU_GATE_MAP` to be sure all your setup is correct.  
+&nbsp;&nbsp;A good practice is to check the gates state after make changes in filaments with the command `MMU_GATE_MAP` to be sure all your setup is correct.  
 The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can also use for exemple `MMU_CHECK_GATE TOOLS=0,2,5` to check and update only tools 0, 2 and 5.
 
 </details>
@@ -86,7 +86,7 @@ The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can a
 <details>
 <summary><sub>🔸 Read more about this error...</sub></summary>
 
-After installing HHv2 or upgrade it if you have this error, you must check and modify your Klippain `mcu.cfg` file to uncomment the correct line in the EXTRUDER DRIVER section:
+&nbsp;&nbsp;After installing HHv2 or upgrade it if you have this error, you must check and modify your Klippain `mcu.cfg` file to uncomment the correct line in the EXTRUDER DRIVER section:
 
 ![img](images/mmu/HHv2_mcu_tmc.png)
 
