@@ -31,7 +31,7 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
 
 ‎ 
 
-- <u>**Early check MMU errors during print_start :**</u>
+- <u>**Early check MMU errors during print_start:**</u>
 
 &nbsp;&nbsp;If you want MMU errors to be checked early, you must modify the `print_start_detection` by using `0` as parameter in `mmu/base/mmu_parameters.cfg`.  
 &nbsp;&nbsp;By default, with `print_start_detection: 1`, HHv2 will automatically detect start and end of print. But if an "error" occur in loading/checking MMU tools the MMU pause occur at the end of the print_start. ***So you must wait the end of start_print to debug MMU***.  
