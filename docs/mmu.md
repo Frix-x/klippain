@@ -58,11 +58,19 @@ But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> and select bypass with `MMU_SELECT_BYPASS` command ;  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> finaly manualy insert the filament in the bowden to the extruder and load the filament to the nozzle by using `MMU_LOAD` command. You can also just insert manualy the filament in the bowden until contact with the extruder and then run the print (the `start_print` macro will try to load filament in the toolhead).  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* At the end of the print you can use the `MMU_EJECT` command to unload filament out of the extruder and then manualy unload the bowden. (Automatic if `variable_mmu_unload_on_end_print` is set to True in Klippain `variables.cfg`).  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Rem for Spoolman users:** you can set in your slicer sart_print gcode the `INITIAL_TOOL` parameter for your filament...
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Rem for Spoolman users:** you can set in your slicer sart_print gcode the `INITIAL_TOOL` parameter for your filament so klippain use it to activate the correct Spoolman spool...
 
 ‎ 
 
-- <u>**Some exemples of error message:**</u>
+- <u>**HHv2 and Spoolman user:**</u>
+
+&nbsp;&nbsp;HHv2 natively handles spool change in Spoolman. To do this, you must activate Spoolman support and configure the spool IDs in HHv2 `mmu_parameters.cfg`:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `enable_spoolman:1`  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:`
+
+‎ 
+
+- <u>**Some error message exemples:**</u>
 
 ![img](images/mmu/check_mmu_variables.png)  
 <details>
