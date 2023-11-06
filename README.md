@@ -35,6 +35,21 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
   > General rule to keep the auto-update feature working: **never modify Klippain files directly**, but instead add overrides as per the documentation! To proceed, you can modify all the pre-installed templates in your config root folder (`printer.cfg`, `mcu.cfg`, `variables.cfg` and `overrides.cfg`) as they will be preserved on update.
 
 
+## Removing Klippain
+
+In case Klippain doesn't suit your needs or if you installed it by mistake, you can easily remove Klippain and revert to your previous configuration by using the automated uninstall script. During the uninstallation process, the script will remove all specific Klippain files and configurations. Additionally, you will be given an option to restore your previously backed-up configuration, allowing your printer to return to its last working state (from before Klippain was installed).
+
+To run the uninstall script, execute the following command over SSH:
+
+```bash
+wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/uninstall.sh | bash
+```
+
+  > **Note**
+  >
+  > All backups are preserved during the uninstallation process. So, you can easily revert back at any time if you wish to :stuck_out_tongue_winking_eye:
+
+
 ## Support the Project
 
 I strive to accommodate user requests that align with this configuration's design. Feel free to open an issue or a PR for specific hardware device support or new features.
