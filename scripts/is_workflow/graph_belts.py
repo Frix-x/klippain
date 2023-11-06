@@ -4,9 +4,10 @@
 ######## CoreXY BELTS CALIBRATION SCRIPT ########
 #################################################
 # Written by Frix_x#0161 #
-# @version: 2.0
+# @version: 2.1
 
 # CHANGELOG:
+#   v2.1: replaced the TwoSlopNorm by a custom made norm to allow the script to work on older versions of matplotlib
 #   v2.0: updated the script to align it to the new K-Shake&Tune module
 #   v1.0: first version of this tool for enhanced vizualisation of belt graphs
 
@@ -28,10 +29,6 @@ import locale
 from datetime import datetime
 
 matplotlib.use('Agg')
-try:
-    locale.setlocale(locale.LC_TIME, locale.getdefaultlocale())
-except locale.Error:
-    locale.setlocale(locale.LC_TIME, 'C')
 
 
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" # For paired peaks names
@@ -52,6 +49,22 @@ KLIPPAIN_COLORS = {
     "dark_orange": "#F24130",
     "red_pink": "#F2055C"
 }
+
+
+# Set the best locale for time and date formating (generation of the titles)
+try:
+    locale.setlocale(locale.LC_TIME, locale.getdefaultlocale())
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, 'C')
+
+# Override the built-in print function to avoid problem in Klipper due to locale settings
+original_print = print
+def print_with_c_locale(*args, **kwargs):
+    original_locale = locale.setlocale(locale.LC_ALL, None)
+    locale.setlocale(locale.LC_ALL, 'C')
+    original_print(*args, **kwargs)
+    locale.setlocale(locale.LC_ALL, original_locale)
+print = print_with_c_locale
 
 
 ######################################################################
@@ -330,15 +343,15 @@ def compute_mhi(combined_data, similarity_coefficient, num_unpaired_peaks):
 def mhi_lut(mhi):
     if 0 <= mhi <= 30:
         return "Excellent mechanical health"
-    elif 31 <= mhi <= 45:
+    elif 30 < mhi <= 45:
         return "Good mechanical health"
-    elif 46 <= mhi <= 55:
+    elif 45 < mhi <= 55:
         return "Acceptable mechanical health"
-    elif 56 <= mhi <= 70:
+    elif 55 < mhi <= 70:
         return "Potential signs of a mechanical issue"
-    elif 71 <= mhi <= 85:
+    elif 70 < mhi <= 85:
         return "Likely a mechanical issue"
-    elif 86 <= mhi <= 100:
+    elif 85 < mhi <= 100:
         return "Mechanical issue detected"
 
 
@@ -461,9 +474,13 @@ def plot_difference_spectrogram(ax, data1, data2, signal1, signal2, similarity_f
     ax.set_title(f"Differential Spectrogram", fontsize=14, color=KLIPPAIN_COLORS['dark_orange'], weight='bold')
     ax.plot([], [], ' ', label=f'{textual_mhi} (experimental)')
     
-    # Draw the differential spectrogram with a specific norm to get light grey zero values and red for max values (vmin to vcenter is not used)
-    norm = matplotlib.colors.TwoSlopeNorm(vcenter=np.min(combined_data), vmax=np.max(combined_data))
-    ax.pcolormesh(bins, t, combined_data.T, cmap='RdBu_r', norm=norm, shading='gouraud')
+    # Draw the differential spectrogram with a specific custom norm to get white or light orange zero values and red for max values
+    colors = ['white', 'bisque', 'red', 'black']  
+    n_bins = [0, 0.12, 0.9, 1] # These values where found experimentaly to get a good higlhlighting of the differences only
+    cm = matplotlib.colors.LinearSegmentedColormap.from_list('WhiteToRed', list(zip(n_bins, colors)))
+    norm = matplotlib.colors.Normalize(vmin=np.min(combined_data), vmax=np.max(combined_data))
+    ax.pcolormesh(bins, t, combined_data.T, cmap=cm, norm=norm, shading='gouraud')
+
     ax.set_xlabel('Frequency (hz)')
     ax.set_xlim([0., max_freq])
     ax.set_ylabel('Time (s)')
@@ -570,11 +587,15 @@ def belts_calibration(lognames, klipperdir="~/klipper", max_freq=200.):
     ax2 = fig.add_subplot(gs[1])
 
     # Add title
-    filename = lognames[0].split('/')[-1]
-    dt = datetime.strptime(f"{filename.split('_')[1]} {filename.split('_')[2]}", "%Y%m%d %H%M%S")
     title_line1 = "RELATIVE BELT CALIBRATION TOOL"
-    title_line2 = dt.strftime('%x %X')
     fig.text(0.12, 0.965, title_line1, ha='left', va='bottom', fontsize=20, color=KLIPPAIN_COLORS['purple'], weight='bold')
+    try:
+        filename = lognames[0].split('/')[-1]
+        dt = datetime.strptime(f"{filename.split('_')[1]} {filename.split('_')[2]}", "%Y%m%d %H%M%S")
+        title_line2 = dt.strftime('%x %X')
+    except:
+        print("Warning: CSV filenames look to be different than expected (%s , %s)" % (lognames[0], lognames[1]))
+        title_line2 = lognames[0].split('/')[-1] + " / " +  lognames[1].split('/')[-1]
     fig.text(0.12, 0.957, title_line2, ha='left', va='top', fontsize=16, color=KLIPPAIN_COLORS['dark_purple'])
 
     # Plot the graphs
