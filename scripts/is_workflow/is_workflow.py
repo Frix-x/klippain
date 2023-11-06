@@ -63,7 +63,16 @@ def get_belts_graph():
     current_date = datetime.now().strftime('%Y%m%d_%H%M%S')
     lognames = []
 
-    for filename in glob.glob('/tmp/raw_data_axis*.csv'):
+    globbed_files = glob.glob('/tmp/raw_data_axis*.csv')
+    if not globbed_files:
+        print("No CSV files found in the /tmp folder to create the belt graphs!")
+        sys.exit(1)
+    if len(globbed_files) < 2:
+        print("Not enough CSV files found in the /tmp folder. Two files are required for the belt graphs!")
+        sys.exit(1)
+    sorted_files = sorted(globbed_files, key=os.path.getmtime, reverse=True)
+
+    for filename in sorted_files[:2]:
         # Wait for the file handler to be released by Klipper
         while is_file_open(filename):
             time.sleep(3)
@@ -86,13 +95,13 @@ def get_belts_graph():
 def get_shaper_graph():
     current_date = datetime.now().strftime('%Y%m%d_%H%M%S')
 
+    # Get all the files and sort them based on last modified time to select the most recent one
     globbed_files = glob.glob('/tmp/raw_data*.csv')
-    if len(globbed_files) > 1:
-        print("There is more than 1 measurement.csv found in the /tmp folder. Unable to plot the shaper graphs!")
-        print("Please clean the files in the /tmp folder and start again.")
+    if not globbed_files:
+        print("No CSV files found in the /tmp folder to create the input shaper graphs!")
         sys.exit(1)
-
-    filename = globbed_files[0]
+    sorted_files = sorted(globbed_files, key=os.path.getmtime, reverse=True)
+    filename = sorted_files[0]
 
     # Wait for the file handler to be released by Klipper
     while is_file_open(filename):
@@ -114,7 +123,15 @@ def get_vibrations_graph(axis_name):
     current_date = datetime.now().strftime('%Y%m%d_%H%M%S')
     lognames = []
 
-    for filename in glob.glob('/tmp/adxl345-*.csv'):
+    globbed_files = glob.glob('/tmp/adxl345-*.csv')
+    if not globbed_files:
+        print("No CSV files found in the /tmp folder to create the vibration graphs!")
+        sys.exit(1)
+    if len(globbed_files) < 3:
+        print("Not enough CSV files found in the /tmp folder. At least 3 files are required for the vibration graphs!")
+        sys.exit(1)
+
+    for filename in globbed_files:
         # Wait for the file handler to be released by Klipper
         while is_file_open(filename):
             time.sleep(3)
