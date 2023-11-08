@@ -1,0 +1,15 @@
+#for micron+
+
+[stepper_x]
+position_min: 0
+position_endstop: 180
+position_max: 180
+
+[stepper_y]
+position_min: 0
+position_endstop: 190
+position_max: 190
+
+[stepper_z]
+position_max: 165
+position_min: -5
