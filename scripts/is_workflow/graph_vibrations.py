@@ -29,10 +29,6 @@ import locale
 from datetime import datetime
 
 matplotlib.use('Agg')
-try:
-    locale.setlocale(locale.LC_TIME, locale.getdefaultlocale())
-except locale.Error:
-    locale.setlocale(locale.LC_TIME, 'C')
 
 
 PEAKS_DETECTION_THRESHOLD = 0.05
@@ -44,6 +40,22 @@ KLIPPAIN_COLORS = {
     "dark_purple": "#150140",
     "dark_orange": "#F24130"
 }
+
+
+# Set the best locale for time and date formating (generation of the titles)
+try:
+    locale.setlocale(locale.LC_TIME, locale.getdefaultlocale())
+except locale.Error:
+    locale.setlocale(locale.LC_TIME, 'C')
+
+# Override the built-in print function to avoid problem in Klipper due to locale settings
+original_print = print
+def print_with_c_locale(*args, **kwargs):
+    original_locale = locale.setlocale(locale.LC_ALL, None)
+    locale.setlocale(locale.LC_ALL, 'C')
+    original_print(*args, **kwargs)
+    locale.setlocale(locale.LC_ALL, original_locale)
+print = print_with_c_locale
 
 
 ######################################################################
@@ -348,7 +360,7 @@ def setup_klipper_import(kdir):
     shaper_calibrate = importlib.import_module('.shaper_calibrate', 'extras')
 
 
-def vibrations_calibration(lognames, klipperdir="~/klipper", axisname=None, max_freq=200., remove=0):
+def vibrations_calibration(lognames, klipperdir="~/klipper", axisname=None, max_freq=1000., remove=0):
     setup_klipper_import(klipperdir)
 
     # Parse the raw data and get them ready for analysis
@@ -368,11 +380,15 @@ def vibrations_calibration(lognames, klipperdir="~/klipper", axisname=None, max_
     ax1 = fig.add_subplot(gs[0])
     ax2 = fig.add_subplot(gs[1])
 
-    filename_parts = (lognames[0].split('/')[-1]).split('_')
-    dt = datetime.strptime(f"{filename_parts[1]} {filename_parts[2].split('-')[0]}", "%Y%m%d %H%M%S")
     title_line1 = "VIBRATIONS MEASUREMENT TOOL"
-    title_line2 = dt.strftime('%x %X') + ' -- ' + axisname.upper() + ' axis'
     fig.text(0.12, 0.965, title_line1, ha='left', va='bottom', fontsize=20, color=KLIPPAIN_COLORS['purple'], weight='bold')
+    try:
+        filename_parts = (lognames[0].split('/')[-1]).split('_')
+        dt = datetime.strptime(f"{filename_parts[1]} {filename_parts[2].split('-')[0]}", "%Y%m%d %H%M%S")
+        title_line2 = dt.strftime('%x %X') + ' -- ' + axisname.upper() + ' axis'
+    except:
+        print("Warning: CSV filename look to be different than expected (%s)" % (lognames[0]))
+        title_line2 = lognames[0].split('/')[-1]
     fig.text(0.12, 0.957, title_line2, ha='left', va='top', fontsize=16, color=KLIPPAIN_COLORS['dark_purple'])
 
     # Remove speeds duplicates and graph the processed datas
