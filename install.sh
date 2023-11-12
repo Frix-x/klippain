@@ -130,7 +130,7 @@ function install_config {
     chmod +x ${FRIX_CONFIG_PATH}/install.sh
     chmod +x ${FRIX_CONFIG_PATH}/uninstall.sh
     for file in is_workflow.py graph_vibrations.py graph_shaper.py graph_belts.py; do
-        chmod +x ${FRIX_CONFIG_PATH}/scripts/$file
+        chmod +x ${FRIX_CONFIG_PATH}/scripts/is_workflow/$file
     done
 
     # Symlink the gcode_shell_command.py file in the correct Klipper folder (erased to always get the last version)
