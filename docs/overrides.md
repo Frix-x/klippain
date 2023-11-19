@@ -15,7 +15,7 @@ Use overrides to tweak machine dimensions, invert motor directions, change axis 
 
 Since my defaults aim to be as generic as possible, you won't need many overrides. However, there are still some common elements to check.
 
-For example, **pay special attention to axis limits** in the `[stepper_...]` sections, run current, etc. Verify thermistor types in `[extruder]` and `[heated_bed]` sections. If using a multi-MCU configuration, you'll need to override any section where pins are connected to the secondary or toolhead boards to specify it. Finally, use overrides if you want to change motor direction or add a pull-up/down (using `!`, `^`, and `~`).
+For example, **pay special attention to axis limits** in the `[stepper_...]` sections, run current, etc. Verify thermistor types in `[extruder]` and `[heater_bed]` sections. If using a multi-MCU configuration, you'll need to override any section where pins are connected to the secondary or toolhead boards to specify it. Finally, use overrides if you want to change motor direction or add a pull-up/down (using `!`, `^`, and `~`).
 
 Additionally, if you want to add a new macro to Klippain or even replace an existing one to adapt it to your use case, you can do it the same way!
 
@@ -38,7 +38,7 @@ dir_pin: !mcu:Z2_DIR
 
 Changing a thermistor type (like for the bed), can be done this way:
 ```
-[heated_bed]
+[heater_bed]
 sensor_type: ...
 ```
 
