@@ -1,5 +1,7 @@
   > **Warning**
   >
+  > <span style="color: red"> IF YOU HARE HERE PREFER TO USE THE OTHER BRANCH OF KLIPPAIN FOR Happy_Hare v2.2 : -> https://github.com/Frix-x/klippain/Happy_Hare_Benoit </span>  
+  >
   > This branch of klippain is in beta state for using with the new Happy_Hare v2 for MMU/ERCF module from https://github.com/moggieuk/Happy-Hare.git **use it at your own risks and make sure to have a backup of your config before using it**.
 
 
@@ -30,7 +32,8 @@ To install Klippain, first ensure you have already Klipper, Moonraker, and a Web
 Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
 
   > **ONLY IF YOU HAVE PREVIOUSLY INSTALL Klippain**: before install this branch of klippain I recommand to make a clear install... **So after saving your previous configuration!!!**, remove **.VERSION** in config folder and then remove the klippain_config (cloned git source tree):
-```bash
+
+```bash
 rm ~/printer_data/config/.VERSION
 rm -rf ~/klippain_config
 ```
