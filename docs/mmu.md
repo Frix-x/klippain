@@ -1,5 +1,5 @@
 # <u>**MMU details for correct install**</u>
-before installing Happy-Hare V2 you must
+before installing Happy-Hare V2.2 you must
 
 Uninstall the old ercf ERCF-Software-V3 (if you already have it):
 1. backup your old ercf_***.cfg files for future reference,
