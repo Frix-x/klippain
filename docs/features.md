@@ -15,6 +15,7 @@ Here you can find a list of all the custom features availables in the macros or 
   - Easy [pressure advance calibration](./features/pa_calibration.md) macro
   - Easy [flow calibration](./features/flow_calibration.md) macro
   - Automatic [input shaper workflow](./features/is_workflow.md) to calibrate it without using SSH
+   - Automatic [accel_speed_calibration](./features/accel_speed_calibration.md) to calibrate the max speed and acceleration (travel)
   - Custom designed [vibrations measurements and calibration workflow](./features/vibr_measurements.md) to be able to do an advanced calibration of the machine speed settings and optimize your global mechanical assembly
   - More feature descriptions and info will be added later...
 
