@@ -1,5 +1,4 @@
-## made by fragmon@crydteam
-## https://www.youtube.com/@Crydteam
+made by fragmon@crydteam https://www.youtube.com/@Crydteam
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LIaPKYyOujQ/0.jpg)](https://www.youtube.com/watch?v=LIaPKYyOujQ)
 
