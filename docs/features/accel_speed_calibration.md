@@ -11,8 +11,6 @@ Only the physical properties are being tested. These can be used, for example, f
 
 # Preparation:
 - Ensure that the 3D printer is correctly set up and all axes are free to move.
-- Copy the speed_test.cfg file into your configuration and select your printer type within the file (cartesian or corexy).
-- Add [include speed_test.cfg] and [respond], [endstop_phase stepper_x], [endstop_phase stepper_y] to your printer.cfg file.
 
 # Explanation of the Macros:
 ## CAUTION -- The macros can only be stopped by emergency stop
