@@ -33,6 +33,10 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
 
 - <u>**Early check MMU errors during print_start:**</u>
 
+  > **Warning**
+  >
+  > If you want MMU errors to be checked earlier, you must have set `variable_mmu_check_errors_on_start_print: True` in your klippain `variables.cfg` file. Setting it to `True` at this time will force MMU `print_start_detection to be disabled.  
+
 &nbsp;&nbsp;If you want MMU errors to be checked early, you must modify the `print_start_detection` by using `0` as parameter in `mmu/base/mmu_parameters.cfg`.  
 &nbsp;&nbsp;By default, with `print_start_detection: 1`, HHv2 will automatically detect start and end of print. But if an "error" occur in loading/checking MMU tools the MMU pause occur at the end of the print_start. ***So you must wait the end of start_print to debug MMU***.  
 &nbsp;&nbsp; With `print_start_detection: 0` Klippain will manage the state changes of the MMU, and allows you to check early (and immediately stop the print_start) and therefore avoid having to wait for the whole process to be completed. ***But in this case you will have to restart printing after debugging the MMU***.  
@@ -82,6 +86,7 @@ But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, 
     - variable_mmu_unload_on_cancel_print: True or False
     - variable_mmu_unload_on_end_print: True or False
     - variable_mmu_check_gates_on_start_print: True or False
+    - variable_mmu_check_errors_on_start_print: True or False
 
 </details>
 
