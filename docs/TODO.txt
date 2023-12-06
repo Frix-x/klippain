@@ -1,2 +1,3 @@
-test repo
-remove Happy_Hare_Benoit references
+test repo + mainsail beta channel
+remove Happy_Hare_Dev references from startup.cfg
+test with new dev HH
