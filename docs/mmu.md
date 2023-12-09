@@ -51,7 +51,12 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
 &nbsp;&nbsp;The `TOOL` designates the software MMU tool use to call the filament by the `Tx` command.  
 In HHv2, by default, GATE=TOOL. To see your current config use the `MMU_REMAP_TTG` command.  
 But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, or for complete remaping (example for a 6 gates MMU to completely reverse the order of all tools): `MMU_REMAP_TTG MAP=5,4,3,2,1,0` command.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> See the complete description of the [Tool-to-Gate (TTG) mapping](https://github.com/moggieuk/Happy-Hare/blob/main/README.md#3-tool-to-gate-ttg-mapping).
+&nbsp;&nbsp;You can use it, for exemple, if you have previously slice a print project with some tools defined in th final slicer gcode file and you want to reprint it but you have moved the colors spools to another gate or you want to make it with different colors without having to move the spools entries, or reslice your project.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> Here I have slice my project with default tool (T0) and import in mainsail:  
+![img](images/mmu/HHv2slice.png)  
+and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Klippain macro: `MMU_SET_TOOL_TO_GATE TOOL_TO_REMAP=0 GATE_TO_LINK=5`:  
+![img](images/mmu/HHv2Tool_to_Gate.png)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> For the complete description have a look at [Tool-to-Gate (TTG) mapping](https://github.com/moggieuk/Happy-Hare/blob/main/README.md#3-tool-to-gate-ttg-mapping).
 
 ‎ 
 
@@ -70,7 +75,7 @@ But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, 
 
 &nbsp;&nbsp;HHv2 natively handles spool change in Spoolman. To do this, you must activate Spoolman support and configure the spool IDs in HHv2 `mmu_parameters.cfg`:  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `enable_spoolman:1`  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:`
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:` or use HH macro: `MMU_GATE_MAP GATE=n SPOOLID=id`. You can also use Klippain macro `MMU_SET_GATE_ID` with `GATE` and `SPOOL_ID` parameters.  
 
 ‎ 
 
