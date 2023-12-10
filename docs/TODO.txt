@@ -1,3 +1,5 @@
-test repo + mainsail beta channel
-remove Happy_Hare_Dev references from startup.cfg
-test with new dev HH
+OK test repo + mainsail beta channel
+remove Happy_Hare_Dev references from startup.cfg -> 
+just before merge to other branch
+test with new dev HH ok
+view for add led effects...
