@@ -1,4 +1,4 @@
-test repo + mainsail beta channel and dev as override
+test repo + mainsail beta channel and dev as override OK??
 remove Happy_Hare_Dev references from startup.cfg -> 
 just before merge to other branch
 test with new dev HH ok
