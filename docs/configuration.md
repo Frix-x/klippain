@@ -42,7 +42,8 @@ START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_
   > **Note** for MMU/ERCF users:
   >
   > You can add `CHECK_GATES=0` or `1` to override the one define in Klippain `variables.cfg`.  
-  > The `TOOLS_USED=!referenced_tools!` parameter is for the [HHv2 moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md) to check only the used tools.
+  > The `TOOLS_USED=!referenced_tools!` parameter is for the [HHv2 moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md) to check only the used tools.  
+  > You can also add `SYNC_MMU_EXTRUDER=1` to override the one define in Happy_Hare `mmu_parameters.cfg` (in case `sync_to_extruder: 0` (by default in Happy_Hare), and want to use the synchronized gear/extruder for a particular print...).
 
 Another example for OrcaSlicer:
 ```
