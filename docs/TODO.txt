@@ -1,5 +1,5 @@
-test repo + mainsail beta channel and dev as override OK??
-remove Happy_Hare_Dev references from startup.cfg -> 
-just before merge to other branch
+test repo + mainsail beta channel and dev as override -> OK when override with channel: dev
+remove Happy_Hare_Dev references from startup.cfg -> just before merge to other branch
 test with new dev HH ok
+{% set SYNC_MMU_EXTRUDER = params.SYNC_MMU_EXTRUDER|default(0)|int %} # set MMU gear motor and extruder synchronization during print TODO start_print
 view for add led effects...
