@@ -236,9 +236,16 @@ function install_mcu_templates {
         fi
     fi
 }
+# Step 5: install Klipper-led_effect
+function install_klipper_led_effect {
+    echo "[INSTALL] Installing klipper-led_effect"
+    cd ~
+    git clone https://github.com/julianschill/klipper-led_effect.git
+    cd klipper-led_effect
+    ./install-led_effect.sh
+}
 
-
-# Step 5: restarting Klipper
+# Step 6: restarting Klipper
 function restart_klipper {
     echo "[POST-INSTALL] Restarting Klipper..."
     sudo systemctl restart klipper
@@ -256,6 +263,7 @@ preflight_checks
 check_download
 backup_config
 install_config
+install_klipper_led_effect
 restart_klipper
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
