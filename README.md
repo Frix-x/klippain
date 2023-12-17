@@ -38,7 +38,7 @@ rm -rf ~/klippain_config
   > Then you can install Happy_Hare branch of Klippain over ssh by using this command:
 
 ```bash
-wget -O - https://raw.githubusercontent.com/Frix-x/klippain/Happy_Hare_Benoit/install.sh | bash
+wget -O - https://raw.githubusercontent.com/smwoodward/klippain/Happy_Hare_Woodward/install.sh | bash
 ```
 
 After this you need to install Happy_Hare V2 from it's own repo: https://github.com/moggieuk/Happy-Hare.git see [mmu guide](./docs/mmu.md).
