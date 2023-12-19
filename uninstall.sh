@@ -13,7 +13,7 @@
 
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
 USER_CONFIG_PATH="${HOME}/printer_data/config"
-# Where Frix-x repository config files are stored (Klippain read-only files that are untouched)
+# Where klippain repository config files are stored (Klippain read-only files that are untouched)
 FRIX_CONFIG_PATH="${HOME}/klippain_config"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
 BACKUP_PATH="${HOME}/klippain_config_backups"
