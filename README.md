@@ -1,3 +1,5 @@
+### This version of klippain includes some of my personal modifications that are not included in the official branch
+
 # Klippain
 
 > Klippain - The pain-free recipe for (french)bread and butter Klipper configuration!
@@ -25,7 +27,7 @@ To install Klippain, first ensure you have already Klipper, Moonraker, and a Web
 Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
 
 ```bash
-wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/install.sh | bash
+wget -O - https://raw.githubusercontent.com/tehniemer/klippain/main/install.sh | bash
 ```
 
 Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./docs/configuration.md).
@@ -42,7 +44,7 @@ In case Klippain doesn't suit your needs or if you installed it by mistake, you 
 To run the uninstall script, execute the following command over SSH:
 
 ```bash
-wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/uninstall.sh | bash
+wget -O - https://raw.githubusercontent.com/tehniemer/klippain/main/uninstall.sh | bash
 ```
 
   > **Note**
