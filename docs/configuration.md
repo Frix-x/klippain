@@ -30,16 +30,20 @@ Don't overlook, this section is the most important. Now that your MCU is configu
 
   🔸 Then, add this base custom print start G-code to your slicer:
 
-example for SuperSlicer
+example for [SuperSlicer](https://github.com/supermerill/SuperSlicer) :
 ```
 START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
 ```
-Another example for OrcaSlicer:
+example for [OrcaSlicer](https://github.com/SoftFever/OrcaSlicer) :
 ```
 START_PRINT EXTRUDER_TEMP=[nozzle_temperature_initial_layer] BED_TEMP=[bed_temperature_initial_layer_single] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL=[initial_tool]
 ```
+example for [PrusaSlicer](https://github.com/prusa3d/PrusaSlicer) :
+```
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
+```
 There is also a couple of other optionnal parameters that are supported in Klippain (they need to be added on the same one line following the other parameters):
-  - `CHAMBER=[chamber_temperature]` to be able to specify a target heatsoak temperature for the START_PRINT sequence
+  - `CHAMBER=[chamber_temperature]` (for SuperSlicer and OrcaSlicer) or `CHAMBER=[idle_temperature]` (for PrusaSlicer) to be able to specify a target heatsoak temperature for the START_PRINT sequence
   - `TOTAL_LAYER=[total_layer_count]` to be able to set the PRINT_STATS_INFOS in Klipper. If using this, you will need to add on your slicer custom layer change gcode the appropriate `SET_PRINT_STATS_INFO CURRENT_LAYER={layer_num}`
 
   > **Note** for MMU/ERCF users:
@@ -57,5 +61,5 @@ END_PRINT
 
   > **Note** for MMU/ERCF users:
   >
-  > - `MMU_UNLOAD_AT_END=0 / 1` parameter: to be able to override the default `variable_mmu_unload_on_end_print` in your Klippain `variables.cfg` file.
+  > - `MMU_UNLOAD_AT_END=0` or `1` parameter: to be able to override the default `variable_mmu_unload_on_end_print` in your Klippain `variables.cfg` file.
 
