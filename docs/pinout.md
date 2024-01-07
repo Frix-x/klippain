@@ -31,11 +31,12 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
   - `[EXYZ1-3]_DIR`: drivers dir pins
   - `[EXYZ1-3]_ENABLE`: drivers enable pins
   - `[EXYZ1-3]_TMCUART`: drivers UART pins
-  - Beside standard axis there is also the support for the `MMU_GEAR_...` and `MMU_SEL_...` drivers used in the MMU/ERCF
+  - Beside standard axis there is also the support for the `MMU_GEAR_...` and `MMU_SEL_...` drivers used in the MMU/ERCF/TRADRACK
 
 #### Endstops & Probe
   - `[XYZ]_STOP`: classic axis endstops pins
   - `PROBE_INPUT`: classical probe like Klicky, Omron, Pinda, TAP, etc...
+  - `MMU_SEL_ENDSTOP`: for the MMU/ERCF physical Selector endstop
 
 #### Heaters    
   - `E_HEATER`: hotend heater cartridge
@@ -59,13 +60,16 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
   - `LIGHT_OUTPUT`: simple chamber lights (such as 24v leds or 24v fcob light bars)
   - `LIGHT_NEOPIXEL` : neopixel chamber lights
   - `STATUS_NEOPIXEL` : toolhead neopixel lights (such as the one used on the Voron StealthBurner toolhead)
+  - `MMU_NEOPIXEL`: for the MMU/ERCF neopixel leds
 
 #### Other I/Os
   - `RUNOUT_SENSOR`: filament motion sensor
   - `MMU_ENCODER`: filament motion sensor used in the MMU/ERCF carriage
-  - `TOOLHEAD_SENSOR`: toolhead filament sensor used for the MMU/ERCF
+  - `TOOLHEAD_SENSOR`: toolhead filament sensor used for the MMU/ERCF/TRADRACK
   - `SERVO_PIN`: for a mechanical and movable probe dock or brush (such as the ones that are commonly found on the Voron V0 mods)
-  - `MMU_SERVO`: for a the MMU/ERCF servo
+  - `MMU_SERVO`: for the MMU servo
+  - `MMU_GATE_SENSOR`: for the MMU/TRADRACK sensor
+  - `MMU_PRE_GATE_[0-11]`: for the MMU/ERCT sensors
 
 
 ## External references

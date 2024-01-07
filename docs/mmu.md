@@ -1,15 +1,19 @@
 # <u>**MMU details for correct install**</u>
+
 before installing Happy-Hare V2.2 you must
 
 Uninstall the old ercf ERCF-Software-V3 (if you already have it):
+
 1. backup your old ercf_***.cfg files for future reference,
 1. Cleanly REMOVE ERCF-Software-V3:
+
 ```
 ~/ERCF-Software-V3/install.sh -u
 rm -rf ~/ERCF-Software-V3
 ```
 
-and install the "new" Happy Hare V2 by following instructions in https://github.com/moggieuk/Happy-Hare:
+and install the "new" Happy Hare V2 by following instructions in <https://github.com/moggieuk/Happy-Hare>:
+
 ```
 cd ~
 git clone https://github.com/moggieuk/Happy-Hare.git
@@ -22,6 +26,7 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
 
 ----
 ‎  
+
 # <u>**Some loose details:**</u>
 
 - <u>**MMU check Gates on Start Print:**</u>
@@ -56,9 +61,9 @@ In HHv2, by default, GATE=TOOL. To see your current config use the `MMU_REMAP_TT
 But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, or for complete remaping (example for a 6 gates MMU to completely reverse the order of all tools): `MMU_REMAP_TTG MAP=5,4,3,2,1,0` command.  
 &nbsp;&nbsp;You can use it, for exemple, if you have previously slice a print project with some tools defined in th final slicer gcode file and you want to reprint it but you have moved the colors spools to another gate or you want to make it with different colors without having to move the spools entries, or reslice your project.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> Here I have slice my project with default tool (T0) and import in mainsail:  
-![img](images/mmu/HHv2slice.png)  
+<p align="center"><img src="images/mmu/HHv2slice.png"></p>  
 and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Klippain macro: `MMU_SET_TOOL_TO_GATE TOOL_TO_REMAP=0 GATE_TO_LINK=5`:  
-![img](images/mmu/HHv2Tool_to_Gate.png)  
+<p align="center"><img src="images/mmu/HHv2Tool_to_Gate.png"></p>  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> For the complete description have a look at [Tool-to-Gate (TTG) mapping](https://github.com/moggieuk/Happy-Hare/blob/main/README.md#3-tool-to-gate-ttg-mapping).
 
 ‎  
@@ -87,11 +92,11 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 
 - <u>**Some error message exemples:**</u>
 
-![img](images/mmu/check_mmu_variables.png)  
+<p align="center"><img src="images/mmu/check_mmu_variables.png"></p>  
 <details>
 <summary><sub>🔸 Read more about this error...</sub></summary>
 
-&nbsp;&nbsp;If you have this message at bootup in the console you must check your Klippain variables in `variables.cfg` !!! 
+&nbsp;&nbsp;If you have this message at bootup in the console you must check your Klippain variables in `variables.cfg` !!!
 
     - variable_mmu_force_homing_in_start_print: True or False
     - variable_mmu_unload_on_cancel_print: True or False
@@ -104,7 +109,8 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 ‎  
 ‎  
 ----
-![img](images/mmu/HHv2emptygate.png)  
+
+<p align="center"><img src="images/mmu/HHv2emptygate.png"></p>  
 <details>
 <summary><sub>🔸 Read more about this error...</sub></summary>
 
@@ -119,13 +125,14 @@ The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can a
 ‎  
 ‎  
 ----
-![img](images/mmu/HHv2_error_tmc.png)  
+
+<p align="center"><img src="images/mmu/HHv2_error_tmc.png"></p>  
 <details>
 <summary><sub>🔸 Read more about this error...</sub></summary>
 
 &nbsp;&nbsp;After installing HHv2 or upgrade it if you have this error, you must check and modify your Klippain `mcu.cfg` file to uncomment the correct line in the EXTRUDER DRIVER section:
 
-![img](images/mmu/HHv2_mcu_tmc.png)
+<p align="center"><img src="images/mmu/HHv2_mcu_tmc.png"></p>
 
 </details>
 
