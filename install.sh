@@ -6,6 +6,7 @@
 # @version: 1.3
 
 # CHANGELOG:
+#   v1.4: added Shake&Tune install call
 #   v1.3: - added a warning on first install to be sure the user wants to install klippain and fixed a bug
 #           where some artefacts of the old user config where still present after the install (harmless bug but not clean)
 #         - automated the install of the Gcode shell commands plugin
@@ -129,9 +130,6 @@ function install_config {
     # CHMOD the scripts to be sure they are all executables (Git should keep the modes on files but it's to be sure)
     chmod +x ${FRIX_CONFIG_PATH}/install.sh
     chmod +x ${FRIX_CONFIG_PATH}/uninstall.sh
-    for file in is_workflow.py graph_vibrations.py graph_shaper.py graph_belts.py; do
-        chmod +x ${FRIX_CONFIG_PATH}/scripts/is_workflow/$file
-    done
 
     # Symlink the gcode_shell_command.py file in the correct Klipper folder (erased to always get the last version)
     ln -fsn ${FRIX_CONFIG_PATH}/scripts/gcode_shell_command.py ${KLIPPER_PATH}/klippy/extras
@@ -257,6 +255,8 @@ check_download
 backup_config
 install_config
 restart_klipper
+
+wget -O - https://raw.githubusercontent.com/Frix-x/klippain-shaketune/main/install.sh | bash
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
 echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
