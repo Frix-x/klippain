@@ -40,7 +40,7 @@ START_PRINT EXTRUDER_TEMP=[nozzle_temperature_initial_layer] BED_TEMP=[bed_tempe
 ```
 example for [PrusaSlicer](https://github.com/prusa3d/PrusaSlicer) :
 ```
-START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[idle_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
 ```
 There is also a couple of other optionnal parameters that are supported in Klippain (they need to be added on the same one line following the other parameters):
   - `CHAMBER=[chamber_temperature]` (for SuperSlicer and OrcaSlicer) or `CHAMBER=[idle_temperature]` (for PrusaSlicer) to be able to specify a target heatsoak temperature for the START_PRINT sequence
