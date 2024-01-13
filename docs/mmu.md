@@ -85,7 +85,7 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 
 &nbsp;&nbsp;HHv2 natively handles spool change in Spoolman. To do this, you must activate Spoolman support and configure the spool IDs in HHv2 `mmu_parameters.cfg`:  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `enable_spoolman:1`  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:` or use HH macro: `MMU_GATE_MAP GATE=n SPOOLID=id`. You can also use Klippain macro `MMU_SET_GATE_ID` with `GATE` and `SPOOL_ID` parameters.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:` or use HH macro: `MMU_GATE_MAP GATE=n SPOOLID=id`. You can also use Klippain macro `MMU_SET_GATE_ID` with `GATE` and `SPOOL_ID` parameters (eg: `MMU_SET_GATE_ID GATE=5 SPOOL_ID=12` to define Spoolman spool_ID 12 on MMU gate 5).  
 
 ‎  
 ‎  
