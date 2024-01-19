@@ -81,11 +81,11 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
 ## External references
 
 For more information on the boards and pinouts, please see directly the manufacturers website or github:
-
-- [BTT Octopus](https://github.com/bigtreetech/BIGTREETECH-OCTOPUS-V1.0)
-- [Fystec Spiders](https://github.com/FYSETC/FYSETC-SPIDER)
-- [BTT SKR 1.4](https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/tree/master/BTT%20SKR%20V1.4)
-- [BTT Manta 8P](https://github.com/bigtreetech/Manta-M8P)
-- [Fly SHT](https://mellow.klipper.cn/#/board/fly_sht36_42/)
-- [BTT EBB](https://github.com/bigtreetech/EBB)
-- [BTT SKR Mini E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
+  - [BTT Octopus](https://github.com/bigtreetech/BIGTREETECH-OCTOPUS-V1.0)
+  - [Fystec Spiders](https://github.com/FYSETC/FYSETC-SPIDER)
+  - [BTT SKR 1.4](https://github.com/bigtreetech/BIGTREETECH-SKR-V1.3/tree/master/BTT%20SKR%20V1.4)
+  - [BTT Manta 8P](https://github.com/bigtreetech/Manta-M8P)
+  - [Fly SHT](https://mellow.klipper.cn/#/board/fly_sht36_42/)
+  - [BTT EBB](https://github.com/bigtreetech/EBB)
+  - [BTT SKR Mini E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
+  - [Fysetc S6](https://github.com/FYSETC/FYSETC-S6)
