@@ -101,7 +101,7 @@ function restore_latest_backup {
         return
     fi
 
-    latest_backup=$(find ${BACKUP_PATH} -type d -not -path "${BACKUP_PATH}" -exec sh -c 'if [ ! -f "$1/.VERSION" ]; then echo "$1"; fi' sh {} \; | sort -r | head -n 1)
+    latest_backup=$(find ${BACKUP_PATH} -maxdepth 1 -type d -not -path "${BACKUP_PATH}" -exec sh -c 'if [ ! -f "$1/.VERSION" ]; then echo "$1"; fi' sh {} \; | sort -r | head -n 1)
     if [ -n "${latest_backup}" ]; then
         cp -fa ${latest_backup}/. ${USER_CONFIG_PATH} 2>/dev/null || :
         printf "[RESTORE] Latest backup restored from: ${latest_backup}\n\n"
