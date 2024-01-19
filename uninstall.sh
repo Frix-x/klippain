@@ -84,6 +84,11 @@ function delete_current_klippain {
 function restore_latest_backup {
     local restore_backup latest_backup 
 
+    if [[ ! -e "${BACKUP_PATH}" ]]; then
+        printf "[RESTORE] No backup folder found! Skipping...\n\n"
+        return
+    fi
+
     read < /dev/tty -rp "[RESTORE] Would you like to restore your last config backup? This script will look for the last one before running Klippain (Y/n) " restore_backup
     if [[ -z "$restore_backup" ]]; then
         restore_backup="y"
