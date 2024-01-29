@@ -25,7 +25,6 @@ cd Happy-Hare
 Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./configuration.md).
 
 ----
-‎  
 
 # <u>**Some loose details:**</u>
 
@@ -33,9 +32,6 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
 
 &nbsp;&nbsp;I recommend to set your `variable_mmu_check_gates_on_start_print` to `True` in your Klippain `variables.cfg` file.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> But take in mind that you also must add in your slicer start g_code the parameter `TOOLS_USED=!referenced_tools!` used by the [HHv2 moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md). Otherwise, only the INITIAL TOOL will be checked and if the gates used have previously been marked as empty an error may occur during printing!!!
-
-‎  
-‎  
 
 - <u>**Early check MMU errors during print_start:**</u>
 
@@ -50,9 +46,6 @@ Finally, Klippain requires a few simple steps to configure and customize it for 
 &nbsp;&nbsp;&nbsp;-> If you define `variable_mmu_check_errors_on_start_print: True` in your Klippain `variables.cfg` file, HH's `print_start_detection` will be automatically disabled and Klippain will manage the MMU state change.  
 &nbsp;&nbsp;&nbsp;-> If you define `variable_mmu_check_errors_on_start_print: False` in your Klippain `variables.cfg` file, you can choose in `mmu_parameters.cfg` how MMU state changes will be managed.
 
-‎  
-‎  
-
 - <u>**Difference between GATE and TOOL:**</u>
 
 &nbsp;&nbsp;The `GATE` designates the hardware MMU selector spool.  
@@ -66,8 +59,6 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 <p align="center"><img src="images/mmu/HHv2Tool_to_Gate.png"></p>  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> For the complete description have a look at [Tool-to-Gate (TTG) mapping](https://github.com/moggieuk/Happy-Hare/blob/main/README.md#3-tool-to-gate-ttg-mapping).
 
-‎  
-‎  
 
 - <u>**How to use bypass:**</u>
 
@@ -78,8 +69,6 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* At the end of the print you can use the `MMU_EJECT` command to unload filament out of the extruder and then manualy unload the bowden. (Automatic if `variable_mmu_unload_on_end_print` is set to True in Klippain `variables.cfg`).  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Rem for Spoolman users:** you can set in your slicer start_print gcode the `INITIAL_TOOL` parameter for your filament so klippain use it to activate the correct Spoolman spool...
 
-‎  
-‎  
 
 - <u>**HHv2 and Spoolman user:**</u>
 
@@ -87,8 +76,6 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `enable_spoolman:1`  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:` or use HH macro: `MMU_GATE_MAP GATE=n SPOOLID=id`. You can also use Klippain macro `MMU_SET_GATE_ID` with `GATE` and `SPOOL_ID` parameters (eg: `MMU_SET_GATE_ID GATE=5 SPOOL_ID=12` to define Spoolman spool_ID 12 on MMU gate 5).  
 
-‎  
-‎  
 
 - <u>**Some error message exemples:**</u>
 
@@ -106,8 +93,6 @@ and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Kl
 
 </details>
 
-‎  
-‎  
 ----
 
 <p align="center"><img src="images/mmu/HHv2emptygate.png"></p>  
@@ -122,8 +107,6 @@ The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can a
 
 </details>
 
-‎  
-‎  
 ----
 
 <p align="center"><img src="images/mmu/HHv2_error_tmc.png"></p>  

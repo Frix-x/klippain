@@ -17,7 +17,8 @@ Frix-x names -> Manufacturer (PCB print) names > controller names
 
 So in order to populate your own `mcu.cfg` file, just copy one of the [user template](./../user_templates/mcu_defaults/) into it. Then feel free to change the wiring to your liking. For example, if you have wired your part fan to port `FAN3` instead of `FAN0`, just change the definition to `PART_FAN=MCU_FAN3` and that's it!
 
-  > **Info**
+  > **Info**:
+  >
   > Klipper does not allow `[board_pins]` sections to contain pin modifiers such as `!`, `^` and `~`. Moreover, when configuring multiple MCUs at the same time, all the aliases used in the hardware sections must be prefixed with the MCU name. This is a current limitation of Klipper and is why you need to use the overrides.cfg file to add them.
 
 ## Using a new MCU
@@ -28,55 +29,56 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
 
 #### Steppers
 
-- `[EXYZ1-3]_STEP`: drivers step pins
-- `[EXYZ1-3]_DIR`: drivers dir pins
-- `[EXYZ1-3]_ENABLE`: drivers enable pins
-- `[EXYZ1-3]_TMCUART`: drivers UART pins
-- Beside standard axis there is also the support for the `MMU_GEAR_...` and `MMU_SEL_...` drivers used in the MMU/ERCF/TRADRACK
+  - `[EXYZ1-3]_STEP`: drivers step pins
+  - `[EXYZ1-3]_DIR`: drivers dir pins
+  - `[EXYZ1-3]_ENABLE`: drivers enable pins
+  - `[EXYZ1-3]_TMCUART`: drivers UART pins
+  - `DRIVER_SPI_MOSI`, `DRIVER_SPI_MISO`, `DRIVER_SPI_SCK`: used in case of SPI drivers
+  - Beside standard axis there is also the support for the `MMU_GEAR_...` and `MMU_SEL_...` drivers used in the MMU/ERCF/TRADRACK
 
 #### Endstops & Probe
 
-- `[XYZ]_STOP`: classic axis endstops pins
-- `PROBE_INPUT`: classical probe like Klicky, Omron, Pinda, TAP, etc...
-- `MMU_SEL_ENDSTOP`: for the MMU/ERCF physical Selector endstop
+  - `[XYZ]_STOP`: classic axis endstops pins
+  - `PROBE_INPUT`: classical probe input like Klicky, Omron, Pinda, TAP, etc...
+  - `MMU_SEL_ENDSTOP`: for the MMU/ERCF physical selector endstop
 
 #### Heaters
 
-- `E_HEATER`: hotend heater cartridge
-- `BED_HEATER`: bed heating pad (or bed SSR)
+  - `E_HEATER`: hotend heater cartridge
+  - `BED_HEATER`: bed heating pad (or bed SSR)
 
 #### Temperature sensors
 
-- `E_TEMPERATURE`: hotend temperature sensor
-- `BED_TEMPERATURE`: bed temperature sensor
-- `CHAMBER_TEMPERATURE`: chamber temperature sensor
-- `ELECTRICAL_CABINET_TEMPERATURE`: electrical cabinet temperature sensor (not really used in the config, but if present, this sensor is added to the Mainsail / Fluidd web interface as an additional info)
+  - `E_TEMPERATURE`: hotend temperature sensor
+  - `BED_TEMPERATURE`: bed temperature sensor
+  - `CHAMBER_TEMPERATURE`: chamber temperature sensor (used to heatsoak the chamber during the START_PRINT sequence)
+  - `ELECTRICAL_CABINET_TEMPERATURE`: electrical cabinet temperature sensor (not really used in the config, but if present, this sensor is added to the Mainsail / Fluidd web interface as an additional info)
 
 #### Fans
 
-- `E_FAN`: hotend fan. This fan should stay at 100% whenever the hotend is hot, so a PWM capable pin is not mandatory
-- `PART_FAN`: part fan used during the print. This pin should be a PWM capable pin to allow power modulation
-- `EXHAUST_FAN`: for an exhaust filter (such as the Voron basic exhaust). This pin should be a PWM capable pin to allow power modulation
-- `FILTER_FAN`: for a filter (such as a Nevermore filter). This pin should be a PWM capable pin to allow power modulation
-- `CONTROLLER_FAN`: to cool down your MCUs or electronic bay
-- `HOST_CONTROLLER_FAN`: to cool down your Pi (or equivalent Klipper host controller)
+  - `E_FAN`: hotend fan. This fan should stay at 100% whenever the hotend is hot, so a PWM capable pin is not mandatory
+  - `PART_FAN`: part fan used during the print. This pin should be a PWM capable pin to allow modulation of the fan speed
+  - `EXHAUST_FAN`: for an exhaust filter (such as the Voron basic exhaust). This pin should be a PWM capable pin to allow modulation of the fan speed
+  - `FILTER_FAN`: for a filter (such as a Nevermore filter). This pin should be a PWM capable pin to allow modulation of the fan speed
+  - `CONTROLLER_FAN`: to cool down your MCUs or electronic bay
+  - `HOST_CONTROLLER_FAN`: to cool down your Pi (or equivalent Klipper host controller)
 
 #### Lights
 
-- `LIGHT_OUTPUT`: simple chamber lights (such as 24v leds or 24v fcob light bars)
-- `LIGHT_NEOPIXEL` : neopixel chamber lights
-- `STATUS_NEOPIXEL` : toolhead neopixel lights (such as the one used on the Voron StealthBurner toolhead)
-- `MMU_NEOPIXEL`: for the MMU/ERCF neopixel leds
+  - `LIGHT_OUTPUT`: simple chamber lights (such as 24v leds or 24v fcob light bars)
+  - `LIGHT_NEOPIXEL` : neopixels chamber lights
+  - `STATUS_NEOPIXEL` : toolhead/machine status led neopixels (such as the one used on the Voron StealthBurner toolhead)
+  - `MMU_NEOPIXEL`: for the specific MMU/ERCF neopixel leds
 
 #### Other I/Os
 
-- `RUNOUT_SENSOR`: filament motion sensor
-- `MMU_ENCODER`: filament motion sensor used in the MMU/ERCF carriage
-- `TOOLHEAD_SENSOR`: toolhead filament sensor used for the MMU/ERCF/TRADRACK
-- `SERVO_PIN`: for a mechanical and movable probe dock or brush (such as the ones that are commonly found on the Voron V0 mods)
-- `MMU_SERVO`: for the MMU servo
-- `MMU_GATE_SENSOR`: for the MMU/TRADRACK sensor
-- `MMU_PRE_GATE_[0-11]`: for the MMU/ERCT sensors
+  - `RUNOUT_SENSOR`: filament runout sensor (currently only one motion or switch sensor is supported in Klippain)
+  - `MMU_ENCODER`: filament motion sensor used in the MMU/ERCF carriage
+  - `TOOLHEAD_SENSOR`: optional toolhead filament sensor used for the MMU/ERCF/TRADRACK
+  - `SERVO_PIN`: for a mechanical and movable probe dock or brush (such as the ones that are commonly found on the Voron V0 mods)
+  - `MMU_SERVO`: for the MMU servo
+  - `MMU_GATE_SENSOR`: for the MMU/TRADRACK gate sensor
+  - `MMU_PRE_GATE_[0-11]`: for the MMU/ERCT sensors
 
 ## External references
 

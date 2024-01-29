@@ -26,8 +26,8 @@ FRIX_CONFIG_PATH="${HOME}/klippain_config"
 BACKUP_PATH="${HOME}/klippain_config_backups"
 # Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
 KLIPPER_PATH="${HOME}/klipper"
-# Branch on Frix-x repo to use (default: main)
-FRIX_BRANCH="Happy_Hare_Dev"
+# Branch from Frix-x/klippain repo to use during install (default: main)
+FRIX_BRANCH="main"
 
 
 set -eu
@@ -231,7 +231,7 @@ function install_mcu_templates {
             filename=$(basename "${file_list[$((mmu_template-1))]}")
             cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/mmu/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
             echo "[CONFIG] Template '$filename' inserted into your mcu.cfg user file"
-            printf "[CONFIG] You must install Happy Hare from https://github.com/moggieuk/Happy-Hare.git to use MMU/ERCF with Klippain\n\n"
+            printf "[CONFIG] Note: keep in mind that you have to install the HappyHare backend manually to use an MMU/ERCF with Klippain. See the Klippain documentation for more information!\n\n"
         else
             printf "[CONFIG] No MMU/ERCF template selected. Skip and continuing...\n\n"
         fi
