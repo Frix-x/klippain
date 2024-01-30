@@ -1,4 +1,0 @@
-remove Happy_Hare_Dev references from startup.cfg -> just before merge to other branch
-change install.sh to main branch
-view for add led effects...
-review skr pico for mmu
