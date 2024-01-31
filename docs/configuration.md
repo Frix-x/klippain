@@ -33,12 +33,16 @@ Before your first print, **carefully check all features to prevent issues on you
 
 Next, ensure the mechanical probe (if used) can be attached/detached, verify that QGL/Z_TILT works, and confirm correct coordinates for all components (purge bucket, physical Z endstop, etc.). Check your first layer calibration (and the `switch_offset` parameter of the automatic Z calibration plugin, if used), etc.
 
-Finally, add custom print start G-code to your slicer. Here's an example for SuperSlicer:  
+Then, add this custom print start G-code to your slicer (example for SuperSlicer):  
 ```
-START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] CHAMBER=[chamber_temperature] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}
 ```
 
-Also, add custom print end G-code to your slicer:
+There is also a couple of other optionnal parameters that are supported in Klippain (they need to be added on the same one line following the other parameters):
+  - `CHAMBER=[chamber_temperature]` to be able to specify a target heatsoak temperature for the START_PRINT sequence
+  - `TOTAL_LAYER=[total_layer_count]` to be able to set the PRINT_STATS_INFOS in Klipper. If using this, you will need to add on your slicer custom layer change gcode the appropriate `SET_PRINT_STATS_INFO CURRENT_LAYER={layer_num}`
+
+Finally, add custom print end G-code to your slicer:
 ```
 END_PRINT
 ```

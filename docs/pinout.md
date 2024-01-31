@@ -78,3 +78,4 @@ For more information on the boards and pinouts, please see directly the manufact
   - [Fly SHT](https://mellow.klipper.cn/#/board/fly_sht36_42/)
   - [BTT EBB](https://github.com/bigtreetech/EBB)
   - [BTT SKR Mini E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
+  - [Fysetc S6](https://github.com/FYSETC/FYSETC-S6)
