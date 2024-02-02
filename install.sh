@@ -27,7 +27,7 @@ BACKUP_PATH="${HOME}/klippain_config_backups"
 # Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
 KLIPPER_PATH="${HOME}/klipper"
 # Branch from Frix-x/klippain repo to use during install (default: main)
-FRIX_BRANCH="main"
+FRIX_BRANCH="develop"
 
 
 set -eu
