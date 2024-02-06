@@ -3,9 +3,11 @@
 ###### AUTOMATED INSTALL AND UPDATE SCRIPT ######
 #################################################
 # Written by yomgui1 & Frix_x
-# @version: 1.3
+# @version: 1.5
 
 # CHANGELOG:
+#   v1.5: - Allow multi printer. Path of 'printer_data' can be passed as a script parameter. If parameter is not present,
+#           `${HOME}/printer_data/` is used as default value.
 #   v1.4: added Shake&Tune install call
 #   v1.3: - added a warning on first install to be sure the user wants to install klippain and fixed a bug
 #           where some artefacts of the old user config where still present after the install (harmless bug but not clean)
@@ -18,8 +20,6 @@
 #   v1.0: first version of the script to allow a peaceful install and update ;)
 
 
-# Where the user Klipper config is located (ie. the one used by Klipper to work)
-USER_CONFIG_PATH="${HOME}/printer_data/config"
 # Where to clone Frix-x repository config files (read-only and keep untouched)
 FRIX_CONFIG_PATH="${HOME}/klippain_config"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
@@ -29,6 +29,17 @@ KLIPPER_PATH="${HOME}/klipper"
 # Branch from Frix-x/klippain repo to use during install (default: main)
 FRIX_BRANCH="main"
 
+FORCE_PRINTER_NAME=$1
+
+# Default configuration top directory
+TARGET_DIR=${HOME}/printer_data
+
+# Where the user Klipper config is located (ie. the one used by Klipper to work)
+USER_CONFIG_PATH="${TARGET_DIR}/config"
+
+# Default values
+PRINTER_NAME=printer
+SERVICE_NAME=klipper.service
 
 set -eu
 export LC_ALL=C
@@ -41,12 +52,32 @@ function preflight_checks {
         exit -1
     fi
 
-    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F 'klipper.service')" ]; then
+    if [ "$FORCE_PRINTER_NAME" != "" ]; then
+      if [ -d "${HOME}/${FORCE_PRINTER_NAME}_data" ]; then
+        echo "[PRE-CHECK] Installing Klippain for printer '${FORCE_PRINTER_NAME}'"
+        PRINTER_NAME=$FORCE_PRINTER_NAME
+        if [[ ${name} =~ ^[0-9]+$ ]]; then
+          TARGET_DIR=${HOME}/printer_${PRINTER_NAME}_data
+        else
+          TARGET_DIR=${HOME}/${PRINTER_NAME}_data
+        fi
+        USER_CONFIG_PATH="${TARGET_DIR}/config"
+        SERVICE_NAME=klipper-${PRINTER_NAME}
+	BACKUP_PATH=${BACKUP_PATH}_${PRINTER_NAME}
+      else
+        echo "[PRE-CHECK] target directory '${HOME}/${FORCE_PRINTER_NAME}_data' does not exist."
+        exit -1
+      fi
+    fi
+
+    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F "${SERVICE_NAME}")" ]; then
         printf "[PRE-CHECK] Klipper service found! Continuing...\n\n"
     else
         echo "[ERROR] Klipper service not found, please install Klipper first!"
         exit -1
     fi
+
+    echo "[PRE-CHECK] Installing Klippain in $USER_CONFIG_PATH"
 
     local install_klippain_answer
     if [ ! -f "${USER_CONFIG_PATH}/.VERSION" ]; then
@@ -246,11 +277,10 @@ function install_mcu_templates {
 # Step 5: restarting Klipper
 function restart_klipper {
     echo "[POST-INSTALL] Restarting Klipper..."
-    sudo systemctl restart klipper
+    sudo service $SERVICE_NAME restart
 }
 
 
-BACKUP_DIR="${BACKUP_PATH}/$(date +'%Y_%m_%d-%H%M%S')"
 
 printf "\n======================================\n"
 echo "- Klippain install and update script -"
@@ -258,6 +288,7 @@ printf "======================================\n\n"
 
 # Run steps
 preflight_checks
+BACKUP_DIR="${BACKUP_PATH}/$(date +'%Y_%m_%d-%H%M%S')"
 check_download
 backup_config
 install_config
