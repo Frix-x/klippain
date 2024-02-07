@@ -56,14 +56,14 @@ function preflight_checks {
       if [ -d "${HOME}/${FORCE_PRINTER_NAME}_data" ]; then
         echo "[PRE-CHECK] Installing Klippain for printer '${FORCE_PRINTER_NAME}'"
         PRINTER_NAME=$FORCE_PRINTER_NAME
-        if [[ ${name} =~ ^[0-9]+$ ]]; then
+        if [[ ${PRINTER_NAME} =~ ^[0-9]+$ ]]; then
           TARGET_DIR=${HOME}/printer_${PRINTER_NAME}_data
         else
           TARGET_DIR=${HOME}/${PRINTER_NAME}_data
         fi
         USER_CONFIG_PATH="${TARGET_DIR}/config"
         SERVICE_NAME=klipper-${PRINTER_NAME}
-	BACKUP_PATH=${BACKUP_PATH}_${PRINTER_NAME}
+        BACKUP_PATH=${BACKUP_PATH}/${PRINTER_NAME}
       else
         echo "[PRE-CHECK] target directory '${HOME}/${FORCE_PRINTER_NAME}_data' does not exist."
         exit -1
