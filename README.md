@@ -15,12 +15,12 @@ Fun fact: "pain" \pɛ̃\ is the French word for bread, so there's no pain in thi
 
 Klippain is designed for versatility. By selecting and enabling the desired hardware and software options, it can be used on a wide range of machines.
 
-Custom features available out of the box include **adaptive bed mesh**, **custom printer calibration macros**, **automated input shaper workflows**, and **vibration measurement** macros and scripts, ... Refer to the [features documentation](./docs/features.md) for a detailed list and usage instructions.
+Custom features available out of the box include a full featured set of standard macros, **adaptive bed mesh**, **custom printer calibrations**, **automated input shaper workflows**, and **vibration measurement** macros and scripts, ... Refer to the [features documentation](./docs/features.md) for a detailed list and usage instructions.
 
 
 ## Installation
 
-To install Klippain, first ensure you have already Klipper, Moonraker, and a WebUI installed on your printer. If not, use [KIAUH](https://github.com/th33xitus/kiauh).
+To install Klippain, first ensure you have already Klipper, Moonraker, and a WebUI installed on your printer. If not, you can use [KIAUH](https://github.com/th33xitus/kiauh).
 
 Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
 
@@ -30,9 +30,9 @@ wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/install.sh | ba
 
 Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./docs/configuration.md).
 
-  > **Warning**
+  > **Warning**:
   >
-  > General rule to keep the auto-update feature working: **never modify Klippain files directly**, but instead add overrides as per the documentation! To proceed, you can modify all the pre-installed templates in your config root folder (`printer.cfg`, `mcu.cfg`, `variables.cfg` and `overrides.cfg`) as they will be preserved on update.
+  > General rule to keep the auto-update feature working: **never modify Klippain files directly**, but instead add overrides as per [the documentation](./docs/overrides.md)! To proceed, you can modify all the pre-installed templates in your config root folder (`printer.cfg`, `mcu.cfg`, `variables.cfg` and `overrides.cfg`) as they will be preserved on update.
 
 
 ## Removing Klippain
@@ -45,7 +45,7 @@ To run the uninstall script, execute the following command over SSH:
 wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/uninstall.sh | bash
 ```
 
-  > **Note**
+  > **Note**:
   >
   > All backups are preserved during the uninstallation process. So, you can easily revert back at any time if you wish to :stuck_out_tongue_winking_eye:
 

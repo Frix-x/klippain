@@ -6,6 +6,7 @@
 # @version: 1.3
 
 # CHANGELOG:
+#   v1.4: added Shake&Tune install call
 #   v1.3: - added a warning on first install to be sure the user wants to install klippain and fixed a bug
 #           where some artefacts of the old user config where still present after the install (harmless bug but not clean)
 #         - automated the install of the Gcode shell commands plugin
@@ -25,6 +26,8 @@ FRIX_CONFIG_PATH="${HOME}/klippain_config"
 BACKUP_PATH="${HOME}/klippain_config_backups"
 # Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
 KLIPPER_PATH="${HOME}/klipper"
+# Branch from Frix-x/klippain repo to use during install (default: main)
+FRIX_BRANCH="main"
 
 
 set -eu
@@ -72,10 +75,11 @@ function check_download {
     local frixtemppath frixreponame
     frixtemppath="$(dirname ${FRIX_CONFIG_PATH})"
     frixreponame="$(basename ${FRIX_CONFIG_PATH})"
+    frixbranchname="${FRIX_BRANCH}"
 
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
         echo "[DOWNLOAD] Downloading Klippain repository..."
-        if git -C $frixtemppath clone https://github.com/Frix-x/klippain.git $frixreponame; then
+        if git -C $frixtemppath clone -b $frixbranchname https://github.com/Frix-x/klippain.git $frixreponame; then
             chmod +x ${FRIX_CONFIG_PATH}/install.sh
             printf "[DOWNLOAD] Download complete!\n\n"
         else
@@ -129,9 +133,6 @@ function install_config {
     # CHMOD the scripts to be sure they are all executables (Git should keep the modes on files but it's to be sure)
     chmod +x ${FRIX_CONFIG_PATH}/install.sh
     chmod +x ${FRIX_CONFIG_PATH}/uninstall.sh
-    for file in is_workflow.py graph_vibrations.py graph_shaper.py graph_belts.py; do
-        chmod +x ${FRIX_CONFIG_PATH}/scripts/is_workflow/$file
-    done
 
     # Symlink the gcode_shell_command.py file in the correct Klipper folder (erased to always get the last version)
     ln -fsn ${FRIX_CONFIG_PATH}/scripts/gcode_shell_command.py ${KLIPPER_PATH}/klippy/extras
@@ -143,7 +144,7 @@ function install_config {
 
 # Helper function to ask and install the MCU templates if needed
 function install_mcu_templates {
-    local install_template file_list main_template install_toolhead_template toolhead_template install_ercf_template
+    local install_template file_list main_template install_toolhead_template toolhead_template install_mmu_template
 
     read < /dev/tty -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
     if [[ -z "$install_template" ]]; then
@@ -206,33 +207,33 @@ function install_mcu_templates {
         fi
     fi
 
-    # Finally see if the user use an ERCF board
-    read < /dev/tty -rp "[CONFIG] Do you have an ERCF MCU and want to install a template? (y/N) " install_ercf_template
-    if [[ -z "$install_ercf_template" ]]; then
-        install_ercf_template="n"
+    # Finally see if the user use an MMU/ERCF board
+    read < /dev/tty -rp "[CONFIG] Do you have an MMU/ERCF MCU and want to install a template? (y/N) " install_mmu_template
+    if [[ -z "$install_mmu_template" ]]; then
+        install_mmu_template="n"
     fi
-    install_ercf_template="${install_ercf_template,,}"
+    install_mmu_template="${install_mmu_template,,}"
 
-    # Check if the user wants to install an ERCF MCU template
-    if [[ "$install_ercf_template" =~ ^(yes|y)$ ]]; then
+    # Check if the user wants to install an MMU/ERCF MCU template
+    if [[ "$install_mmu_template" =~ ^(yes|y)$ ]]; then
         file_list=()
         while IFS= read -r -d '' file; do
             file_list+=("$file")
-        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf" -maxdepth 1 -type f -print0)
-        echo "[CONFIG] Please select your ERCF MCU in the following list:"
+        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/mmu" -maxdepth 1 -type f -print0)
+        echo "[CONFIG] Please select your MMU/ERCF MCU in the following list:"
         for i in "${!file_list[@]}"; do
             echo "  $((i+1))) $(basename "${file_list[i]}")"
         done
 
-        read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " ercf_template
-        if [[ "$ercf_template" -gt 0 ]]; then
+        read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " mmu_template
+        if [[ "$mmu_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
-            filename=$(basename "${file_list[$((ercf_template-1))]}")
-            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/ercf/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
+            filename=$(basename "${file_list[$((mmu_template-1))]}")
+            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/mmu/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
             echo "[CONFIG] Template '$filename' inserted into your mcu.cfg user file"
-            printf "[CONFIG] You must install ERCF Happy Hare from https://github.com/moggieuk/ERCF-Software-V3 to use ERCF with Klippain\n\n"
+            printf "[CONFIG] Note: keep in mind that you have to install the HappyHare backend manually to use an MMU/ERCF with Klippain. See the Klippain documentation for more information!\n\n"
         else
-            printf "[CONFIG] No ERCF template selected. Skip and continuing...\n\n"
+            printf "[CONFIG] No MMU/ERCF template selected. Skip and continuing...\n\n"
         fi
     fi
 }
@@ -257,6 +258,8 @@ check_download
 backup_config
 install_config
 restart_klipper
+
+wget -O - https://raw.githubusercontent.com/Frix-x/klippain-shaketune/main/install.sh | bash
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
 echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
