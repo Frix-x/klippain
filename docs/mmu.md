@@ -1,139 +1,104 @@
-# <u>**MMU details for correct install**</u>
+# MMU Configuration in Klippain
 
-before installing Happy-Hare V2.2 you must
+Klippain is fully compatible with Multi-Material Units (MMU) and leverages the [HappyHare](https://github.com/moggieuk/Happy-Hare) software backend for an easy and effective use of them.
 
-Uninstall the old ercf ERCF-Software-V3 (if you already have it):
+This documentation outlines the procedures for setting up and operate an MMU within Klippain. It includes instructions on proper usage and troubleshooting common issues.
 
-1. backup your old ercf_***.cfg files for future reference,
-1. Cleanly REMOVE ERCF-Software-V3:
 
-```
-~/ERCF-Software-V3/install.sh -u
-rm -rf ~/ERCF-Software-V3
-```
+## Installing HappyHare
 
-and install the "new" Happy Hare V2 by following instructions in <https://github.com/moggieuk/Happy-Hare>:
+  > **Note**:
+  >
+  > If you were using the previous ERCF-Software-V3, move your old `ercf_***.cfg` files in a safe place for future reference and then uninstall it completely by running `~/ERCF-Software-V3/install.sh -u && rm -rf ~/ERCF-Software-V3`.
 
-```
+Follow these steps to install the latest HappyHare:
+
+```bash
 cd ~
 git clone https://github.com/moggieuk/Happy-Hare.git
 cd Happy-Hare
-
 ./install.sh -i
 ```
 
-Finally, Klippain requires a few simple steps to configure and customize it for your printer: please follow the [configuration guide](./configuration.md).
+Klippain requires a few simple steps to configure and customize it for your printer, if you haven't already followed the [configuration guide](./configuration.md), please do so first.
 
-----
-‎  
+Finally, enable Klippain's MMU feature by uncommenting the corresponding line in your `printer.cfg`. Don't forget to have a look at the HappyHare config files in the `mmu` folder at the root of your config.
 
-# <u>**Some loose details:**</u>
 
-- <u>**MMU check Gates on Start Print:**</u>
+## Configuration Tips
 
-&nbsp;&nbsp;I recommend to set your `variable_mmu_check_gates_on_start_print` to `True` in your Klippain `variables.cfg` file.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> But take in mind that you also must add in your slicer start g_code the parameter `TOOLS_USED=!referenced_tools!` used by the [HHv2 moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md). Otherwise, only the INITIAL TOOL will be checked and if the gates used have previously been marked as empty an error may occur during printing!!!
+HappyHare is a software with a lot of features and you should first have a look at how it works and its concepts [here](https://github.com/moggieuk/Happy-Hare?tab=readme-ov-file#---readme-table-of-contents) and its documentation section [here](https://github.com/moggieuk/Happy-Hare/tree/main/doc). On top of this, Klippain define a couple of things a bit differently to allow more flexibility and a better integration with it.
 
-‎  
-‎  
+### Check gates on START_PRINT
 
-- <u>**Early check MMU errors during print_start:**</u>
+If you want to check the gates at the start of a print to avoid an error when using a gate that was previously marked as empty, it is recommended to set `variable_mmu_check_gates_on_start_print: True` in your Klippain `variables.cfg`.
 
-  > **Warning**
+  > **Note**:
   >
-  > If you want MMU errors to be checked earlier, you must have set `variable_mmu_check_errors_on_start_print: True` in your klippain `variables.cfg` file ***or*** set `print_start_detection: 0` in `mmu/base/mmu_parameters.cfg`. Setting it to `True` at this time will force MMU `print_start_detection to be disabled.  
+  > Be sure to also include `TOOLS_USED=!referenced_tools!` in your slicer custom start print gcode in order to allow the [HappyHare Moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md) to work correctly and and to ensure that all tools are checked.
 
-&nbsp;&nbsp;By default, with `print_start_detection: 1`, HHv2 will automatically detect start and end of print. But if an "error" occur in loading/checking MMU tools the MMU pause occur at the end of the print_start. ***So you must wait the end of start_print to debug MMU***.  
-&nbsp;&nbsp; With `print_start_detection: 0` Klippain will manage the state changes of the MMU, and allows you to check early (and immediately stop the print_start) and therefore avoid having to wait for the whole process to be completed. ***But in this case you will have to restart printing after debugging the MMU***.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> **Personally** I recommend setting the operation with detection and stopping of print_start by setting `print_start_detection: 0` in `mmu_parameters.cfg` or by setting `variable_mmu_check_errors_on_start_print: True` in your Klippain `variables.cfg`.  
-&nbsp;&nbsp;&nbsp;&nbsp;But you have the choice of the desired operating mode. Either stop print_start immediately, or wait for the process to complete and pause automatically at the end of print_start (default operating mode).  
-&nbsp;&nbsp;&nbsp;-> If you define `variable_mmu_check_errors_on_start_print: True` in your Klippain `variables.cfg` file, HH's `print_start_detection` will be automatically disabled and Klippain will manage the MMU state change.  
-&nbsp;&nbsp;&nbsp;-> If you define `variable_mmu_check_errors_on_start_print: False` in your Klippain `variables.cfg` file, you can choose in `mmu_parameters.cfg` how MMU state changes will be managed.
+### Early check errors during START_PRINT
 
-‎  
-‎  
+In Klippain, you have two options to control how and when MMU errors are detected during the start of a print:
+  
+  1. **Managed by Klippain**: This allows the system to check for errors during the sequence and, if errors are detected, to stop the sequence immediately so that you can troubleshoot the MMU. However, you'll need to restart the print after the MMU problems are fixed.
+  To enable this mode, set `variable_mmu_check_gates_on_start_print: True` in your Klippain `variables.cfg`. Note that when this is set, the original `print_start_detection` parameter of HH will have no effect, as Klippain will take over the management of MMU state changes.
 
-- <u>**Difference between GATE and TOOL:**</u>
+  1. **Managed by HappyHare**: This allows HappyHare to automatically detect the start and end of a print. However, if an MMU error occurs, the system will only pause at the very end of the START_PRINT sequence, meaning you'll have to wait until then to fix any MMU problems. However, once the problem is resolved, you can resume printing, provided you have been able to manually purge, clean, and prepare the nozzle for printing.
+  To enable this mode, set `variable_mmu_check_gates_on_start_print: False` in your Klippain `variables.cfg` to allow HappyHare to take care of this and set its `print_start_detection` parameter to your liking.
 
-&nbsp;&nbsp;The `GATE` designates the hardware MMU selector spool.  
-&nbsp;&nbsp;The `TOOL` designates the software MMU tool use to call the filament by the `Tx` command.  
-In HHv2, by default, GATE=TOOL. To see your current config use the `MMU_REMAP_TTG` command.  
-But it's possible to remap that if you want with `MMU_REMAP_TTG TOOL=x GATE=y`, or for complete remaping (example for a 6 gates MMU to completely reverse the order of all tools): `MMU_REMAP_TTG MAP=5,4,3,2,1,0` command.  
-&nbsp;&nbsp;You can use it, for exemple, if you have previously slice a print project with some tools defined in th final slicer gcode file and you want to reprint it but you have moved the colors spools to another gate or you want to make it with different colors without having to move the spools entries, or reslice your project.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> Here I have slice my project with default tool (T0) and import in mainsail:  
-<p align="center"><img src="images/mmu/HHv2slice.png"></p>  
-and I want to use spool loaded in gate 5 instead of Gate 0: so I can use this Klippain macro: `MMU_SET_TOOL_TO_GATE TOOL_TO_REMAP=0 GATE_TO_LINK=5`:  
-<p align="center"><img src="images/mmu/HHv2Tool_to_Gate.png"></p>  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> For the complete description have a look at [Tool-to-Gate (TTG) mapping](https://github.com/moggieuk/Happy-Hare/blob/main/README.md#3-tool-to-gate-ttg-mapping).
+Using these parameters, you can choose to detect errors early and stop printing immediately for faster troubleshooting, or you can stick with the default mode, which stops printing at the end of the START_PRINT sequence for error handling. The choice depends entirely on your preferences and how you want to handle MMU errors during printing.
 
-‎  
-‎  
+### Difference between GATE and TOOL
 
-- <u>**How to use bypass:**</u>
+  - **GATE** refers to the physical MMU slot
+  - **TOOL** refers to the virtual tool (or filament) used in software. The one you can call using the `Tx` command.
 
-&nbsp;&nbsp;If you want to use the MMU bypass for a print you must load the filament to the extruder before start your print:  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> First Home the MMU by running `MMU_HOME FORCE_UNLOAD=1` ;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> and select bypass with `MMU_SELECT_BYPASS` command ;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> finaly manualy insert the filament in the bowden to the extruder and load the filament to the nozzle by using `MMU_LOAD` command. You can also just insert manualy the filament in the bowden until contact with the extruder and then run the print (the `start_print` macro will try to load filament in the toolhead).  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* At the end of the print you can use the `MMU_EJECT` command to unload filament out of the extruder and then manualy unload the bowden. (Automatic if `variable_mmu_unload_on_end_print` is set to True in Klippain `variables.cfg`).  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Rem for Spoolman users:** you can set in your slicer start_print gcode the `INITIAL_TOOL` parameter for your filament so klippain use it to activate the correct Spoolman spool...
+By default, as you can see with the `MMU_REMAP_TTG` command in HappyHare, GATE and TOOL are mapped equivalently one by one. But you can use the same command to change this mapping like this: `MMU_REMAP_TTG TOOL=x GATE=y`.
 
-‎  
-‎  
+This feature is particularly useful if you have already sliced a project with certain tools defined in the slicer and want to reprint it after moving the filament spools to different gates, or with different filament colors without having to reorganize the spool positions or reslice your project. For more information, please look at the official HappyHare [Tool-to-Gate (TTG) mapping documentation](https://github.com/moggieuk/Happy-Hare?tab=readme-ov-file#3-tool-to-gate-ttg-mapping).
 
-- <u>**HHv2 and Spoolman user:**</u>
+### Using Bypass
 
-&nbsp;&nbsp;HHv2 natively handles spool change in Spoolman. To do this, you must activate Spoolman support and configure the spool IDs in HHv2 `mmu_parameters.cfg`:  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `enable_spoolman:1`  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> `gate_spool_id:` or use HH macro: `MMU_GATE_MAP GATE=n SPOOLID=id`. You can also use Klippain macro `MMU_SET_GATE_ID` with `GATE` and `SPOOL_ID` parameters (eg: `MMU_SET_GATE_ID GATE=5 SPOOL_ID=12` to define Spoolman spool_ID 12 on MMU gate 5).  
+If you want to print without using the MMU features, you can use the MMU bypass mode. Here is how to use it:
+  1. Home the MMU by running `MMU_HOME FORCE_UNLOAD=1`.
+  1. Select the bypass mode with `MMU_SELECT_BYPASS`.
+  1. Finally, manually insert the filament into the bowden tube up to the extruder gears and load the filament with the `MMU_LOAD` command or start the print (the `START_PRINT` sequence will automatically try to load the filament into the toolhead).
 
-‎  
-‎  
+At the end of the print, you can use the `MMU_EJECT` command (if `variable_mmu_unload_on_end_print` is set to False in Klippain `variables.cfg`, otherwise it is ejected automatically) to unload the filament from the extruder and then manually pull it out of the bowden tube.
 
-- <u>**Some error message exemples:**</u>
+### Spoolman support with MMU
 
-<p align="center"><img src="images/mmu/check_mmu_variables.png"></p>  
-<details>
-<summary><sub>🔸 Read more about this error...</sub></summary>
+HappyHare can natively handle spool changes in Spoolman. This requires some configuration in the `mmu/mmu_parameters.cfg` file:
+  1. Set `enable_spoolman:1` to enable spoolman support in HH.
+  1. Then configure the spool IDs using the `gate_spool_id:` variable.
 
-&nbsp;&nbsp;If you have this message at bootup in the console you must check your Klippain variables in `variables.cfg` !!!
+You can also use the `MMU_GATE_MAP GATE=n SPOOLID=id` macro at runtime to change the spool ID associated with a gate.
 
-    - variable_mmu_force_homing_in_start_print: True or False
-    - variable_mmu_unload_on_cancel_print: True or False
-    - variable_mmu_unload_on_end_print: True or False
-    - variable_mmu_check_gates_on_start_print: True or False
-    - variable_mmu_check_errors_on_start_print: True or False
+  > **Note**:
+  >
+  > If you set the `INITIAL_TOOL` parameter in your slicer custom start gcode, Klippain will use it to select and activate the correct spool from Spoolman for the print.
 
-</details>
 
-‎  
-‎  
-----
+## MMU error messages in Klippain
 
-<p align="center"><img src="images/mmu/HHv2emptygate.png"></p>  
-<details>
-<summary><sub>🔸 Read more about this error...</sub></summary>
+### Variable check error
 
-&nbsp;&nbsp;If the gate is "correctly" loaded and this error appears, this is generally due to the fact that the gate was previously marked as empty and its state has not been updated.
-To correct during print for example you can use the command: `MMU_GATE_MAP GATE=1 AVAILABLE=1` (adapt for your GATE number...)
+```
+MMU support is enabled in Klippain, but some variables are missing from your variables.cfg. Please update your template or refer to the corresponding documentation: https://github.com/Frix-x/klippain/blob/main/docs/mmu.md
+```
+ 
+If you have the previous message in the console when Klippain is starting, you will want to update your Klippain `variables.cfg` template file or check that the MMU variables are set correctly in it:
+  - `variable_mmu_force_homing_in_start_print`: True or False
+  - `variable_mmu_unload_on_cancel_print`: True or False
+  - `variable_mmu_unload_on_end_print`: True or False
+  - `variable_mmu_check_gates_on_start_print`: True or False
+  - `variable_mmu_check_errors_on_start_print`: True or False
 
-&nbsp;&nbsp;A good practice is to check the gates state after make changes in filaments with the command `MMU_GATE_MAP` to be sure all your setup is correct.  
-The command `MMU_CHECK_GATE` can update the MAP for all MMU gates. But you can also use for exemple `MMU_CHECK_GATE TOOLS=0,2,5` to check and update only tools 0, 2 and 5 or `MMU_CHECK_GATE GATES=0,2,5` to check and update only gates 0, 2 and 5.
+### Empty gate error
 
-</details>
+![](./images/mmu/HHv2emptygate.png)
 
-‎  
-‎  
-----
+If you encounter an error despite the gate being loaded correctly, it's often because the gate was previously marked as empty and hasn't had its status updated. To resolve this during a print, for instance, you can use the command `MMU_GATE_MAP GATE=n AVAILABLE=1`.
 
-<p align="center"><img src="images/mmu/HHv2_error_tmc.png"></p>  
-<details>
-<summary><sub>🔸 Read more about this error...</sub></summary>
-
-&nbsp;&nbsp;After installing HHv2 or upgrade it if you have this error, you must check and modify your Klippain `mcu.cfg` file to uncomment the correct line in the EXTRUDER DRIVER section:
-
-<p align="center"><img src="images/mmu/HHv2_mcu_tmc.png"></p>
-
-</details>
-
-----
+It's a best practice to verify the state of each gate after changing filaments. Use the `MMU_GATE_MAP` command to ensure your setup is accurate. Additionally, the `MMU_CHECK_GATE` command allows you to update the status for all MMU gates. If you need to update specific gates or tools, you can use commands like `MMU_CHECK_GATE TOOLS=0,2,5` to check and update tools 0, 2, and 5, or `MMU_CHECK_GATE GATES=0,2,5` for gates 0, 2, and 5, respectively.
