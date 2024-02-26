@@ -33,7 +33,7 @@ jobs:
         stale-pr-label: 'stale, reviewer-needed'
         exempt-issue-labels: 'tracking'
         exempt-pr-labels: 'tracking'
-        close-issue-message: 'This issue was closed due to inactivity for 14 days. Feel free to reopen it if you think it was an error or if there's new information or progress.'
+        close-issue-message: 'This issue was closed due to inactivity for 14 days. Feel free to reopen it if you think it was an error or if you have new information or progress to share'
         close-pr-message: 'This pull request was closed due to inactivity for 14 days. Please reopen it if you think it was an error or if you wish to continue the contribution.'
         exempt-all-milestones: true
         exempt-all-assignees: true
