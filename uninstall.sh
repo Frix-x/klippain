@@ -76,8 +76,6 @@ function delete_current_klippain {
     else
         echo "[WARNING] Klippain path not found! Nothing to delete here. Continuing..."
     fi
-
-    rm -f ${KLIPPER_PATH}/klippy/extras/gcode_shell_command.py
 }
 
 # Step 3: Find the latest backup without a .VERSION file and restore it if needed
