@@ -79,6 +79,42 @@ You can also use the `MMU_GATE_MAP GATE=n SPOOLID=id` macro at runtime to change
   >
   > If you set the `INITIAL_TOOL` parameter in your slicer custom start gcode, Klippain will use it to select and activate the correct spool from Spoolman for the print.
 
+### MMU with Happy_Hare v2.5 and highter
+
+HappyHare v2.5 and highter can natively manage all the initialisation/finalization of the MMU:  
+Some thinks for good compatibilities with klippain:  
+  1. In `mmu/base/mmu_macro_vars.cfg`  
+- You can set `variable_user_pre_initialize_extension` like this:
+```yml
+[gcode_macro _MMU_SOFTWARE_VARS]
+description: Happy Hare optional configuration for print start/end checks
+...
+variable_user_pre_initialize_extension      : "_CG28"	; Executed at start of _MMU_INITIALIZE. Commonly G28 to home
+```
+- Check the `variable_park_z_hop` you want to use with MMU macros:
+```yml
+[gcode_macro _MMU_SEQUENCE_VARS]
+description: Happy Hare sequence macro configuration variables
+variable_park_z_hop             : 1.0		; Additional Z_hop (mm) when toolchanging (works in and out of print)
+...
+
+```
+- Some MMU variables are overrides by klippain on startup to use the one define in Klippain `variables.cfg`:
+```yml
+[gcode_macro _MMU_SEQUENCE_VARS]
+description: Happy Hare sequence macro configuration variables
+...
+variable_park_xy                : 50, 50	; Coordinates of park position for toolchange variable_travel_speed           : 200		; XY travel speed in mm/s
+variable_lift_speed             : 15		; Z travel speed in mm/s
+```
+  2. An exemple of start_print macros for MMU and in SuperSlicer:  
+```
+MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! PURGE_VOLUMES=!purge_volumes!
+
+MMU_START_CHECK
+
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
+```
 
 ## MMU error messages in Klippain
 
