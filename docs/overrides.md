@@ -24,7 +24,18 @@ Additionally, if you want to add a new macro to Klippain or even replace an exis
 
 The following examples should help you add all the overrides you need to customize Klippain and make it work correctly with your printer!
 
-Let's say you want to change the motor current for the X-axis. You'll need to override the `[tmc2209 stepper_x]` section because that's where the current is defined. To do this, simply add the following to your `overrides.cfg` file:
+If something in your hardware isn't working as expected, first inspect the relevant default configuration file for your hardware. For example if your v0 display encoder is rotating in the opposite direction:
+`cd ~/printer_data/config` then `less config/hardware/displays/V0_display.cfg`, copy the relevant portion then edit to suit in your `overrides.cfg`:
+```
+[display]
+# Set the direction of the encoder wheel
+#   Standard: Right (clockwise) scrolls down or increases values. Left (counter-clockwise scrolls up or decreases values.
+#encoder_pins: ^v0_display:PA3, ^v0_display:PA4
+#   Reversed: Right (clockwise) scrolls up or decreases values. Left (counter-clockwise scrolls down or increases values.
+encoder_pins: ^v0_display:PA4, ^v0_display:PA3
+```
+
+Or let's say you want to change the motor current for the X-axis. You'll need to override the `[tmc2209 stepper_x]` section because that's where the current is defined. To do this, simply add the following to your `overrides.cfg` file:
 ```
 [tmc2209 stepper_x]
 run_current: ...

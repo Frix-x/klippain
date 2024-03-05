@@ -22,15 +22,6 @@ Here you can find a list of all the custom features availables in the macros or 
 ## Hardware
 
 This config support out of the box a lot of different machine hardware configurations.
-More info will be added in this section later...
 
-If something in your hardware isn't working as expected, inspect the relevant default configuration file for your hardware. For example if your v0 display encoder is rotating in the opposite direction:
-`cd ~/printer_data/config` then `less config/hardware/displays/V0_display.cfg`, copy the relevant portion then edit to suit in your `overrides.cfg`:
-```
-[display]
-# Set the direction of the encoder wheel
-#   Standard: Right (clockwise) scrolls down or increases values. Left (counter-clockwise scrolls up or decreases values.
-#encoder_pins: ^v0_display:PA3, ^v0_display:PA4
-#   Reversed: Right (clockwise) scrolls up or decreases values. Left (counter-clockwise scrolls down or increases values.
-encoder_pins: ^v0_display:PA4, ^v0_display:PA3
-```
+Please see [docs/overrides.md#how-to-write-an-override](How to write an override) in docs/overrides.md for more information on customizing your configuration.
+
