@@ -25,7 +25,7 @@ This config support out of the box a lot of different machine hardware configura
 More info will be added in this section later...
 
 If something in your hardware isn't working as expected, inspect the relevant default configuration file for your hardware. For example if your v0 display encoder is rotating in the opposite direction:
-`cd ~/printer_data/config` then `less config/hardware/displays/V0_display.cfg`, copy the relevant portion then add edit to suit in your `overrides.cfg`:
+`cd ~/printer_data/config` then `less config/hardware/displays/V0_display.cfg`, copy the relevant portion then edit to suit in your `overrides.cfg`:
 ```
 [display]
 # Set the direction of the encoder wheel
