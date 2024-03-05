@@ -80,7 +80,6 @@ function check_download {
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
         echo "[DOWNLOAD] Downloading Klippain repository..."
         if git -C $frixtemppath clone -b $frixbranchname https://github.com/Frix-x/klippain.git $frixreponame; then
-            chmod +x ${FRIX_CONFIG_PATH}/install.sh
             printf "[DOWNLOAD] Download complete!\n\n"
         else
             echo "[ERROR] Download of Klippain git repository failed!"
@@ -94,6 +93,11 @@ function check_download {
 
 # Step 3: Backup the old Klipper configuration
 function backup_config {
+    if [ ! -e "${USER_CONFIG_PATH}" ]; then
+        printf "[BACKUP] No previous config found, skipping backup...\n\n"
+        return 0
+    fi
+
     mkdir -p ${BACKUP_DIR}
 
     # Copy every files from the user config ("2>/dev/null || :" allow it to fail silentely in case the config dir doesn't exist)
@@ -104,7 +108,7 @@ function backup_config {
     # If Klippain is not already installed (we check for .VERSION in the backup to detect it),
     # we need to remove, wipe and clean the current user config folder...
     if [ ! -f "${BACKUP_DIR}/.VERSION" ]; then
-        rm -R ${USER_CONFIG_PATH}
+        rm -fR ${USER_CONFIG_PATH}
     fi
 
     printf "[BACKUP] Backup of current user config files done in: ${BACKUP_DIR}\n\n"
