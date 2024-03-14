@@ -4,7 +4,7 @@
 ###### BASIC SERVICE RESTART SCRIPT ######
 ##########################################
 
-# Be sure to make this script executable using SSH: type 'chmod +x ./system_info.py' when in the folder !
+# Be sure to make this script executable using SSH: type 'chmod +x ./service_restart.py' when in the folder !
 
 # List of services to be checked/restarted
 services = ['KlipperScreen']
