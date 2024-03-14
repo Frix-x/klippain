@@ -137,6 +137,8 @@ function install_config {
     # CHMOD the scripts to be sure they are all executables (Git should keep the modes on files but it's to be sure)
     chmod +x ${FRIX_CONFIG_PATH}/install.sh
     chmod +x ${FRIX_CONFIG_PATH}/uninstall.sh
+    chmod +x ${FRIX_CONFIG_PATH}/scripts/system_info.py
+    chmod +x ${FRIX_CONFIG_PATH}/scripts/service_restart.py
 
     # Symlink the gcode_shell_command.py file in the correct Klipper folder (erased to always get the last version)
     ln -fsn ${FRIX_CONFIG_PATH}/scripts/gcode_shell_command.py ${KLIPPER_PATH}/klippy/extras
