@@ -26,7 +26,7 @@ FRIX_CONFIG_PATH="${HOME}/klippain_config"
 BACKUP_PATH="${HOME}/klippain_config_backups"
 # Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
 KLIPPER_PATH="${HOME}/klipper"
-# Branch from Frix-x/klippain repo to use during install (default: main)
+# Branch from tehniemer/klippain repo to use during install (default: main)
 FRIX_BRANCH="main"
 
 
@@ -264,7 +264,7 @@ backup_config
 install_config
 restart_klipper
 
-wget -O - https://raw.githubusercontent.com/Frix-x/klippain-shaketune/main/install.sh | bash
+wget -O - https://raw.githubusercontent.com/tehniemer/klippain-shaketune/main/install.sh | bash
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
 echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/tehniemer/klippain/releases"
