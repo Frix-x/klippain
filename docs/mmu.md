@@ -29,13 +29,45 @@ Finally, enable Klippain's MMU feature by uncommenting the corresponding line in
 
 HappyHare is a software with a lot of features and you should first have a look at how it works and its concepts [here](https://github.com/moggieuk/Happy-Hare?tab=readme-ov-file#---readme-table-of-contents) and its documentation section [here](https://github.com/moggieuk/Happy-Hare/tree/main/doc). On top of this, Klippain define a couple of things a bit differently to allow more flexibility and a better integration with it.
 
+### Happy_Hare v2.5 and higher
+
+HappyHare v2.5 and higher can natively manage all the initialisation and finalization of the MMU. Here are some recommendations for a good experience with klippain:  
+
+#### Changes recommended in Happy_Hare configuration variables
+  1. You can set `variable_user_pre_initialize_extension` like this:
+```yml
+# in [gcode_macro _MMU_SOFTWARE_VARS]
+variable_user_pre_initialize_extension: "_CG28"	; Executed at start of _MMU_INITIALIZE. Commonly G28 to home
+```
+  2. Check the `variable_park_z_hop` you want to use with MMU macros:
+```yml
+# in [gcode_macro _MMU_SEQUENCE_VARS]
+variable_park_z_hop  : 1.0 ; Additional Z_hop (mm) when toolchanging (works in and out of print)
+```
+  3. Some MMU variables are overridden by klippain on startup to use the more global ones defined in klippain. So be aware that the following variables will have no effect if you have those defined in Klippain `variables.cfg`.
+```yml
+# in [gcode_macro _MMU_SEQUENCE_VARS]
+variable_park_xy       : 50, 50	; Coordinates of park position for toolchange
+variable_travel_speed  : 200	  ; XY travel speed in mm/s
+variable_lift_speed    : 15	  	; Z travel speed in mm/s
+```
+
+#### Custom start print gcode in your slicer
+Add the `MMU_START_SETUP` and `MMU_START_CHECK` as below, before your original `START_PRINT` call:
+```
+MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! PURGE_VOLUMES=!purge_volumes!
+MMU_START_CHECK
+# And followed by your standard START_PRINT call
+START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
+```
+
 ### Check gates on START_PRINT
 
 If you want to check the gates at the start of a print to avoid an error when using a gate that was previously marked as empty, it is recommended to set `variable_mmu_check_gates_on_start_print: True` in your Klippain `variables.cfg`.
 
   > **Note**:
   >
-  > Be sure to also include `TOOLS_USED=!referenced_tools!` in your slicer custom start print gcode in order to allow the [HappyHare Moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md) to work correctly and and to ensure that all tools are checked.
+  > Be sure to also include `TOOLS_USED=!referenced_tools!` in your slicer custom start print gcode in order to allow the [HappyHare Moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md) to work correctly and to ensure that all tools are checked.
 
 ### Early check errors during START_PRINT
 
@@ -79,50 +111,12 @@ You can also use the `MMU_GATE_MAP GATE=n SPOOLID=id` macro at runtime to change
   >
   > If you set the `INITIAL_TOOL` parameter in your slicer custom start gcode, Klippain will use it to select and activate the correct spool from Spoolman for the print.
 
-### MMU with Happy_Hare v2.5 and highter
-
-HappyHare v2.5 and highter can natively manage all the initialisation/finalization of the MMU:  
-Some thinks for good compatibilities with klippain:  
-  1. In `mmu/base/mmu_macro_vars.cfg`  
-- You can set `variable_user_pre_initialize_extension` like this:
-```yml
-[gcode_macro _MMU_SOFTWARE_VARS]
-description: Happy Hare optional configuration for print start/end checks
-...
-variable_user_pre_initialize_extension      : "_CG28"	; Executed at start of _MMU_INITIALIZE. Commonly G28 to home
-```
-- Check the `variable_park_z_hop` you want to use with MMU macros:
-```yml
-[gcode_macro _MMU_SEQUENCE_VARS]
-description: Happy Hare sequence macro configuration variables
-variable_park_z_hop             : 1.0		; Additional Z_hop (mm) when toolchanging (works in and out of print)
-...
-
-```
-- Some MMU variables are overrides by klippain on startup to use the one define in Klippain `variables.cfg`:
-```yml
-[gcode_macro _MMU_SEQUENCE_VARS]
-description: Happy Hare sequence macro configuration variables
-...
-variable_park_xy                : 50, 50	; Coordinates of park position for toolchange variable_travel_speed           : 200		; XY travel speed in mm/s
-variable_lift_speed             : 15		; Z travel speed in mm/s
-```
-  2. An exemple of start_print macros for MMU and in SuperSlicer:  
-```
-MMU_START_SETUP INITIAL_TOOL={initial_tool} REFERENCED_TOOLS=!referenced_tools! TOOL_COLORS=!colors! TOOL_TEMPS=!temperatures! TOOL_MATERIALS=!materials! PURGE_VOLUMES=!purge_volumes!
-
-MMU_START_CHECK
-
-START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder] + extruder_temperature_offset[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]}
-```
 
 ## MMU error messages in Klippain
 
 ### Variable check error
 
-```
-MMU support is enabled in Klippain, but some variables are missing from your variables.cfg. Please update your template or refer to the corresponding documentation: https://github.com/Frix-x/klippain/blob/main/docs/mmu.md
-```
+  > MMU support is enabled in Klippain, but some variables are missing from your variables.cfg. Please update your template or refer to the corresponding documentation: https://github.com/Frix-x/klippain/blob/main/docs/mmu.md
  
 If you have the previous message in the console when Klippain is starting, you will want to update your Klippain `variables.cfg` template file or check that the MMU variables are set correctly in it:
   - `variable_mmu_force_homing_in_start_print`: True or False
