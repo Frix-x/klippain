@@ -211,7 +211,7 @@ function install_mcu_templates {
         fi
     fi
 
-    # Finally see if the user use an MMU/ERCF board
+    # Next see if the user use an MMU/ERCF board
     read < /dev/tty -rp "[CONFIG] Do you have an MMU/ERCF MCU and want to install a template? (y/N) " install_mmu_template
     if [[ -z "$install_mmu_template" ]]; then
         install_mmu_template="n"
@@ -240,8 +240,36 @@ function install_mcu_templates {
             printf "[CONFIG] No MMU/ERCF template selected. Skip and continuing...\n\n"
         fi
     fi
-}
 
+   # Finally see if the user use an expander board
+    read < /dev/tty -rp "[CONFIG] Do you have an expander board and want to install a template? (y/N) " install_expander_template
+    if [[ -z "$install_expander_template" ]]; then
+        install_expander_template="n"
+    fi
+    install_expander_template="${install_expander_template,,}"
+
+    # Check if the user wants to install an expander MCU template
+    if [[ "$install_expander_template" =~ ^(yes|y)$ ]]; then
+        file_list=()
+        while IFS= read -r -d '' file; do
+            file_list+=("$file")
+        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/expand" -maxdepth 1 -type f -print0)
+        echo "[CONFIG] Please select your expander MCU in the following list:"
+        for i in "${!file_list[@]}"; do
+            echo "  $((i+1))) $(basename "${file_list[i]}")"
+        done
+
+        read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " expander_template
+        if [[ "$expander_template" -gt 0 ]]; then
+            # If the user selected a file, copy its content into the mcu.cfg file
+            filename=$(basename "${file_list[$((expander_template-1))]}")
+            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/expand/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
+            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
+        else
+            printf "[CONFIG] No expander template selected. Skip and continuing...\n\n"
+        fi
+    fi
+}
 
 # Step 5: restarting Klipper
 function restart_klipper {
