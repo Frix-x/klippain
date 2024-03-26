@@ -12,12 +12,13 @@ The brush size is provided to accomodate different brush sizes and is used to ca
 For example, if the variable_brush_xyz is set to (40, 250, 2) and the variable_brush_center_offset is set to 10, then the new brush center will be (50, 250, 2). 
 This will create the following brush action:
 
-|-----------------------------|---------------|--------------|
-left					    center		center + offset		right
-
-											  ^ nozzle starts here
-											  ---------------> first brush stroke direction {(brush size/2) - brush center offset}
-				 <-------------------------------------------- n brush stroke direction {(brush size/2)}
-				 --------------------------------------------> n+1 brush stroke direction {(brush size/2)}
+	|-----------------------------|---------------|--------------|
+       left			    center     center + offset     right
+	    					      ^ nozzle starts here
+					              ---------------> first brush stroke direction {(brush size/2) - brush center offset}
+		         <-------------------------------------------- n brush stroke direction {(brush size/2)}
+		         --------------------------------------------> n+1 brush stroke direction {(brush size/2)}
 
 If variable_brush_center_offset is set to -10, then the new brush center will be (30, 250, 2) and the nozzle will start to the left of the center and do the mirror of the above brush action.
+
+Therefore, this allows the nozzle brushing action to occur entirely with the brush with no wasted motion or unwanted interactions with other components.
