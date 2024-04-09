@@ -6,7 +6,7 @@
 # @version: 1.5
 
 # CHANGELOG:
-#   v1.5: - Allow multi printer. Path of 'printer_data' can be passed as a script parameter. If parameter is not present,
+#   v1.5: - Allow specific printer installation. Printer name, used to construct `~/[name]_data` path can be passed as a script parameter. If parameter is not present,
 #           `${HOME}/printer_data/` is used as default value.
 #   v1.4: added Shake&Tune install call
 #   v1.3: - added a warning on first install to be sure the user wants to install klippain and fixed a bug
