@@ -116,7 +116,7 @@ def print_system_info():
     if total_ram is None or available_ram is None:
         print("RAM information not found...")
     else:
-        print(f"Used RAM: {available_ram}/{total_ram} MB")
+        print(f"Available RAM: {available_ram}/{total_ram} MB")
 
 
 if __name__ == "__main__":
