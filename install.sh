@@ -291,7 +291,16 @@ backup_config
 install_config
 restart_klipper
 
-wget -O - https://raw.githubusercontent.com/Frix-x/klippain-shaketune/main/install.sh | bash
+read < /dev/tty -rp "Do you want to install the recommended Klippain ShakeTune functionality? (Y/n) " install_shaketune_answer
+if [[ -z "$install_shaketune_answer" ]]; then
+    install_shaketune_answer="y"    
+fi
+install_shaketune_answer="${install_shaketune_answer,,}"
+if [[ "$install_shaketune_answer" =~ ^(yes|y)$ ]]; then
+    wget -O - https://raw.githubusercontent.com/Frix-x/klippain-shaketune/main/install.sh | bash
+else
+    echo "Klippain ShakeTune functionality is not being installed."
+fi
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
 echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
