@@ -20,13 +20,13 @@
 
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
 USER_CONFIG_PATH="${HOME}/printer_data/config"
-# Where to clone Frix-x repository config files (read-only and keep untouched)
+# Where to clone klippain repository config files (read-only and keep untouched)
 FRIX_CONFIG_PATH="${HOME}/klippain_config"
 # Path used to store backups when updating (backups are automatically dated when saved inside)
 BACKUP_PATH="${HOME}/klippain_config_backups"
 # Where the Klipper folder is located (ie. the internal Klipper firmware machinery)
 KLIPPER_PATH="${HOME}/klipper"
-# Branch from Frix-x/klippain repo to use during install (default: main)
+# Branch from tehniemer/klippain repo to use during install (default: main)
 FRIX_BRANCH="main"
 
 
@@ -79,7 +79,7 @@ function check_download {
 
     if [ ! -d "${FRIX_CONFIG_PATH}" ]; then
         echo "[DOWNLOAD] Downloading Klippain repository..."
-        if git -C $frixtemppath clone -b $frixbranchname https://github.com/Frix-x/klippain.git $frixreponame; then
+        if git -C $frixtemppath clone -b $frixbranchname https://github.com/tehniemer/klippain.git $frixreponame; then
             printf "[DOWNLOAD] Download complete!\n\n"
         else
             echo "[ERROR] Download of Klippain git repository failed!"
@@ -120,7 +120,7 @@ function install_config {
     echo "[INSTALL] Installation of the last Klippain config files"
     mkdir -p ${USER_CONFIG_PATH}
 
-    # Symlink Frix-x config folders (read-only git repository) to the user's config directory
+    # Symlink klippain config folders (read-only git repository) to the user's config directory
     for dir in config macros scripts moonraker; do
         ln -fsn ${FRIX_CONFIG_PATH}/$dir ${USER_CONFIG_PATH}/$dir
     done
@@ -291,7 +291,7 @@ backup_config
 install_config
 restart_klipper
 
-wget -O - https://raw.githubusercontent.com/Frix-x/klippain-shaketune/main/install.sh | bash
+wget -O - https://raw.githubusercontent.com/tehniemer/klippain-shaketune/main/install.sh | bash
 
 echo "[POST-INSTALL] Everything is ok, Klippain installed and up to date!"
-echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/Frix-x/klippain/releases"
+echo "[POST-INSTALL] Be sure to check the breaking changes on the release page: https://github.com/tehniemer/klippain/releases"
