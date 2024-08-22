@@ -1,0 +1,40 @@
+name: Mark and Manage Stale Issues and Pull Requests
+
+on:
+  schedule:
+  - cron: '30 7 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - uses: actions/stale@v9.0.0
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 30
+        days-before-close: 14
+        stale-issue-message: >
+          📌 **This issue has been marked as stale because it has not had activity in the past 30 days.**
+          
+          To keep it open, please respond to this message or add new information. Otherwise, this will be closed in 14 days.
+          
+          Thank you for your contributions!
+        stale-pr-message: >
+          📌 **This pull request has been marked as stale because it has not had activity in the past 30 days.**
+          
+          Please update the PR or comment to keep it active. Otherwise, this will be closed in 14 days.
+          
+          We appreciate your contribution!
+        stale-issue-label: 'stale'
+        stale-pr-label: 'stale, reviewer-needed'
+        exempt-issue-labels: 'tracking'
+        exempt-pr-labels: 'tracking'
+        close-issue-message: 'This issue was closed due to inactivity for 14 days. Feel free to reopen it if you think it was an error or if you have new information or progress to share'
+        close-pr-message: 'This pull request was closed due to inactivity for 14 days. Please reopen it if you think it was an error or if you wish to continue the contribution.'
+        exempt-all-milestones: true
+        exempt-all-assignees: true
+        exempt-draft-prs: true
