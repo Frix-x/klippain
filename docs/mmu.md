@@ -65,7 +65,7 @@ If you want to print without using the MMU features, you can use the MMU bypass 
   1. Select the bypass mode with `MMU_SELECT_BYPASS`.
   1. Finally, manually insert the filament into the bowden tube up to the extruder gears and load the filament with the `MMU_LOAD` command or start the print (the `START_PRINT` sequence will automatically try to load the filament into the toolhead).
 
-At the end of the print, you can use the `MMU_EJECT` command (if `variable_mmu_unload_on_end_print` is set to False in Klippain `variables.cfg`, otherwise it is ejected automatically) to unload the filament from the extruder and then manually pull it out of the bowden tube.
+At the end of the print, you can use the `MMU_UNLOAD` command (if `variable_mmu_unload_on_end_print` is set to False in Klippain `variables.cfg`, otherwise it is unloaded automatically) to unload the filament from the extruder and then manually pull it out of the bowden tube.
 
 ### Spoolman support with MMU
 

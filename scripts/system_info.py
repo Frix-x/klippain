@@ -4,10 +4,11 @@
 ###### BASIC SYSTEM INFO SCRIPT ######
 ######################################
 # Written by Frix_x#0161 #
-# @version: 1.0
+# @version: 1.1
 
 # CHANGELOG:
 #   v1.0: first version of the script to get some system info printed in the klippy.log
+#   v1.1: fix get_ram_info, Fixed an issue where Available RAM was displayed in "Used RAM".
 
 
 # Be sure to make this script executable using SSH: type 'chmod +x ./system_info.py' when in the folder !
@@ -72,8 +73,8 @@ def get_os_kernel_info():
 def get_ram_info():
     try:
         total_ram = subprocess.check_output(['free', '-m'], universal_newlines=True).split('\n')[1].split()[1]
-        available_ram = subprocess.check_output(['free', '-m'], universal_newlines=True).split('\n')[1].split()[6]
-        return total_ram, available_ram
+        used_ram = subprocess.check_output(['free', '-m'], universal_newlines=True).split('\n')[1].split()[2]
+        return total_ram, used_ram
     except subprocess.CalledProcessError:
         return None, None
 
@@ -112,12 +113,13 @@ def print_system_info():
         print(f"System information: {get_unknown_board_info()}")
 
 
-    total_ram, available_ram = future_ram_info.result()
-    if total_ram is None or available_ram is None:
+    total_ram, used_ram = future_ram_info.result()
+    if total_ram is None or used_ram is None:
         print("RAM information not found...")
     else:
-        print(f"Used RAM: {available_ram}/{total_ram} MB")
+        print(f"Used RAM: {used_ram}/{total_ram} MB")
 
 
 if __name__ == "__main__":
     print_system_info()
+
