@@ -43,7 +43,7 @@ Klippain will work out of the box with most slicers on the market and your profi
 |[PrusaSlicer](https://github.com/prusa3d/PrusaSlicer)|`START_PRINT EXTRUDER_TEMP={first_layer_temperature[initial_extruder]} BED_TEMP=[first_layer_bed_temperature] MATERIAL=[filament_type] SIZE={first_layer_print_min[0]}_{first_layer_print_min[1]}_{first_layer_print_max[0]}_{first_layer_print_max[1]} INITIAL_TOOL={initial_extruder}`|
 
 In addition, there are a few other optional parameters that are supported in Klippain (they must be added on the same line after the first parameters):
-  - `CHAMBER=[chamber_temperature]` *(for SuperSlicer and OrcaSlicer)* or `CHAMBER=[idle_temperature]` *(for PrusaSlicer)* to set a target heatsoak temperature during the START_PRINT sequence.
+  - `CHAMBER=[chamber_temperature]` to set a target heatsoak temperature during the START_PRINT sequence.
   - `TOTAL_LAYER=[total_layer_count]` to be able to set the PRINT_STATS_INFOS in Klipper. If you use this, you will also need to add the corresponding `SET_PRINT_STATS_INFO CURRENT_LAYER={layer_num}` to your slicer custom layer change gcode.
   - `TOOLS_USED=!referenced_tools!` *(only for MMU users)* is highly recommended to check only the used tools with the HappyHare [Moonraker gcode preprocessor](https://github.com/moggieuk/Happy-Hare/blob/main/doc/gcode_preprocessing.md).
   - `CHECK_GATES=0` or `1` *(only for MMU users)* that will override the corresponding variable defined in Klippain `variables.cfg` for this specific print.
