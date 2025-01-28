@@ -4,11 +4,16 @@
 ######## AUTOMATED UNINSTALL SCRIPT #############
 #################################################
 # Written by Frix_x
-# @version: 1.0
+# @version: 1.2
 
 # CHANGELOG:
 #   v1.0: first version of the script to allow an user to revert to his old config
 #         in case the install script was called by error... ;)
+#   v1.1: Don't fail uninstall if the backup folder has been removed. ,
+#         Make uninstall work when backup has sub-directories.
+#         Contributed by magne
+#   v1.2: add options to keep user config files.
+#         Contributed by NanoMetere
 
 
 # Where the user Klipper config is located (ie. the one used by Klipper to work)
@@ -60,22 +65,35 @@ function preflight_checks {
     fi
 }
 
-# Step 2: Delete everything in ~/printer_data/config and the Klippain repository
+# Step 2: Delete everything in Klippain repository and the ~/printer_data/config
+# someone ran this script to delete Shake&Tune so we should check if Klippain is installed first.
+# Maybe someone want to keep override.cfg or etc.. make option to keep user config files.
 function delete_current_klippain {
-    if [ -d "${USER_CONFIG_PATH}" ]; then
-        rm -rf ${USER_CONFIG_PATH}
-        mkdir ${USER_CONFIG_PATH}
-        printf "[UNINSTALL] Klippain user files deleted!\n\n"
-    else
-        echo "[WARNING] User config path not found! Nothing to delete here. Continuing..."
-    fi
-
     if [ -d "${FRIX_CONFIG_PATH}" ]; then
         rm -rf ${FRIX_CONFIG_PATH}
         printf "[UNINSTALL] Klippain read-only files deleted!\n\n"
     else
-        echo "[WARNING] Klippain path not found! Nothing to delete here. Continuing..."
+        echo "[WARNING] Klippain path not found! if You're trying to unintall Shake&Tune, Press N to safely exit this script and see Klippain Shake&Tune Repository."
     fi
+    
+     read < /dev/tty -rp "[WARNING] Next step we will DELETE USER CONFIG FILES. Continue? (y/N) " uninstall_config_answer
+    if [[ -z "$uninstall_config_answer" ]]; then
+        uninstall_config_answer="n"
+    fi
+    uninstall_config_answer="${uninstall_config_answer,,}"
+    if [[ "$uninstall_config_answer" =~ ^(yes|y)$ ]]; then
+        printf "[UNINSTALL] Config file will be uninstalled...\n\n"
+        if [ -d "${USER_CONFIG_PATH}" ]; then
+            rm -rf ${USER_CONFIG_PATH}
+            mkdir ${USER_CONFIG_PATH}
+            printf "[UNINSTALL] Klippain user files deleted!\n\n"
+        else
+            echo "[WARNING] User config path not found! Nothing to delete here. Continuing..."
+        fi    
+    else
+        echo "[] Config File Uninstall Canceled. continuing..."
+    fi
+    
 }
 
 # Step 3: Find the latest backup without a .VERSION file and restore it if needed
