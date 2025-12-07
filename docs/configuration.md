@@ -50,7 +50,7 @@ In addition, there are a few other optional parameters that are supported in Kli
   - `SYNC_MMU_EXTRUDER=1` *(only for MMU users)* if you want to stay with the default `sync_to_extruder: 0` value of HappyHare (defined in `mmu/mmu_parameters.cfg`), but still want to use the sync for a specific print.
 
 
-### Custom print start Gcode
+### Custom print end Gcode
 
 All slicers will be happy with a simple:
 ```
