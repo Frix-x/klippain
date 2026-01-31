@@ -148,7 +148,7 @@ function install_config {
 
 # Helper function to ask and install the MCU templates if needed
 function install_mcu_templates {
-    local install_template file_list main_template install_toolhead_template toolhead_template install_mmu_template
+    local install_template file_list main_template install_toolhead_template toolhead_template install_scanner_template scanner_template install_mmu_template
 
     read < /dev/tty -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
     if [[ -z "$install_template" ]]; then
@@ -208,6 +208,35 @@ function install_mcu_templates {
             printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
         else
             printf "[CONFIG] No toolhead template selected. Skip and continuing...\n\n"
+        fi
+    fi
+
+    # Next see if the user use a scanner board (e.g. Cartographer)
+    read < /dev/tty -rp "[CONFIG] Do you have a scanner MCU (Cartographer3D) and want to install a template? (y/N) " install_scanner_template
+    if [[ -z "$install_scanner_template" ]]; then
+        install_scanner_template="n"
+    fi
+    install_scanner_template="${install_scanner_template,,}"
+
+    # Check if the user wants to install a scanner MCU template
+    if [[ "$install_scanner_template" =~ ^(yes|y)$ ]]; then
+        file_list=()
+        while IFS= read -r -d '' file; do
+            file_list+=("$file")
+        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/scanner" -maxdepth 1 -type f -print0)
+        echo "[CONFIG] Please select your scanner MCU in the following list:"
+        for i in "${!file_list[@]}"; do
+            echo "  $((i+1))) $(basename "${file_list[i]}")"
+        done
+
+        read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " scanner_template
+        if [[ "$scanner_template" -gt 0 ]]; then
+            # If the user selected a file, copy its content into the mcu.cfg file
+            filename=$(basename "${file_list[$((scanner_template-1))]}")
+            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/scanner/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
+            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
+        else
+            printf "[CONFIG] No scanner template selected. Skip and continuing...\n\n"
         fi
     fi
 
