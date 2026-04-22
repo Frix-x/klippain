@@ -25,16 +25,22 @@ So in order to populate your own `mcu.cfg` file, just copy one of the [user temp
 
 If you want to use a new MCU that is not yet supported in my config, you just have to define a new [board_pins] in your `mcu.cfg` file and use the same convention. Also feel free to also add a manufacturer board_pins to my config and submit a PR: I'll be happy to merge it and extend MCU support for new boards :)
 
-Here is a list of all the "Frix-x names" available to use in your own board_pins:
+Here is a list of the common/public "Frix-x names" available to use in your own board_pins:
+
+  > **Info**:
+  >
+  > Some board templates also define additional aliases for board-local helpers such as optional sensors, accelerometers, explicit TMC `tx_pin` wiring, extra breakout headers, or convenience/debug pins. These aliases are not part of the generic/public naming contract and may exist only on a specific MCU template.
 
 #### Steppers
 
-  - `[EXYZ1-3]_STEP`: drivers step pins
-  - `[EXYZ1-3]_DIR`: drivers dir pins
-  - `[EXYZ1-3]_ENABLE`: drivers enable pins
-  - `[EXYZ1-3]_TMCUART`: drivers UART pins
+  - `X_STEP`, `Y_STEP`, `Z_STEP`, `E_STEP`: main drivers step pins
+  - `X_DIR`, `Y_DIR`, `Z_DIR`, `E_DIR`: main drivers dir pins
+  - `X_ENABLE`, `Y_ENABLE`, `Z_ENABLE`, `E_ENABLE`: main drivers enable pins
+  - `X_TMCUART`, `Y_TMCUART`, `Z_TMCUART`, `E_TMCUART`: main drivers UART / CS pins
+  - `Z1_*`, `Z2_*`, `Z3_*`: additional Z drivers when the board supports them
   - `DRIVER_SPI_MOSI`, `DRIVER_SPI_MISO`, `DRIVER_SPI_SCK`: used in case of SPI drivers
   - Beside standard axis there is also the support for the `MMU_GEAR_...` and `MMU_SEL_...` drivers used in the MMU/ERCF/TRADRACK
+  - Some boards also expose extra board-specific aliases such as `E1_*` for an additional extruder driver
 
 #### Endstops & Probe
 
@@ -81,6 +87,20 @@ Here is a list of all the "Frix-x names" available to use in your own board_pins
   - `MMU_SERVO`: for the MMU servo
   - `MMU_GATE_SENSOR`: for the MMU/TRADRACK gate sensor
   - `MMU_PRE_GATE_[0-11]`: for the MMU/ERCT sensors
+
+#### Accelerometers
+
+  - `ADXL_CS`, `ADXL_SCLK`, `ADXL_MOSI`, `ADXL_MISO`: generic ADXL software-SPI aliases used by the shared accelerometer configs
+
+#### Board-specific helper aliases
+
+The following names are intentionally not generic. They can exist in some templates as convenience aliases, but should not be assumed to exist on every board:
+
+  - Extra sensors or status pins such as `RUNOUT_SENSOR1`, `POWER_DETECT`, `NH_MCU_TEMP`, `STATUS_BOARD`, `EXTRUDER_SENSOR`
+  - Explicit TMC TX aliases such as `TX_PIN` or `E_TXPIN`
+  - Optional MMU-specific helpers such as `MMU_GEAR_ENDSTOP`
+  - Peripheral or breakout header aliases such as `SPI_*`, `I2C_*`, `SWD_*`, or `EXTRA_PINS*`
+  - Some boards can also expose board-local accelerometer aliases that differ from the generic `ADXL_*` names
 
 ## External references
 
