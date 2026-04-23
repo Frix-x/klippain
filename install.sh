@@ -146,9 +146,36 @@ function install_config {
 }
 
 
+# Helper function to convert a template filename to a friendlier display name
+function format_template_display_name {
+    local display_name
+    display_name="${1%.cfg}"
+    display_name="${display_name//_/ }"
+    display_name="${display_name//-/ }"
+    display_name="$(printf '%s\n' "${display_name}" | tr -s ' ' | sed -E 's/(^| )V([0-9])/\1v\2/g')"
+
+    if [[ "${display_name}" == "MY OWN CUSTOM TEMPLATE" ]]; then
+        display_name="My Own Custom Template"
+    fi
+
+    printf '%s\n' "${display_name}"
+}
+
+# Helper function to build sorted "display name <tab> file path" entries for a template directory
+function build_template_menu_entries {
+    local template_dir="$1"
+    local file display_name
+
+    while IFS= read -r -d '' file; do
+        display_name="$(format_template_display_name "$(basename "${file}")")"
+        printf '%s\t%s\n' "${display_name}" "${file}"
+    done < <(find "${template_dir}" -maxdepth 1 -type f -name '*.cfg' -print0) | sort -f
+}
+
 # Helper function to ask and install the MCU templates if needed
 function install_mcu_templates {
-    local install_template file_list main_template install_toolhead_template toolhead_template install_mmu_template
+    local install_template file_list display_list main_template install_toolhead_template toolhead_template install_mmu_template install_expander_template expander_template
+    local display_name selected_file selected_name
 
     read < /dev/tty -rp "[CONFIG] Would you like to select and install MCU wiring templates files? (Y/n) " install_template
     if [[ -z "$install_template" ]]; then
@@ -164,20 +191,23 @@ function install_mcu_templates {
 
     # If "yes" was selected, let's continue the install by listing the main MCU template
     file_list=()
-    while IFS= read -r -d '' file; do
-        file_list+=("$file")
-    done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main" -maxdepth 1 -type f -print0)
+    display_list=()
+    while IFS=$'\t' read -r display_name selected_file; do
+        file_list+=("${selected_file}")
+        display_list+=("${display_name}")
+    done < <(build_template_menu_entries "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main")
     echo "[CONFIG] Please select your main MCU in the following list:"
     for i in "${!file_list[@]}"; do
-        echo "  $((i+1))) $(basename "${file_list[i]}")"
+        echo "  $((i+1))) ${display_list[i]}"
     done
 
     read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " main_template
     if [[ "$main_template" -gt 0 ]]; then
         # If the user selected a file, copy its content into the mcu.cfg file
-        filename=$(basename "${file_list[$((main_template-1))]}")
-        cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/main/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-        printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
+        selected_file="${file_list[$((main_template-1))]}"
+        selected_name="${display_list[$((main_template-1))]}"
+        cat "${selected_file}" >> ${USER_CONFIG_PATH}/mcu.cfg
+        printf "[CONFIG] Template '%s' inserted into your mcu.cfg user file\n\n" "${selected_name}"
     else
         printf "[CONFIG] No template selected. Skip and continuing...\n\n"
     fi
@@ -192,20 +222,23 @@ function install_mcu_templates {
     # Check if the user wants to install a toolhead MCU template
     if [[ "$install_toolhead_template" =~ ^(yes|y)$ ]]; then
         file_list=()
-        while IFS= read -r -d '' file; do
-            file_list+=("$file")
-        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead" -maxdepth 1 -type f -print0)
+        display_list=()
+        while IFS=$'\t' read -r display_name selected_file; do
+            file_list+=("${selected_file}")
+            display_list+=("${display_name}")
+        done < <(build_template_menu_entries "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead")
         echo "[CONFIG] Please select your toolhead MCU in the following list:"
         for i in "${!file_list[@]}"; do
-            echo "  $((i+1))) $(basename "${file_list[i]}")"
+            echo "  $((i+1))) ${display_list[i]}"
         done
 
         read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " toolhead_template
         if [[ "$toolhead_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
-            filename=$(basename "${file_list[$((toolhead_template-1))]}")
-            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/toolhead/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
+            selected_file="${file_list[$((toolhead_template-1))]}"
+            selected_name="${display_list[$((toolhead_template-1))]}"
+            cat "${selected_file}" >> ${USER_CONFIG_PATH}/mcu.cfg
+            printf "[CONFIG] Template '%s' inserted into your mcu.cfg user file\n\n" "${selected_name}"
         else
             printf "[CONFIG] No toolhead template selected. Skip and continuing...\n\n"
         fi
@@ -221,27 +254,30 @@ function install_mcu_templates {
     # Check if the user wants to install an MMU/ERCF MCU template
     if [[ "$install_mmu_template" =~ ^(yes|y)$ ]]; then
         file_list=()
-        while IFS= read -r -d '' file; do
-            file_list+=("$file")
-        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/mmu" -maxdepth 1 -type f -print0)
+        display_list=()
+        while IFS=$'\t' read -r display_name selected_file; do
+            file_list+=("${selected_file}")
+            display_list+=("${display_name}")
+        done < <(build_template_menu_entries "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/mmu")
         echo "[CONFIG] Please select your MMU/ERCF MCU in the following list:"
         for i in "${!file_list[@]}"; do
-            echo "  $((i+1))) $(basename "${file_list[i]}")"
+            echo "  $((i+1))) ${display_list[i]}"
         done
 
         read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " mmu_template
         if [[ "$mmu_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
-            filename=$(basename "${file_list[$((mmu_template-1))]}")
-            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/mmu/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-            echo "[CONFIG] Template '$filename' inserted into your mcu.cfg user file"
+            selected_file="${file_list[$((mmu_template-1))]}"
+            selected_name="${display_list[$((mmu_template-1))]}"
+            cat "${selected_file}" >> ${USER_CONFIG_PATH}/mcu.cfg
+            printf "[CONFIG] Template '%s' inserted into your mcu.cfg user file\n" "${selected_name}"
             printf "[CONFIG] Note: keep in mind that you have to install the HappyHare backend manually to use an MMU/ERCF with Klippain. See the Klippain documentation for more information!\n\n"
         else
             printf "[CONFIG] No MMU/ERCF template selected. Skip and continuing...\n\n"
         fi
     fi
 
-   # Finally see if the user use an expander board
+    # Finally see if the user use an expander board
     read < /dev/tty -rp "[CONFIG] Do you have an expander board and want to install a template? (y/N) " install_expander_template
     if [[ -z "$install_expander_template" ]]; then
         install_expander_template="n"
@@ -251,20 +287,23 @@ function install_mcu_templates {
     # Check if the user wants to install an expander MCU template
     if [[ "$install_expander_template" =~ ^(yes|y)$ ]]; then
         file_list=()
-        while IFS= read -r -d '' file; do
-            file_list+=("$file")
-        done < <(find "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/expand" -maxdepth 1 -type f -print0)
+        display_list=()
+        while IFS=$'\t' read -r display_name selected_file; do
+            file_list+=("${selected_file}")
+            display_list+=("${display_name}")
+        done < <(build_template_menu_entries "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/expander")
         echo "[CONFIG] Please select your expander MCU in the following list:"
         for i in "${!file_list[@]}"; do
-            echo "  $((i+1))) $(basename "${file_list[i]}")"
+            echo "  $((i+1))) ${display_list[i]}"
         done
 
         read < /dev/tty -p "[CONFIG] Template to install (or 0 to skip): " expander_template
         if [[ "$expander_template" -gt 0 ]]; then
             # If the user selected a file, copy its content into the mcu.cfg file
-            filename=$(basename "${file_list[$((expander_template-1))]}")
-            cat "${FRIX_CONFIG_PATH}/user_templates/mcu_defaults/expand/$filename" >> ${USER_CONFIG_PATH}/mcu.cfg
-            printf "[CONFIG] Template '$filename' inserted into your mcu.cfg user file\n\n"
+            selected_file="${file_list[$((expander_template-1))]}"
+            selected_name="${display_list[$((expander_template-1))]}"
+            cat "${selected_file}" >> ${USER_CONFIG_PATH}/mcu.cfg
+            printf "[CONFIG] Template '%s' inserted into your mcu.cfg user file\n\n" "${selected_name}"
         else
             printf "[CONFIG] No expander template selected. Skip and continuing...\n\n"
         fi
