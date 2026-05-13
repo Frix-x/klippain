@@ -8,11 +8,13 @@ Use one probe include:
 
 ```ini
 [include config/hardware/probes/voron_tap.cfg]
+[include config/hardware/probes/revo_pz.cfg]
 [include config/hardware/probes/beacon_contact.cfg]
 [include config/hardware/probes/cartographer_touch.cfg]
 ```
 
 `voron_tap.cfg` keeps the legacy internal identifier `probe_type_enabled: "vorontap"` for compatibility.
+`revo_pz.cfg` is a standard Klipper `[probe]` profile with `probe_contact_z_home_mode: "standard_g28"`, plus Revo PZ-specific per-probe current handling in `[probe] activate_gcode` and `deactivate_gcode`.
 
 ## Shared Contact Variables
 

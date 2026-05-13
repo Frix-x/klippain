@@ -15,7 +15,7 @@ HOOK_MACROS = {
     "contact_activate": "_PROBE_HOOK_CONTACT_ACTIVATE",
     "contact_deactivate": "_PROBE_HOOK_CONTACT_DEACTIVATE",
 }
-BANNED_NAMES = {"cartographer_survey.cfg"}
+BANNED_NAMES = {"cartographer_survey.cfg", "PZ Probe.cfg"}
 REQUIRED_REPO_PATHS = {
     "README.md": "file",
     "config/machine.cfg": "file",
