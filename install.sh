@@ -93,6 +93,8 @@ function check_download {
 
 # Step 3: Backup the old Klipper configuration
 function backup_config {
+    local link link_target
+
     if [ ! -e "${USER_CONFIG_PATH}" ]; then
         printf "[BACKUP] No previous config found, skipping backup...\n\n"
         return 0
@@ -102,8 +104,15 @@ function backup_config {
 
     # Copy every files from the user config ("2>/dev/null || :" allow it to fail silentely in case the config dir doesn't exist)
     cp -fa ${USER_CONFIG_PATH}/. ${BACKUP_DIR} 2>/dev/null || :
-    # Then delete the symlinks inside the backup folder as they are not needed here...
-    find ${BACKUP_DIR} -type l -exec rm -f {} \;
+    # Then delete Klippain-managed symlinks while preserving external config symlinks like mainsail.cfg
+    while IFS= read -r -d '' link; do
+        link_target="$(readlink -f "${link}" 2>/dev/null || true)"
+        case "${link_target}" in
+            "${FRIX_CONFIG_PATH}"|"${FRIX_CONFIG_PATH}"/*)
+                rm -f "${link}"
+                ;;
+        esac
+    done < <(find "${BACKUP_DIR}" -type l -print0)
 
     # If Klippain is not already installed (we check for .VERSION in the backup to detect it),
     # we need to remove, wipe and clean the current user config folder...
