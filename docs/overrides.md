@@ -59,3 +59,57 @@ You can even redefine a full macro! For example if the default Klippain prime li
 gcode:
   # Put your custom prime line G-code here...
 ```
+
+## Custom START_PRINT and END_PRINT actions
+
+`START_PRINT` and `END_PRINT` are built from ordered action lists in `_USER_VARIABLES`.
+Override these lists in `overrides.cfg` to reorder actions, remove actions,
+duplicate actions, or insert your own custom actions.
+
+Built-in `START_PRINT` actions are `bed_soak`, `extruder_preheating`,
+`chamber_soak`, `extruder_heating`, `tilt_calib`, `z_offset`, `beacon_calib`,
+`bedmesh`, `purge`, `clean`, and `primeline`.
+
+Built-in `END_PRINT` actions are `retract_filament`, `turn_off_heaters`,
+`turn_off_fans`, `turn_off_motors`, and `reset_limits`.
+
+Example:
+```
+[gcode_macro _USER_VARIABLES]
+variable_startprint_actions: "bed_soak", "extruder_preheating", "my_start_action", "bedmesh", "primeline"
+variable_endprint_actions: "retract_filament", "my_end_action", "turn_off_heaters", "turn_off_fans"
+gcode:
+```
+
+The preferred way to add a custom action is to add its name to the list and define
+its matching macro in `overrides.cfg`. Use lowercase letters, numbers, and
+underscores for custom action names. Klippain uppercases the action name and calls
+`_START_PRINT_ACTION_<NAME>` or `_END_PRINT_ACTION_<NAME>`.
+
+For a custom `START_PRINT` action named `my_start_action`:
+```
+[gcode_macro _START_PRINT_ACTION_MY_START_ACTION]
+gcode:
+  # Put your custom START_PRINT G-code here...
+```
+
+For a custom `END_PRINT` action named `my_end_action`:
+```
+[gcode_macro _END_PRINT_ACTION_MY_END_ACTION]
+gcode:
+  # Put your custom END_PRINT G-code here...
+```
+
+Custom action macros receive the original `START_PRINT` or `END_PRINT` parameters,
+so values such as `BED_TEMP`, `EXTRUDER_TEMP`, `MATERIAL`, or `FILTER_TIME` are
+available through `params` when they were passed to the parent macro.
+
+If a custom action is listed but its matching macro does not exist, Klippain raises
+an error instead of silently skipping it.
+
+`START_PRINT` also keeps the older `custom1` through `custom9` action slots for
+compatibility. If `variable_startprint_actions` contains `custom1`, Klippain calls
+`_MODULE_CUSTOM1`; if it contains `custom9`, Klippain calls `_MODULE_CUSTOM9`, and
+so on. These slots only exist for `START_PRINT`. For new custom actions, prefer the
+named `_START_PRINT_ACTION_<NAME>` pattern because it is clearer and does not limit
+you to nine custom actions.
