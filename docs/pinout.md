@@ -80,7 +80,8 @@ Here is a list of the common/public "Frix-x names" available to use in your own 
 
 #### Other I/Os
 
-  - `RUNOUT_SENSOR`: filament runout sensor (currently only one motion or switch sensor is supported in Klippain)
+  - `RUNOUT_SENSOR`: filament runout sensor, or the switch output of a combined runout/motion sensor
+  - `MOTION_SENSOR`: motion output of a combined filament sensor used to detect possible clogs or tangles
   - `MMU_ENCODER`: filament motion sensor used in the MMU/ERCF carriage
   - `TOOLHEAD_SENSOR`: optional toolhead filament sensor used for the MMU/ERCF/TRADRACK
   - `SERVO_PIN`: for a mechanical and movable probe dock or brush (such as the ones that are commonly found on the Voron V0 mods)
