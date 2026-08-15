@@ -115,3 +115,4 @@ For more information on the boards and pinouts, please see directly the manufact
   - [BTT SKR Mini E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
   - [Fysetc S6](https://github.com/FYSETC/FYSETC-S6)
   - [Fly Gemini v3](https://mellow-3d.github.io/fly-gemini_v3_pins.html)
+  - [Fly Pro X10](https://mellow.klipper.cn/en/docs/category/fly-pro-x10/)
