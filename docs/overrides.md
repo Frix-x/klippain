@@ -114,3 +114,26 @@ compatibility. If `variable_startprint_actions` contains `custom1`, Klippain cal
 so on. These slots only exist for `START_PRINT`. For new custom actions, prefer the
 named `_START_PRINT_ACTION_<NAME>` pattern because it is clearer and does not limit
 you to nine custom actions.
+
+## Button actions
+
+After installing the matching button hardware template, enable the button
+software profile in `printer.cfg`:
+
+```
+[include config/software/buttons.cfg]
+```
+
+Each button calls the shared `_HOTKEY_BUTTON` dispatcher. Define only the actions
+you want to use in `overrides.cfg` with the matching `_HOTKEY_BUTTON_B1` through
+`_HOTKEY_BUTTON_B12` name:
+
+```
+[gcode_macro _HOTKEY_BUTTON_B1]
+gcode:
+  G28 Z
+```
+
+An undefined button hook reports that the button is not mapped and safely does
+nothing. When a hook is defined, the corresponding button LEDs use the existing
+shared `busy` and `standby` colors around the action.
