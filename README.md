@@ -11,6 +11,15 @@ Klippain is regularly updated with new features and merged PRs from users. You c
 Fun fact: "pain" \pɛ̃\ is the French word for bread, so there's no pain in this pain—only joy! Thanks to the French channel "honhonhonbaguette-FR" on the Voron Discord for the joke and name suggestion!
 
 
+## What makes this fork different
+
+This repository is a fork of [Frix-x/klippain](https://github.com/Frix-x/klippain) that tracks upstream and adds the following on top of it:
+
+- **Auxiliary part cooling fan** (`AUX_FAN`): an independent secondary part cooling fan, natively controllable through `START_AUX_FAN`/`STOP_AUX_FAN` macros and compatible with OrcaSlicer's "Auxiliary Part Cooling Fan" via an `M106 P2`/`M107 P2` bridge. Optional `AUX_FAN_TACHO` tachometer monitoring provides the same safety checks as the base fans. It is integrated in the start/end/cancel print sequence for chamber venting (when too hot), heatsoak heat spreading, and a post-print run-down to cool the bed faster. Enabling it requires uncommenting `[include config/hardware/fans/aux_fan.cfg]` (or the `aux_fan_tachometer.cfg` variant) in `user_templates/printer.cfg`, wiring the `AUX_FAN`/`AUX_FAN_TACHO` pins in `mcu.cfg`, and tuning the `variable_aux_fan_*` settings in `user_templates/variables.cfg`.
+
+- **Automated config validation**: a CI pipeline (`tests/lint_jinja.py` and `tests/config_check.py`, run by `.github/workflows/validate.yml`) syntax-checks every templated macro block with Klipper's own Jinja2 environment, then assembles a full reference configuration and loads it with a real Klippy (standard and aux-fan-tachometer variants) to catch errors before they reach your printer. Run it locally with `python3 tests/lint_jinja.py` and `python3 tests/config_check.py standard <path-to-klipper>`.
+
+
 ## Features
 
 Klippain is designed for versatility. By selecting and enabling the desired hardware and software options, it can be used on a wide range of machines.
@@ -23,6 +32,10 @@ Custom features available out of the box include a full featured set of standard
 To install Klippain, first ensure you have already Klipper, Moonraker, and a WebUI installed on your printer. If not, you can use [KIAUH](https://github.com/th33xitus/kiauh).
 
 Then, run the installation script using the following command over SSH. This script will backup your old configuration, download this GitHub repository to your RaspberryPi home directory, and set up Klippain in `~/printer_data/config`. You will also be prompted to select and install MCU board_pins templates. This is recommended for faster `mcu.cfg` setup, but you can do it manually later if you prefer.
+
+  > **Note for users of this fork**:
+  >
+  > The command below installs **upstream** Klippain (the `Frix-x/klippain` repository). If you want to use the fork-specific additions described in [What makes this fork different](#what-makes-this-fork-different), install from this fork instead, e.g. via the `Code` button on GitHub or by cloning `git@github.com:ndotzbgt/klippain.git` into `~/printer_data/config`.
 
 ```bash
 wget -O - https://raw.githubusercontent.com/Frix-x/klippain/main/install.sh | bash

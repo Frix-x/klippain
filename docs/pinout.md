@@ -66,6 +66,8 @@ Here is a list of the common/public "Frix-x names" available to use in your own 
   - `E_FAN_TACHO`: tachometer of the hotend fan, optional and used to validate that the fan is spinning as a safety feature
   - `PART_FAN`: part fan used during the print. This pin should be a PWM capable pin to allow modulation of the fan speed
   - `PART_FAN_TACHO`: tachometer of the part fan, optional and used to validate that the fan is spinning as a safety feature
+  - `AUX_FAN`: secondary part cooling fan, independently controlled (e.g. OrcaSlicer "Auxiliary Part Cooling Fan"). This pin should be a PWM capable pin to allow modulation of the fan speed
+  - `AUX_FAN_TACHO`: tachometer of the auxiliary fan, optional and used to validate that the fan is spinning as a safety feature
   - `EXHAUST_FAN`: for an exhaust filter (such as the Voron basic exhaust). This pin should be a PWM capable pin to allow modulation of the fan speed
   - `FILTER_FAN`: for a filter (such as a Nevermore filter). This pin should be a PWM capable pin to allow modulation of the fan speed
   - `CONTROLLER_FAN`: to cool down your MCUs or electronic bay
