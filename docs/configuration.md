@@ -61,4 +61,5 @@ END_PRINT
 
 In addition, there are a few other optional parameters that are supported in Klippain (they must be added on the same line after the first parameters):
   - `FILTER_TIME=600` that will override the corresponding variable defined in Klippain `variables.cfg` for this specific print. Time is expressed in seconds.
+  - `EXHAUST_TIME=600` that will override the corresponding variable defined in Klippain `variables.cfg` for this specific print. Time is expressed in seconds.
   - `MMU_UNLOAD_AT_END=0` or `1` *(only for MMU users)* that will override the corresponding variable defined in Klippain `variables.cfg`.
